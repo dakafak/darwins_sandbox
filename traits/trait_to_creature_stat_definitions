@@ -7,9 +7,9 @@
       }
     },
     {
-      "color": "tan",
+      "size": "medium",
       "stats": {
-      "color":"#D2B48C"
+      "size":"2"
       }
     }
   ]
