@@ -1,0 +1,16 @@
+{
+  "traitToStatDefinitions":[
+    {
+      "color": "tan",
+      "stats": {
+        "color": "#D2B48C"
+      }
+    },
+    {
+      "color": "tan",
+      "stats": {
+      "color":"#D2B48C"
+      }
+    }
+  ]
+}
