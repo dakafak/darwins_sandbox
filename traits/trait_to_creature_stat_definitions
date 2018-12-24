@@ -1,16 +1,17 @@
+//TODO load this into a map <Sting, info> so stats can be retrieved by the paired
 {
   "traitToStatDefinitions":[
-    {
-      "color": "tan",
-      "stats": {
-        "color": "#D2B48C"
-      }
-    },
-    {
-      "size": "medium",
-      "stats": {
-      "size":"2"
-      }
-    }
+	{
+        "color": "tan",
+        "stats": {
+            "color": "#D2B48C"
+        }
+	},
+	{
+		"size": "medium",
+		"stats": {
+			"size": "2"
+		}
+	}
   ]
 }

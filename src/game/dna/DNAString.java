@@ -1,23 +1,23 @@
 package game.dna;
 
-import game.dna.traits.Trait;
+import game.dna.traits.TraitPair;
 
 public class DNAString {
 
-	Trait[] traitString;
+	TraitPair[] traitString;
 
-	public Trait[] getTraitString() {
+	public TraitPair[] getTraitString() {
 		return traitString;
 	}
 
-	public void setTraitString(Trait[] traitString) {
+	public void setTraitString(TraitPair[] traitString) {
 		this.traitString = traitString;
 	}
 
 	@Override
 	public String toString(){
 		StringBuilder traitStringBuilder = new StringBuilder();
-		for(Trait trait : traitString){
+		for(TraitPair trait : traitString){
 			traitStringBuilder.append(trait.toString());
 		}
 

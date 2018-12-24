@@ -1,31 +1,44 @@
 package game.dna.traits;
 
 public class Trait {
-	char[] characterRepresentation;
 
-	public Trait(String traitRepresentation){
-		characterRepresentation = traitRepresentation.toCharArray();
-	}
+    char traitCharacter;
+    String traitType;
+    String traitDefinition;
 
-	public Trait(char[] characterRepresentation){
-		this.characterRepresentation = characterRepresentation;
-	}
+    public Trait(char traitCharacter, String traitDefinition, String traitType){
+        this.traitCharacter = traitCharacter;
+        this.traitDefinition = traitDefinition;
+        this.traitType = traitType;
+    }
 
-	public char[] getCharacterRepresentation() {
-		return characterRepresentation;
-	}
+    public char getTraitCharacter() {
+        return traitCharacter;
+    }
 
-	public void setCharacterRepresentation(char[] characterRepresentation) {
-		this.characterRepresentation = characterRepresentation;
-	}
+    public void setTraitCharacter(char traitCharacter) {
+        this.traitCharacter = traitCharacter;
+    }
 
-	@Override
-	public String toString(){
-		StringBuilder traitStringBuilder = new StringBuilder();
-		for(char characters : characterRepresentation){
-			traitStringBuilder.append(characters);
-		}
+    public String getTraitType() {
+        return traitType;
+    }
 
-		return traitStringBuilder.toString();
-	}
+    public void setTraitType(String traitType) {
+        this.traitType = traitType;
+    }
+
+    public String getTraitDefinition() {
+        return traitDefinition;
+    }
+
+    public void setTraitDefinition(String traitDefinition) {
+        this.traitDefinition = traitDefinition;
+    }
+
+    @Override
+    public String toString(){
+        return traitType + "(" + traitCharacter + ")";
+    }
+
 }
