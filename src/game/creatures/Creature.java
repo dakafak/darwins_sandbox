@@ -45,6 +45,6 @@ public class Creature {
 
     @Override
     public String toString(){
-        return creatureDNAString.toString();
+        return sexOfCreature.getSexString() + "(" + creatureDNAString.toString() + ")";
     }
 }

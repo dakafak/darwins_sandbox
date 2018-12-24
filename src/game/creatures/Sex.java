@@ -1,5 +1,19 @@
 package game.creatures;
 
 public enum Sex {
-    MALE, FEMALE, ASEXUAL
+    MALE("Male"), FEMALE("Female"), ASEXUAL("Asexual");
+
+    private String sexString;
+
+    Sex(String sex){
+        this.sexString = sex;
+    }
+
+    public String getSexString() {
+        return sexString;
+    }
+
+    public void setSexString(String sexString) {
+        this.sexString = sexString;
+    }
 }

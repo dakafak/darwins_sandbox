@@ -10,6 +10,8 @@ import game.dna.traits.TraitPair;
 import java.util.ArrayList;
 import java.util.List;
 
+import static game.creatures.Sex.*;
+
 public class World {
 
 	Tile[][] tileMap;
@@ -44,28 +46,32 @@ public class World {
 	}
 
 	public void tryMatingCreatures(){
-		int parent1ID = (int)Math.floor(Math.random()*creatures.size());
-		Creature parent1ToCombine = creatures.get(parent1ID);
+		List<Creature> malesToMate = new ArrayList<>();
+		List<Creature> femalesToMate = new ArrayList<>();
+		List<Creature> asexualToMate = new ArrayList<>();
 
-		//TODO change to check creatures mating type trait when that's added
-		//TODO
+		//TODO eventually this should be changed to just check around the creature
+		//TODO add a timer for creatures so they only mate so often, not every cycle
+		for(Creature creature : creatures){
+			if(creature.getSexOfCreature().equals(MALE)){
+				malesToMate.add(creature);
+			} else if(creature.getSexOfCreature().equals(FEMALE)){
+				femalesToMate.add(creature);
+			} else if(creature.getSexOfCreature().equals(ASEXUAL)){
+				asexualToMate.add(creature);
+			}
+		}
 
-		if(creatures.size() == 1) {
-			DNAString childString = DNABuilder.getAsexualDNAString(parent1ToCombine.getCreatureDNAString());
+		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
+		for(int i = 0; i < numberOfMatings; i++){
+			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
 			Creature newCreature = new Creature();
 			newCreature.setCreatureDNAString(childString);
-			creatures.add(newCreature);
-		} else {
-			List<Creature> malesToMate = new ArrayList<>();
-			List<Creature> femalesToMate = new ArrayList<>();
-
-			int parent2ID = parent1ID > 0 ? parent1ID - 1 : parent1ID + 1;
-			Creature parent2ToCombine = creatures.get(parent2ID);
-			DNAString childString = DNABuilder.getChildDNAString(parent1ToCombine.getCreatureDNAString(), parent2ToCombine.getCreatureDNAString());
-			Creature newCreature = new Creature();
-			newCreature.setCreatureDNAString(childString);
+			newCreature.setSexOfCreature(Math.random() > .5 ? MALE : FEMALE);
 			creatures.add(newCreature);
 		}
+
+		//TODO add loop for reproducing the asexual group -- after adding the asexual reproduce function
 	}
 
 }
