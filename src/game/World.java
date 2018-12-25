@@ -18,12 +18,14 @@ public class World {
 	List<Creature> creatures;
 
 	TraitLoader traitLoader;
+	WorldStatisticsTool worldStatisticsTool;
 
 	public World(int width, int height){
 		tileMap = new Tile[width][height];//TODO may be more beneficial to create it with height first
 		creatures = new ArrayList();
 
 		traitLoader = new TraitLoader();
+		worldStatisticsTool = new WorldStatisticsTool();
 	}
 
 	public void addRandomCreature(Sex sexOfCreature){
@@ -74,4 +76,21 @@ public class World {
 		//TODO add loop for reproducing the asexual group -- after adding the asexual reproduce function
 	}
 
+	public List<Creature> getCreatures() {
+		return creatures;
+	}
+
+	public void setCreatures(List<Creature> creatures) {
+		this.creatures = creatures;
+	}
+
+	public void printWorldStatistics(){
+		System.out.println("---- World Statistics ----");
+		System.out.println(//TODO Change this to string builder
+					worldStatisticsTool.getNumberOfCreatures(this) + "(" +
+					worldStatisticsTool.getNumberMaleCreatures(this) + "M " +
+					worldStatisticsTool.getNumberFemaleCreatures(this) + "F " +
+					worldStatisticsTool.getNumberAsexualCreatures(this) + "A" + ")"
+				);
+	}
 }

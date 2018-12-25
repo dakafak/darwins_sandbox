@@ -8,7 +8,7 @@ public class Creature {
 
     DNAString creatureDNAString;
     Map<Enum, Object> creatureStats;
-    Sex sexOfCreature;
+    Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
 
     public Creature(){
     }
@@ -45,6 +45,6 @@ public class Creature {
 
     @Override
     public String toString(){
-        return sexOfCreature.getSexString() + "(" + creatureDNAString.toString() + ")";
+        return sexOfCreature.getSexString().substring(0, 1) + "(" + creatureDNAString.toString() + ")";
     }
 }

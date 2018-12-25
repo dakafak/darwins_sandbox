@@ -11,9 +11,11 @@ public class SimulatorRunner {
 
 		System.out.println(newWorld.creatures);
 
-		for(int i = 0; i < 5; i++){
+		for(int i = 0; i < 20; i++){
+			System.out.println("[" + i + "]");
 			newWorld.tryMatingCreatures();
-			System.out.println(newWorld.creatures);
+			newWorld.printWorldStatistics();
+//			System.out.println(newWorld.creatures);
 		}
 	}
 
