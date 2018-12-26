@@ -2,8 +2,10 @@ package game;
 
 import game.creatures.Creature;
 import game.creatures.Sex;
+import game.dna.traits.Trait;
+import game.dna.traits.TraitPair;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WorldStatisticsTool {
@@ -37,6 +39,35 @@ public class WorldStatisticsTool {
         List<Creature> asexualCreatures;
         asexualCreatures = creatureCacheList.stream().filter(creature -> creature.getSexOfCreature().equals(Sex.ASEXUAL)).collect(Collectors.toList());
         return asexualCreatures.size();
+    }
+
+    public Map<String, Integer> getTraitPopularityMap(World world, boolean onlyAddVisibleTraits){
+        checkCache(world);
+        Map<String, Integer> traitsToUsageCount = new HashMap<>();
+        for(Creature creature : world.getCreatures()){
+            Set<Trait> traitsForCreature = new HashSet<>();
+
+            for(TraitPair traitPair : creature.getCreatureDNAString().getTraitString()){
+                if(onlyAddVisibleTraits) {
+                    traitsForCreature.add(traitPair.getTraits()[0]);
+                } else {
+                    for(Trait trait : traitPair.getTraits()){
+                        traitsForCreature.add(trait);
+                    }
+                }
+            }
+
+            for(Trait trait : traitsForCreature){
+                String keyForTrait = trait.getTraitType() + ":" + trait.getTraitDefinition();
+                if (traitsToUsageCount.containsKey(keyForTrait)) {
+                    traitsToUsageCount.put(keyForTrait, traitsToUsageCount.get(keyForTrait) + 1);
+                } else {
+                    traitsToUsageCount.put(keyForTrait, 1);
+                }
+            }
+        }
+
+        return traitsToUsageCount;
     }
 
     private void checkCache(World world){

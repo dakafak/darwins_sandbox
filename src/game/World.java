@@ -9,6 +9,7 @@ import game.dna.traits.TraitPair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static game.creatures.Sex.*;
 
@@ -84,13 +85,40 @@ public class World {
 		this.creatures = creatures;
 	}
 
-	public void printWorldStatistics(){
+	public void printWorldStatistics(StatisticsSave statisticsSave){
 		System.out.println("---- World Statistics ----");
-		System.out.println(//TODO Change this to string builder
-					worldStatisticsTool.getNumberOfCreatures(this) + "(" +
-					worldStatisticsTool.getNumberMaleCreatures(this) + "M " +
-					worldStatisticsTool.getNumberFemaleCreatures(this) + "F " +
-					worldStatisticsTool.getNumberAsexualCreatures(this) + "A" + ")"
-				);
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(statisticsSave.getTotalNumberOfCreatures());
+		stringBuilder.append("(");
+		stringBuilder.append(statisticsSave.getNumberMaleCreatures());
+		stringBuilder.append("M ");
+		stringBuilder.append(statisticsSave.getNumberFemaleCreatures());
+		stringBuilder.append("F ");
+		stringBuilder.append(statisticsSave.getNumberAsexualCreatures());
+		stringBuilder.append("A");
+		stringBuilder.append(")");
+		stringBuilder.append(System.lineSeparator());
+
+		Map<String, Integer> traitPopularityMap = statisticsSave.getTraitPopularityMap();
+		for(String traitKey : traitPopularityMap.keySet()){
+			stringBuilder.append(traitKey);
+			stringBuilder.append("\t");
+			stringBuilder.append(traitPopularityMap.get(traitKey));
+			stringBuilder.append(System.lineSeparator());
+		}
+
+		System.out.println(stringBuilder.toString());
+	}
+
+	public StatisticsSave getStatisticsSaveForCurrentWorld(){
+		StatisticsSave save = new StatisticsSave();
+
+		save.setTotalNumberOfCreatures(worldStatisticsTool.getNumberOfCreatures(this));
+		save.setNumberMaleCreatures(worldStatisticsTool.getNumberMaleCreatures(this));
+		save.setNumberFemaleCreatures(worldStatisticsTool.getNumberFemaleCreatures(this));
+		save.setNumberAsexualCreatures(worldStatisticsTool.getNumberAsexualCreatures(this));
+		save.setTraitPopularityMap(worldStatisticsTool.getTraitPopularityMap(this, true));
+
+		return save;
 	}
 }

@@ -2,9 +2,20 @@ package game;
 
 import game.creatures.Sex;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimulatorRunner {
 
+	List<StatisticsSave> allSaves;
+
 	public static void main(String[] args){
+		SimulatorRunner runner = new SimulatorRunner();
+	}
+
+	public SimulatorRunner(){
+		allSaves = new ArrayList<>();
+
 		World newWorld = new World(50, 50);
 		newWorld.addRandomCreature(Sex.MALE);
 		newWorld.addRandomCreature(Sex.FEMALE);
@@ -14,8 +25,10 @@ public class SimulatorRunner {
 		for(int i = 0; i < 20; i++){
 			System.out.println("[" + i + "]");
 			newWorld.tryMatingCreatures();
-			newWorld.printWorldStatistics();
-//			System.out.println(newWorld.creatures);
+
+			StatisticsSave statisticsSave = newWorld.getStatisticsSaveForCurrentWorld();
+			allSaves.add(statisticsSave);
+			newWorld.printWorldStatistics(statisticsSave);
 		}
 	}
 

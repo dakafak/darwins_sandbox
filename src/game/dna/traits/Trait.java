@@ -1,5 +1,7 @@
 package game.dna.traits;
 
+import java.util.Objects;
+
 public class Trait {
 
     char traitCharacter;
@@ -41,4 +43,18 @@ public class Trait {
         return traitType + "(" + traitCharacter + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trait trait = (Trait) o;
+        return traitCharacter == trait.traitCharacter &&
+                Objects.equals(traitType, trait.traitType) &&
+                Objects.equals(traitDefinition, trait.traitDefinition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(traitCharacter, traitType, traitDefinition);
+    }
 }
