@@ -1,0 +1,5 @@
+{ "trait_diet":[
+ { "c":"carnivore" }
+ { "h":"herbivore" }
+ { "o":"omnivore" }
+]}
