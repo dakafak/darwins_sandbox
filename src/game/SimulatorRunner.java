@@ -29,6 +29,7 @@ public class SimulatorRunner {
 			StatisticsSave statisticsSave = newWorld.getStatisticsSaveForCurrentWorld();
 			allSaves.add(statisticsSave);
 			newWorld.printWorldStatistics(statisticsSave);
+			System.out.println(newWorld.getCreatures());
 		}
 	}
 
