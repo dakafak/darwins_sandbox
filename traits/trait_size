@@ -1,6 +1,4 @@
-{"trait_size":[
-  { "s":"small" }
-  { "m":"medium }
-  { "L":"large" }
-  { "h":"huge" }
- ]}
+s=small
+m=medium
+L=large
+h=huge

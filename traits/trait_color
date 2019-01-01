@@ -1,7 +1,5 @@
-{"trait_color":[
-  { "t":"tan" }
-  { "b":"brown" }
-  { "K":"black" }
-  { "G":"green" }
-  { "B":"blue" }
-]}
+t=tan
+b=brown
+K=black
+G=green
+B=blue
