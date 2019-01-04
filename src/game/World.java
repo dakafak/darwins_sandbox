@@ -1,17 +1,20 @@
 package game;
 
-import game.creatures.Creature;
-import game.creatures.Sex;
+import game.world.creatures.Creature;
+import game.world.creatures.Sex;
 import game.dna.DNABuilder;
 import game.dna.DNAString;
 import game.dna.traits.TraitLoader;
 import game.dna.traits.TraitPair;
+import game.world.units.Location;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static game.creatures.Sex.*;
+import static game.world.creatures.Sex.*;
 
 public class World {
 
@@ -41,14 +44,14 @@ public class World {
 	}
 
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
-		Creature newCreature = new Creature();
+		Creature newCreature = new Creature(Math.random()*40 - 20, Math.random()*40 - 20);
 		newCreature.setCreatureDNAString(dnaString);
 		newCreature.setSexOfCreature(sexOfCreature);
 		//TODO should also set stats
 		creatures.add(newCreature);
 	}
 
-	public void tryMatingCreatures(){
+	public void tryMatingCreatures(){//TODO remove this - temporary method for testing - or modify for range
 		List<Creature> malesToMate = new ArrayList<>();
 		List<Creature> femalesToMate = new ArrayList<>();
 		List<Creature> asexualToMate = new ArrayList<>();
@@ -68,7 +71,7 @@ public class World {
 		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
 		for(int i = 0; i < numberOfMatings; i++){
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
-			Creature newCreature = new Creature();
+			Creature newCreature = new Creature(Math.random()*40 - 20, Math.random()*40 - 20);
 			newCreature.setCreatureDNAString(childString);
 			newCreature.setSexOfCreature(Math.random() > .5 ? MALE : FEMALE);
 			creatures.add(newCreature);
@@ -121,4 +124,5 @@ public class World {
 
 		return save;
 	}
+
 }

@@ -1,7 +1,7 @@
 package game;
 
-import game.creatures.Creature;
-import game.creatures.Sex;
+import game.world.creatures.Creature;
+import game.world.creatures.Sex;
 import game.dna.traits.Trait;
 import game.dna.traits.TraitPair;
 

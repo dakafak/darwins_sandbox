@@ -1,7 +1,10 @@
 package game;
 
-import game.creatures.Sex;
+import game.graphics.SimulatorWindow;
+import game.world.creatures.Sex;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,9 @@ public class SimulatorRunner {
 			allSaves.add(statisticsSave);
 			newWorld.printWorldStatistics(statisticsSave);
 		}
+
+		SimulatorWindow simulatorWindow = new SimulatorWindow("World Simulator");
+		simulatorWindow.setWorld(newWorld);
 	}
 
 }
