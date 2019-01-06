@@ -44,7 +44,7 @@ public class World {
 	}
 
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
-		Creature newCreature = new Creature(Math.random()*40 - 20, Math.random()*40 - 20);
+		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5);
 		newCreature.setCreatureDNAString(dnaString);
 		newCreature.setSexOfCreature(sexOfCreature);
 		//TODO should also set stats
@@ -71,7 +71,7 @@ public class World {
 		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
 		for(int i = 0; i < numberOfMatings; i++){
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
-			Creature newCreature = new Creature(Math.random()*40 - 20, Math.random()*40 - 20);
+			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10);
 			newCreature.setCreatureDNAString(childString);
 			newCreature.setSexOfCreature(Math.random() > .5 ? MALE : FEMALE);
 			creatures.add(newCreature);
@@ -123,6 +123,18 @@ public class World {
 		save.setTraitPopularityMap(worldStatisticsTool.getTraitPopularityMap(this, true));
 
 		return save;
+	}
+
+	public void tellCreaturesToWander(long currentTime){
+		for(Creature creature : creatures){
+			creature.wander(currentTime);
+		}
+	}
+
+	public void moveCreatures(double deltaUpdate){
+		for(Creature creature : creatures){
+			creature.move(deltaUpdate);
+		}
 	}
 
 }

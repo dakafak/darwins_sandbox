@@ -1,4 +1,3 @@
-//TODO load this into a map <Sting, info> so stats can be retrieved by the paired
 {
   "traitToStatDefinitions":[
 	{

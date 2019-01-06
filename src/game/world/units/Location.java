@@ -33,9 +33,10 @@ public class Location {
 			cachedStandardScale = standardScale;
 
 			cachedScaledLocation = new ScaledLocation();
-			cachedScaledLocation.setX(x * cachedStandardScale);
-			cachedScaledLocation.setY(y * cachedStandardScale);
 		}
+
+		cachedScaledLocation.setX(x * cachedStandardScale);
+		cachedScaledLocation.setY(y * cachedStandardScale);
 
 		return cachedScaledLocation;
 	}
