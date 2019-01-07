@@ -21,21 +21,9 @@ public class TraitLoader {
 
     private void loadTraitTypesAndOrder(){
         allTraitTypesInOrder = new ArrayList<>();
-
-        File traitOrderFile = new File(traitFolderLocation + "/trait_string_order");
-        if(traitOrderFile.exists()){
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(traitOrderFile));
-                String readLine = "";
-                while((readLine = br.readLine()) != null){
-                    allTraitTypesInOrder.add(readLine);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        for(TraitType traitType : TraitType.values()){
+        	allTraitTypesInOrder.add(traitType.getValue());
+		}
     }
 
     private void loadTraits(){

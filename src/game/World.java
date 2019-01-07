@@ -24,6 +24,8 @@ public class World {
 	TraitLoader traitLoader;
 	WorldStatisticsTool worldStatisticsTool;
 
+	private final int maxCreatureViewDistance = 10;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
+
 	//TODO for creature location checking
 	//	sort all creatures into a hashmap for their tile coordinates -> the creature
 	//	can grab a creature and check tiles around to grab creatures nearby to test collisions and sight
@@ -48,10 +50,7 @@ public class World {
 	}
 
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
-		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5);
-		newCreature.setCreatureDNAString(dnaString);
-		newCreature.setSexOfCreature(sexOfCreature);
-		//TODO should also set stats
+		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature);
 		creatures.add(newCreature);
 	}
 
@@ -75,9 +74,7 @@ public class World {
 		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
 		for(int i = 0; i < numberOfMatings; i++){
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
-			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10);
-			newCreature.setCreatureDNAString(childString);
-			newCreature.setSexOfCreature(Math.random() > .5 ? MALE : FEMALE);
+			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE);
 			creatures.add(newCreature);
 		}
 

@@ -1,6 +1,7 @@
 package game.graphics;
 
 import game.World;
+import game.dna.traits.TraitType;
 import game.world.creatures.Creature;
 import game.world.units.ScaledLocation;
 import game.world.units.ScaledSize;
@@ -69,7 +70,18 @@ public class Camera {
 
 	private void drawCreatures(Graphics2D g2d, World world){
 		for(Creature creature : world.getCreatures()){
-			g2d.setColor(Color.RED);
+			if(creature.getTraitTypeToTraitMap().get(TraitType.color).getTraitDefinition().equals("tan")){
+				g2d.setColor(new Color(32, 84, 84));
+			} else if(creature.getTraitTypeToTraitMap().get(TraitType.color).getTraitDefinition().equals("brown")){
+				g2d.setColor(new Color(16, 42, 42));
+			} else if(creature.getTraitTypeToTraitMap().get(TraitType.color).getTraitDefinition().equals("black")){
+				g2d.setColor(Color.BLACK);
+			} else if(creature.getTraitTypeToTraitMap().get(TraitType.color).getTraitDefinition().equals("green")){
+				g2d.setColor(new Color(0, 100, 0));
+			} else if(creature.getTraitTypeToTraitMap().get(TraitType.color).getTraitDefinition().equals("blue")){
+				g2d.setColor(Color.BLUE);
+			}
+
 			ScaledLocation scaledLocation = creature.getLocation().getScaledLocation(cachedStandardSize);
 			ScaledSize scaledSize = creature.getSize().getScaledSize(cachedStandardSize);
 			g2d.fillOval(scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()), scaledSize.getWidth(), scaledSize.getHeight());
