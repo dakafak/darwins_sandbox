@@ -64,10 +64,11 @@ public class SimulatorWindow extends JFrame {
 
 	int updateCap = 7;
 	int baseDeltaTime = 10;
-	double deltaUpdate = 1.0f;
+	double deltaUpdate = 1;
 
 	public void start() {
 		continueRunning = true;
+		lastUpdateTime = System.currentTimeMillis();
 
 		while(continueRunning){
 			updateTimeDifference = System.currentTimeMillis() - lastUpdateTime;
@@ -80,7 +81,6 @@ public class SimulatorWindow extends JFrame {
 				world.tellCreaturesToWander(runningTime);
 				world.moveCreatures(deltaUpdate);
 				refresh();
-				System.out.println(world.getCreatures().size());
 
 				lastUpdateTime = System.currentTimeMillis();
 			}

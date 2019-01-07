@@ -24,6 +24,10 @@ public class World {
 	TraitLoader traitLoader;
 	WorldStatisticsTool worldStatisticsTool;
 
+	//TODO for creature location checking
+	//	sort all creatures into a hashmap for their tile coordinates -> the creature
+	//	can grab a creature and check tiles around to grab creatures nearby to test collisions and sight
+
 	public World(int width, int height){
 		tileMap = new Tile[width][height];//TODO may be more beneficial to create it with height first
 		creatures = new ArrayList();

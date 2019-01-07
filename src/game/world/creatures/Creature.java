@@ -75,7 +75,7 @@ public class Creature {
 
 	@Override
     public String toString(){
-        return sexOfCreature.getSexString().substring(0, 1) + "(" + creatureDNAString.toString() + ")";
+        return sexOfCreature.getSexString().substring(0, 1) + "{" + location.getX() + ", " + location.getY() + "}" + "(" + creatureDNAString.toString() + ")";
     }
 
     long nextDirectionChange;
