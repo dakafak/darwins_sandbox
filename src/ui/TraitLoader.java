@@ -1,10 +1,7 @@
 package ui;
 
 import game.dna.stats.StatType;
-import game.dna.traits.CreatureStatModifier;
-import game.dna.traits.Trait;
-import game.dna.traits.TraitNameAndValuePair;
-import game.dna.traits.TraitPair;
+import game.dna.traits.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,8 +13,8 @@ public class TraitLoader {
     private String statsFolderLocation = "";
     private String traitFolderLocation = "traits";
 
-    Map<String, List<Trait>> traitTypeToAllTraits;
-    List<String> allTraitTypesInOrder;
+    Map<TraitType, List<Trait>> traitTypeToAllTraits;
+    List<TraitType> allTraitTypesInOrder;
 
     public TraitLoader(){
         loadTraitTypesAndOrder();
@@ -55,13 +52,22 @@ public class TraitLoader {
 							String traitName = creatureStatDefinition.getString("trait");
 							String traitValue = creatureStatDefinition.getString("traitValue");
 
-							Map<StatType, String> statModifiers = new HashMap<>();
+							Map<StatType, Object> statModifiers = new HashMap<>();
 							JSONArray statChanges = creatureStatDefinition.getJSONArray("stats");
 							for(int j = 0; j < statChanges.length(); j++){
 								JSONObject statModifier = statChanges.getJSONObject(j);
 								String statName = statModifier.getString("statName");
-								String statModifierValue = statModifier.getString("statModifier");
-								statModifiers.put(StatType.valueOf(statName), statModifierValue);
+								String statModifierStringValue = statModifier.getString("statModifier");
+
+								StatType statType = StatType.valueOf(statName);
+								Object statModifierValue;
+								if(statType.getClassType().equals(Double.class)){
+									statModifierValue = Double.parseDouble(statModifierStringValue);
+								} else {
+									statModifierValue = statModifierStringValue;
+								}
+
+								statModifiers.put(statType, statModifierValue);
 							}
 							newStatModifier.setStatModifiers(statModifiers);
 
@@ -84,19 +90,8 @@ public class TraitLoader {
     private void loadTraitTypesAndOrder(){
     	allTraitTypesInOrder = new ArrayList<>();
 
-		File traitOrderFile = new File(traitFolderLocation + "/trait_string_order");
-		if(traitOrderFile.exists()){
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(traitOrderFile));
-				String readLine = "";
-				while((readLine = br.readLine()) != null){
-					allTraitTypesInOrder.add(readLine);
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		for(TraitType traitType : TraitType.values()){
+			allTraitTypesInOrder.add(traitType);
 		}
     }
 
@@ -124,7 +119,7 @@ public class TraitLoader {
             File[] files = traitFolder.listFiles();
             for(File file : files){
                 if(file.getName().startsWith("trait_")){
-                    String traitType = file.getName().substring(6);
+                    String traitTypeString = file.getName().substring(6);
 
                     try {
                         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -132,7 +127,7 @@ public class TraitLoader {
                         while((readLine = br.readLine()) != null){
                             String[] traitProperites = readLine.split("=");
                             if(traitProperites.length == 2){
-                                Trait newTrait = new Trait(traitProperites[0].charAt(0), traitProperites[1], traitType);
+                                Trait newTrait = new Trait(traitProperites[0].charAt(0), traitProperites[1], TraitType.valueOf(traitTypeString));
                                 allTraits.add(newTrait);
                             }
                         }
@@ -153,14 +148,14 @@ public class TraitLoader {
         return null;
     }
 
-    public TraitPair getRandomTraitPair(String traitType){
+    public TraitPair getRandomTraitPair(TraitType traitType){
         Trait trait1 = getRandomTrait(traitType);
         Trait trait2 = getRandomTrait(traitType);
         TraitPair newPair = new TraitPair(trait1, trait2);
         return newPair;
     }
 
-    private Trait getRandomTrait(String traitType){
+    private Trait getRandomTrait(TraitType traitType){
         if(traitTypeToAllTraits.containsKey(traitType)) {
             List<Trait> traitsForType = traitTypeToAllTraits.get(traitType);
             int randomTraitIndex = (int)Math.floor(Math.random()*traitsForType.size());
@@ -171,7 +166,7 @@ public class TraitLoader {
         return null;
     }
 
-    public List<String> getTraitTypesInOrder(){
+    public List<TraitType> getTraitTypesInOrder(){
         return allTraitTypesInOrder;
     }
 

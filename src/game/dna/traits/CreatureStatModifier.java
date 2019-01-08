@@ -6,13 +6,13 @@ import java.util.Map;
 
 public class CreatureStatModifier {
 
-	Map<StatType, String> statModifiers;
+	Map<StatType, Object> statModifiers;
 
-	public Map<StatType, String> getStatModifiers() {
+	public Map<StatType, Object> getStatModifiers() {
 		return statModifiers;
 	}
 
-	public void setStatModifiers(Map<StatType, String> statModifiers) {
+	public void setStatModifiers(Map<StatType, Object> statModifiers) {
 		this.statModifiers = statModifiers;
 	}
 }

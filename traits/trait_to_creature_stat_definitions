@@ -10,15 +10,75 @@
           }
         ]
 	},
-	{
-        "trait":"size",
-		"traitValue": "medium",
-		"stats": [
-          {
-            "statName":"size",
-            "statModifier":"2"
-          }
-        ]
-	}
+    {
+      "trait":"speed",
+      "traitValue": "slow",
+      "stats": [
+        {
+          "statName":"speed",
+          "statModifier":".005"
+        }
+      ]
+    },
+    {
+      "trait":"speed",
+      "traitValue": "medium",
+      "stats": [
+        {
+          "statName":"speed",
+          "statModifier":".01"
+        }
+      ]
+    },
+    {
+      "trait":"speed",
+      "traitValue": "fast",
+      "stats": [
+        {
+          "statName":"speed",
+          "statModifier":".02"
+        }
+      ]
+    },
+    {
+      "trait":"size",
+      "traitValue": "small",
+      "stats": [
+        {
+          "statName":"size",
+          "statModifier":".4"
+        }
+      ]
+    },
+    {
+      "trait":"size",
+      "traitValue": "medium",
+      "stats": [
+        {
+          "statName":"size",
+          "statModifier":".5"
+        }
+      ]
+    },
+    {
+      "trait":"size",
+      "traitValue": "large",
+      "stats": [
+        {
+          "statName":"size",
+          "statModifier":".6"
+        }
+      ]
+    },
+    {
+      "trait":"size",
+      "traitValue": "huge",
+      "stats": [
+        {
+          "statName":"size",
+          "statModifier":".7"
+        }
+      ]
+    }
   ]
 }

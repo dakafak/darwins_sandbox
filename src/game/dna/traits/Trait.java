@@ -5,10 +5,10 @@ import java.util.Objects;
 public class Trait {
 
     char traitCharacter;
-    String traitType;
+	TraitType traitType;
     String traitDefinition;
 
-    public Trait(char traitCharacter, String traitDefinition, String traitType){
+    public Trait(char traitCharacter, String traitDefinition, TraitType traitType){
         this.traitCharacter = traitCharacter;
         this.traitDefinition = traitDefinition;
         this.traitType = traitType;
@@ -22,11 +22,11 @@ public class Trait {
         this.traitCharacter = traitCharacter;
     }
 
-    public String getTraitType() {
+    public TraitType getTraitType() {
         return traitType;
     }
 
-    public void setTraitType(String traitType) {
+    public void setTraitType(TraitType traitType) {
         this.traitType = traitType;
     }
 
