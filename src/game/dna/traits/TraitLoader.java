@@ -1,10 +1,10 @@
 package game.dna.traits;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TraitLoader {
 
@@ -17,12 +17,81 @@ public class TraitLoader {
     public TraitLoader(){
         loadTraitTypesAndOrder();
         loadTraits();
+        loadTraitToCreatureStatDefinitions();
     }
 
+    Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers;
+    private void loadTraitToCreatureStatDefinitions(){
+		File traitOrderFile = new File(traitFolderLocation + "/trait_to_creature_stat_definitions");
+		if(traitOrderFile.exists()){
+			StringBuilder jsonToParse = new StringBuilder();
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(traitOrderFile));
+				String readLine = "";
+				while((readLine = br.readLine()) != null){
+					jsonToParse.append(readLine);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			JSONObject objectFromJsonString = new JSONObject(jsonToParse.toString());
+			if(objectFromJsonString != null) {
+				JSONArray traitToCreatureStatDefinitions = objectFromJsonString.getJSONArray("traitToStatDefinitions");
+				if(traitToCreatureStatDefinitions != null){
+					traitNameAndValueToCreatureStatModifiers = new HashMap<>();
+
+					for(int i = 0; i < traitToCreatureStatDefinitions.length(); i++){
+						JSONObject creatureStatDefinition = traitToCreatureStatDefinitions.getJSONObject(i);
+						if(creatureStatDefinition != null){
+							CreatureStatModifier newStatModifier = new CreatureStatModifier();
+							String traitName = creatureStatDefinition.getString("trait");
+							String traitValue = creatureStatDefinition.getString("traitValue");
+
+							Map<String, String> statModifiers = new HashMap<>();
+							JSONArray statChanges = creatureStatDefinition.getJSONArray("stats");
+							for(int j = 0; j < statChanges.length(); j++){
+								JSONObject statModifier = statChanges.getJSONObject(j);
+								String statName = statModifier.getString("statName");
+								String statModifierValue = statModifier.getString("statModifier");
+								statModifiers.put(statName, statModifierValue);
+							}
+							newStatModifier.setStatModifiers(statModifiers);
+
+							String traitNameAndValueKey = traitName + "_" + traitValue;
+							if(traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValueKey)) {
+								List<CreatureStatModifier> creatureStatList = traitNameAndValueToCreatureStatModifiers.get(traitNameAndValueKey);
+								creatureStatList.add(newStatModifier);
+							} else {
+								List<CreatureStatModifier> newCreatureStatList = new ArrayList<>();
+								newCreatureStatList.add(newStatModifier);
+								traitNameAndValueToCreatureStatModifiers.put(traitNameAndValueKey, newCreatureStatList);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
     private void loadTraitTypesAndOrder(){
-        allTraitTypesInOrder = new ArrayList<>();
-        for(TraitType traitType : TraitType.values()){
-        	allTraitTypesInOrder.add(traitType.getValue());
+    	allTraitTypesInOrder = new ArrayList<>();
+
+		File traitOrderFile = new File(traitFolderLocation + "/trait_string_order");
+		if(traitOrderFile.exists()){
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(traitOrderFile));
+				String readLine = "";
+				while((readLine = br.readLine()) != null){
+					allTraitTypesInOrder.add(readLine);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
     }
 

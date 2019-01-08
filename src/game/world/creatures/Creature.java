@@ -31,28 +31,30 @@ public class Creature {
 		this.location = new Location(x, y);
 
 		//TODO setup trait hashmap
-		traitTypeToTraitMap = new HashMap<>();
-		for(TraitPair traitPair : creatureDNAString.getTraitString()){
-			traitTypeToTraitMap.put(TraitType.valueOf(traitPair.getTraits()[0].getTraitType()), traitPair.getTraits()[0]);
-		}
+//		traitTypeToTraitMap = new HashMap<>();
+//		for(TraitPair traitPair : creatureDNAString.getTraitString()){
+//			traitTypeToTraitMap.put(TraitType.valueOf(traitPair.getTraits()[0].getTraitType()), traitPair.getTraits()[0]);
+//		}
 
-		if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("slow")){
-			speed = .005;
-		} else if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("medium")){
-			speed = .01;
-		} else if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("fast")){
-			speed = .02;
-		}
-
-		if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("small")){
-			size = new Size(.4, .4);
-		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("medium")){
-			size = new Size(.5, .5);
-		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("large")){
-			size = new Size(.6, .6);
-		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("huge")){
-			size = new Size(.7, .7);
-		}
+//		if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("slow")){
+//			speed = .005;
+//		} else if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("medium")){
+//			speed = .01;
+//		} else if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("fast")){
+//			speed = .02;
+//		}
+//
+//		if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("small")){
+//			size = new Size(.4, .4);
+//		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("medium")){
+//			size = new Size(.5, .5);
+//		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("large")){
+//			size = new Size(.6, .6);
+//		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("huge")){
+//			size = new Size(.7, .7);
+//		}
+		speed = .01;
+		size = new Size(.5, .5);
     }
 
     public DNAString getCreatureDNAString() {
