@@ -1,15 +1,16 @@
 package game.world.creatures;
 
 import game.dna.DNAString;
-import game.dna.traits.Trait;
-import game.dna.traits.TraitPair;
-import game.dna.traits.TraitType;
+import game.dna.stats.StatType;
+import game.dna.traits.*;
 import game.world.units.Direction;
 import game.world.units.Location;
 import game.world.units.Size;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static game.world.units.Direction.*;
 import static game.world.units.Direction.MOVING_SOUTH;
@@ -17,24 +18,40 @@ import static game.world.units.Direction.MOVING_SOUTH;
 public class Creature {
 
     DNAString creatureDNAString;
-    Map<Enum, Object> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
+    Map<StatType, String> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
     Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
 	Location location;
 	Size size;//TODO  some of these traits can be moved into creature stats once that loader is added
 	Direction direction = NORTH;
 	double speed;
-	Map<TraitType, Trait> traitTypeToTraitMap;
+//	Map<TraitType, String> traitTypeToTraitValueMap;
 
-    public Creature(double x, double y, DNAString creatureDNAString, Sex sexOfCreature){
+    public Creature(double x, double y, DNAString creatureDNAString, Sex sexOfCreature, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers){
     	this.creatureDNAString = creatureDNAString;
     	this.sexOfCreature = sexOfCreature;
 		this.location = new Location(x, y);
 
-		//TODO setup trait hashmap
-//		traitTypeToTraitMap = new HashMap<>();
-//		for(TraitPair traitPair : creatureDNAString.getTraitString()){
-//			traitTypeToTraitMap.put(TraitType.valueOf(traitPair.getTraits()[0].getTraitType()), traitPair.getTraits()[0]);
-//		}
+		creatureStats = new HashMap<>();
+
+		for(TraitPair traitPair : creatureDNAString.getTraitString()){
+			TraitNameAndValuePair traitNameAndValuePair = new TraitNameAndValuePair(traitPair.getTraits()[0]);//Get displayed trait for creature
+//			traitTypeToTraitValueMap.put(TraitType.valueOf(traitPair.getTraits()[0].getTraitType()), traitPair.getTraits()[0].getTraitDefinition());
+			if(traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValuePair.getKey())) {
+				for (CreatureStatModifier statModifierForTrait : traitNameAndValueToCreatureStatModifiers.get(traitNameAndValuePair.getKey())) {
+					Map<StatType, String> statModifiers = statModifierForTrait.getStatModifiers();
+					for(StatType statType : statModifiers.keySet()){
+						if(creatureStats.containsKey(statType)){
+							creatureStats.put(statType, statModifiers.get(statType));
+							//TODO should determine if the stat type is a numeric or string value. If the value is numeric, it should add to the value instead of replacing it
+							//TODO 			or determine if the class matches the stat type class, for example Size.class, Integer.class, etc.
+						} else {
+							creatureStats.put(statType, statModifiers.get(statType));
+						}
+					}
+				}
+			}
+		}
+
 
 //		if(traitTypeToTraitMap.get(TraitType.speed).getTraitDefinition().equals("slow")){
 //			speed = .005;
@@ -53,6 +70,7 @@ public class Creature {
 //		} else if(traitTypeToTraitMap.get(TraitType.size).getTraitDefinition().equals("huge")){
 //			size = new Size(.7, .7);
 //		}
+		//TODO once creature stats are created, use creature stats to determine these stat values
 		speed = .01;
 		size = new Size(.5, .5);
     }
@@ -71,14 +89,6 @@ public class Creature {
 
 	public Size getSize() {
 		return size;
-	}
-
-	public Map<TraitType, Trait> getTraitTypeToTraitMap() {
-		return traitTypeToTraitMap;
-	}
-
-	public void setTraitTypeToTraitMap(Map<TraitType, Trait> traitTypeToTraitMap) {
-		this.traitTypeToTraitMap = traitTypeToTraitMap;
 	}
 
 	@Override

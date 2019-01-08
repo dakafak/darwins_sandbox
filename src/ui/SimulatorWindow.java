@@ -1,4 +1,4 @@
-package game.graphics;
+package ui;
 
 import game.World;
 

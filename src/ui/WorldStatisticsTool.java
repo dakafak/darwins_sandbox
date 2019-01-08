@@ -1,5 +1,6 @@
-package game;
+package ui;
 
+import game.World;
 import game.world.creatures.Creature;
 import game.world.creatures.Sex;
 import game.dna.traits.Trait;

@@ -1,5 +1,10 @@
-package game.dna.traits;
+package ui;
 
+import game.dna.stats.StatType;
+import game.dna.traits.CreatureStatModifier;
+import game.dna.traits.Trait;
+import game.dna.traits.TraitNameAndValuePair;
+import game.dna.traits.TraitPair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,24 +55,24 @@ public class TraitLoader {
 							String traitName = creatureStatDefinition.getString("trait");
 							String traitValue = creatureStatDefinition.getString("traitValue");
 
-							Map<String, String> statModifiers = new HashMap<>();
+							Map<StatType, String> statModifiers = new HashMap<>();
 							JSONArray statChanges = creatureStatDefinition.getJSONArray("stats");
 							for(int j = 0; j < statChanges.length(); j++){
 								JSONObject statModifier = statChanges.getJSONObject(j);
 								String statName = statModifier.getString("statName");
 								String statModifierValue = statModifier.getString("statModifier");
-								statModifiers.put(statName, statModifierValue);
+								statModifiers.put(StatType.valueOf(statName), statModifierValue);
 							}
 							newStatModifier.setStatModifiers(statModifiers);
 
-							String traitNameAndValueKey = traitName + "_" + traitValue;
-							if(traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValueKey)) {
-								List<CreatureStatModifier> creatureStatList = traitNameAndValueToCreatureStatModifiers.get(traitNameAndValueKey);
+							TraitNameAndValuePair traitNameAndValuePair = new TraitNameAndValuePair(traitName, traitValue);
+							if(traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValuePair.getKey())) {
+								List<CreatureStatModifier> creatureStatList = traitNameAndValueToCreatureStatModifiers.get(traitNameAndValuePair.getKey());
 								creatureStatList.add(newStatModifier);
 							} else {
 								List<CreatureStatModifier> newCreatureStatList = new ArrayList<>();
 								newCreatureStatList.add(newStatModifier);
-								traitNameAndValueToCreatureStatModifiers.put(traitNameAndValueKey, newCreatureStatList);
+								traitNameAndValueToCreatureStatModifiers.put(traitNameAndValuePair.getKey(), newCreatureStatList);
 							}
 						}
 					}
@@ -170,4 +175,11 @@ public class TraitLoader {
         return allTraitTypesInOrder;
     }
 
+	public Map<String, List<CreatureStatModifier>> getTraitNameAndValueToCreatureStatModifiers() {
+		return traitNameAndValueToCreatureStatModifiers;
+	}
+
+	public void setTraitNameAndValueToCreatureStatModifiers(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers) {
+		this.traitNameAndValueToCreatureStatModifiers = traitNameAndValueToCreatureStatModifiers;
+	}
 }

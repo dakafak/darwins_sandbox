@@ -1,4 +1,4 @@
-package game;
+package ui;
 
 import java.util.Map;
 

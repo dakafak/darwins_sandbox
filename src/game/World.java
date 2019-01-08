@@ -4,12 +4,11 @@ import game.world.creatures.Creature;
 import game.world.creatures.Sex;
 import game.dna.DNABuilder;
 import game.dna.DNAString;
-import game.dna.traits.TraitLoader;
+import ui.StatisticsSave;
+import ui.TraitLoader;
 import game.dna.traits.TraitPair;
-import game.world.units.Location;
+import ui.WorldStatisticsTool;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class World {
 	}
 
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
-		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature);
+		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers());
 		creatures.add(newCreature);
 	}
 
@@ -74,7 +73,7 @@ public class World {
 		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
 		for(int i = 0; i < numberOfMatings; i++){
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
-			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE);
+			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers());
 			creatures.add(newCreature);
 		}
 

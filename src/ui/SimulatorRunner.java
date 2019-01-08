@@ -1,10 +1,8 @@
-package game;
+package ui;
 
-import game.graphics.SimulatorWindow;
+import game.World;
 import game.world.creatures.Sex;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class SimulatorRunner {
 		newWorld.addRandomCreature(Sex.MALE);
 		newWorld.addRandomCreature(Sex.FEMALE);
 
-		System.out.println(newWorld.creatures);
+		System.out.println(newWorld.getCreatures());
 
 //		for(int i = 0; i < 20; i++){
 //			System.out.println("[" + i + "]");

@@ -1,16 +1,18 @@
 package game.dna.traits;
 
+import game.dna.stats.StatType;
+
 import java.util.Map;
 
 public class CreatureStatModifier {
 
-	Map<String, String> statModifiers;
+	Map<StatType, String> statModifiers;
 
-	public Map<String, String> getStatModifiers() {
+	public Map<StatType, String> getStatModifiers() {
 		return statModifiers;
 	}
 
-	public void setStatModifiers(Map<String, String> statModifiers) {
+	public void setStatModifiers(Map<StatType, String> statModifiers) {
 		this.statModifiers = statModifiers;
 	}
 }
