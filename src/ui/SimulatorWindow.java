@@ -76,8 +76,6 @@ public class SimulatorWindow extends JFrame {
 
 			if(updateTimeDifference >= updateCap) {
 				deltaUpdate = ((updateTimeDifference) * 1.0f) / baseDeltaTime;
-
-				//TODO add update calls here
 				//TODO add speed functionality - potentially just add a multiplier for deltaUpdate so the game can run at a faster pace if chosen
 				world.tellCreaturesToWander(runningTime);
 				world.moveCreatures(deltaUpdate);

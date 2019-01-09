@@ -5,8 +5,10 @@ import game.dna.traits.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 public class TraitLoader {
 
@@ -61,8 +63,10 @@ public class TraitLoader {
 
 								StatType statType = StatType.valueOf(statName);
 								Object statModifierValue;
-								if(statType.getClassType().equals(Double.class)){
+								if(statType.getClassType().equals(Double.class)) {
 									statModifierValue = Double.parseDouble(statModifierStringValue);
+								} else if(statType.getClassType().equals(Color.class)){
+									statModifierValue = Color.decode(statModifierStringValue);
 								} else {
 									statModifierValue = statModifierStringValue;
 								}

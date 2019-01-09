@@ -11,6 +11,49 @@
         ]
 	},
     {
+      "trait":"color",
+      "traitValue": "brown",
+      "stats": [
+        {
+          "statName":"color",
+          "statModifier":"#A52A2A"
+        }
+      ]
+    },
+    {
+      "trait":"color",
+      "traitValue": "black",
+      "stats": [
+        {
+          "statName":"color",
+          "statModifier":"#000000"
+        }
+      ]
+    },
+    {
+      "trait":"color",
+      "traitValue": "green",
+      "stats": [
+        {
+          "statName":"color",
+          "statModifier":"#7FFF00"
+        }
+      ]
+    },
+    {
+      "trait":"color",
+      "traitValue": "blue",
+      "stats": [
+        {
+          "statName":"color",
+          "statModifier":"#00FFFF"
+        }
+      ]
+    },
+
+
+
+    {
       "trait":"speed",
       "traitValue": "slow",
       "stats": [
@@ -40,6 +83,9 @@
         }
       ]
     },
+
+
+
     {
       "trait":"size",
       "traitValue": "small",

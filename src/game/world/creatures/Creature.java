@@ -77,6 +77,14 @@ public class Creature {
 		return size;
 	}
 
+	public Map<StatType, Object> getCreatureStats() {
+		return creatureStats;
+	}
+
+	public void setCreatureStats(Map<StatType, Object> creatureStats) {
+		this.creatureStats = creatureStats;
+	}
+
 	@Override
     public String toString(){
         return sexOfCreature.getSexString().substring(0, 1) + "{" + location.getX() + ", " + location.getY() + "}" + "(" + creatureDNAString.toString() + ")";

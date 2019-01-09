@@ -1,7 +1,9 @@
 package game.dna.stats;
 
+import java.awt.*;
+
 public enum StatType {
-	color("color"),
+	color("color", Color.class),
 	size("size", Double.class),
 	speed("speed", Double.class);
 
