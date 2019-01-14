@@ -4,14 +4,13 @@ import game.world.creatures.Creature;
 import game.world.creatures.Sex;
 import game.dna.DNABuilder;
 import game.dna.DNAString;
+import game.world.units.Location;
 import ui.StatisticsSave;
 import ui.TraitLoader;
 import game.dna.traits.TraitPair;
 import ui.WorldStatisticsTool;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static game.world.creatures.Sex.*;
 
@@ -23,6 +22,9 @@ public class World {
 	TraitLoader traitLoader;
 	WorldStatisticsTool worldStatisticsTool;
 
+	double dayLength = 100;
+	double worldDay;
+
 	private final int maxCreatureViewDistance = 10;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
 	//TODO for creature location checking
@@ -32,6 +34,7 @@ public class World {
 	public World(int width, int height){
 		tileMap = new Tile[width][height];//TODO may be more beneficial to create it with height first
 		creatures = new ArrayList();
+		creaturesToDelete = new LinkedList<>();
 
 		traitLoader = new TraitLoader();
 		worldStatisticsTool = new WorldStatisticsTool();
@@ -48,19 +51,19 @@ public class World {
 		addRandomCreature(newDNAStringForCreature, sexOfCreature);
 	}
 
-	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
-		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers());
-		creatures.add(newCreature);
+	synchronized public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
+		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
+		getCreatures().add(newCreature);
 	}
 
-	public void tryMatingCreatures(){//TODO remove this - temporary method for testing - or modify for range
+	synchronized public void tryMatingCreatures(){//TODO remove this - temporary method for testing - or modify for range
 		List<Creature> malesToMate = new ArrayList<>();
 		List<Creature> femalesToMate = new ArrayList<>();
 		List<Creature> asexualToMate = new ArrayList<>();
 
 		//TODO eventually this should be changed to just check around the creature
 		//TODO add a timer for creatures so they only mate so often, not every cycle
-		for(Creature creature : creatures){
+		for(Creature creature : getCreatures()){
 			if(creature.getSexOfCreature().equals(MALE)){
 				malesToMate.add(creature);
 			} else if(creature.getSexOfCreature().equals(FEMALE)){
@@ -73,18 +76,18 @@ public class World {
 		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
 		for(int i = 0; i < numberOfMatings; i++){
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
-			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers());
-			creatures.add(newCreature);
+			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
+			getCreatures().add(newCreature);
 		}
 
 		//TODO add loop for reproducing the asexual group -- after adding the asexual reproduce function
 	}
 
-	public List<Creature> getCreatures() {
+	synchronized public List<Creature> getCreatures() {
 		return creatures;
 	}
 
-	public void setCreatures(List<Creature> creatures) {
+	synchronized public void setCreatures(List<Creature> creatures) {
 		this.creatures = creatures;
 	}
 
@@ -125,15 +128,81 @@ public class World {
 		return save;
 	}
 
-	public void tellCreaturesToWander(long currentTime){
-		for(Creature creature : creatures){
-			creature.wander(currentTime);
+	synchronized public void tellCreaturesToWander(long currentTime){
+		for(Creature creature : getCreatures()){
+			creature.setWanderDirection(currentTime);
 		}
 	}
 
-	public void moveCreatures(double deltaUpdate){
-		for(Creature creature : creatures){
-			creature.move(deltaUpdate);
+	synchronized public void moveCreatures(double deltaUpdate){
+		Map<String, List<Creature>> closestTileMapForCreatures = new HashMap<>();
+		for(Creature creature : getCreatures()){
+			String locationString = getLocationStringFromCoordinates(creature.getLocation().getX(), creature.getLocation().getY());
+			if(closestTileMapForCreatures.containsKey(locationString) && closestTileMapForCreatures.get(locationString) != null){
+				List<Creature> creaturesAtLocation = closestTileMapForCreatures.get(locationString);
+				creaturesAtLocation.add(creature);
+			} else {
+				List<Creature> newCreatureListForLocation = new ArrayList<>();
+				newCreatureListForLocation.add(creature);
+				closestTileMapForCreatures.put(locationString, newCreatureListForLocation);
+			}
+		}
+
+		for(Creature creature : getCreatures()){
+			creature.wander(deltaUpdate);
+		}
+
+		checkForCreatureMatingMovement(closestTileMapForCreatures);
+	}
+
+	private String getLocationStringFromCoordinates(double x, double y){
+		return String.format("%04d", (int) Math.round(x)) + String.format("%04d", (int) Math.round(y));
+	}
+
+	private void checkForCreatureMatingMovement(Map<String, List<Creature>> closestTileMapForCreatures){
+		for(Creature creature : getCreatures()){
+			List<Creature> creaturesInRange = new ArrayList<>();
+			int creatureX = (int) Math.round(creature.getLocation().getX());
+			int creatureY = (int) Math.round(creature.getLocation().getY());
+
+			for(int i = creatureX - 5; i < creatureX + 5; i++){
+				for(int j = creatureY - 5; j < creatureY + 5; j++){
+					String currentLocationString = getLocationStringFromCoordinates(i, j);
+					if(closestTileMapForCreatures.containsKey(currentLocationString)) {
+						creaturesInRange.addAll(closestTileMapForCreatures.get(currentLocationString));
+					}
+				}
+			}
+
+			checkMatingForCreatureAndCreaturesInRange(creature, creaturesInRange);
+		}
+	}
+
+	private void checkMatingForCreatureAndCreaturesInRange(Creature creature, List<Creature> creaturesInRange){
+		//TODO loop through and choose creatures to move towards each other and mate
+	}
+
+	public void adjustDay(double deltaUpdate){
+		worldDay += deltaUpdate / dayLength;
+	}
+
+	public double getWorldDay(){
+		return worldDay;
+	}
+
+	synchronized public void checkCreatureLifeSpan(){
+		for(Creature creature : getCreatures()){
+			boolean creatureDies = creature.endedLifeSpan(worldDay);
+			if(creatureDies){
+				creaturesToDelete.add(creature);
+			}
+		}
+	}
+
+	Queue<Creature> creaturesToDelete;
+	public void clearRemovedCreatures(){
+		for(Creature creature : creaturesToDelete){
+			getCreatures().removeAll(creaturesToDelete);
 		}
 	}
 

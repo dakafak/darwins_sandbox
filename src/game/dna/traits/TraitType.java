@@ -7,7 +7,8 @@ public enum TraitType {
 	mating_frequency("mating_frequency"),
 	diet("diet"),
 	social("social"),
-	speed("speed");
+	speed("speed"),
+	lifespan("lifespan");
 
 	private String value;
 	TraitType(String value){

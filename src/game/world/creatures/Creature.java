@@ -24,11 +24,15 @@ public class Creature {
 	Size size;//TODO  some of these traits can be moved into creature stats once that loader is added
 	Direction direction = NORTH;
 	double speed;
+	double lifeSpan;
+	double mating_frequency;
+	double daySpawned;
 
-    public Creature(double x, double y, DNAString creatureDNAString, Sex sexOfCreature, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers){
+    public Creature(double x, double y, DNAString creatureDNAString, Sex sexOfCreature, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay){
     	this.creatureDNAString = creatureDNAString;
     	this.sexOfCreature = sexOfCreature;
 		this.location = new Location(x, y);
+		this.daySpawned = currentDay;
 
 		creatureStats = new HashMap<>();
 
@@ -59,6 +63,8 @@ public class Creature {
 		speed = (Double) creatureStats.get(StatType.speed);
 		double sizeFromStats = (Double) creatureStats.get(StatType.size);
 		size = new Size(sizeFromStats, sizeFromStats);
+		lifeSpan = (Double) creatureStats.get(StatType.life_span);
+		mating_frequency = (Double) creatureStats.get(StatType.mating_frequency);
     }
 
     public DNAString getCreatureDNAString() {
@@ -93,7 +99,7 @@ public class Creature {
     long nextDirectionChange;
     int wanderTimeInMilliseconds = 1000;
     int wanderTimeAdditionInMilliseconds = 4000;
-	public void wander(long currentTime) {
+	public void setWanderDirection(long currentTime) {
 		if(currentTime > nextDirectionChange){
 			setRandomDirection();
 			nextDirectionChange = currentTime + wanderTimeInMilliseconds + (int)(Math.random()*wanderTimeAdditionInMilliseconds);
@@ -106,7 +112,7 @@ public class Creature {
 		direction = allDirections[randomDirection];
 	}
 
-	public void move(double deltaUpdate){
+	public void wander(double deltaUpdate){
 		double dx = 0;
 		double dy = 0;
 
@@ -122,6 +128,14 @@ public class Creature {
 
 		location.setY(location.getY() + (dy * speed * deltaUpdate));
 		location.setX(location.getX() + (dx * speed * deltaUpdate));
+	}
+
+	public boolean endedLifeSpan(double day){
+		if(day - daySpawned > lifeSpan){
+			return true;
+		}
+
+		return false;
 	}
 
 }

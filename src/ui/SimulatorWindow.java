@@ -52,7 +52,7 @@ public class SimulatorWindow extends JFrame {
 	public void paint(Graphics g){
 //		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
-		BufferedImage worldImage = mainCamera.getBufferedWorldImage(world, getWidth(), getHeight());
+		BufferedImage worldImage = mainCamera.getBufferedWorldImage(world, getWidth(), getHeight(), deltaUpdate);
 		g2d.drawRenderedImage(worldImage, null);
 	}
 
@@ -79,6 +79,9 @@ public class SimulatorWindow extends JFrame {
 				//TODO add speed functionality - potentially just add a multiplier for deltaUpdate so the game can run at a faster pace if chosen
 				world.tellCreaturesToWander(runningTime);
 				world.moveCreatures(deltaUpdate);
+				world.adjustDay(deltaUpdate);
+				world.checkCreatureLifeSpan();
+				world.clearRemovedCreatures();
 				refresh();
 
 				lastUpdateTime = System.currentTimeMillis();

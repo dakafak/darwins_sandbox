@@ -5,7 +5,9 @@ import java.awt.*;
 public enum StatType {
 	color("color", Color.class),
 	size("size", Double.class),
-	speed("speed", Double.class);
+	speed("speed", Double.class),
+	mating_frequency("mating_frequency", Double.class),
+	life_span("life_span", Double.class);
 
 	String value;
 	Object classType;

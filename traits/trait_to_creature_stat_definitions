@@ -125,6 +125,66 @@
           "statModifier":".7"
         }
       ]
+    },
+    {
+      "trait":"lifespan",
+      "traitValue": "short",
+      "stats": [
+        {
+          "statName":"life_span",
+          "statModifier":"5"
+        }
+      ]
+    },
+    {
+      "trait":"lifespan",
+      "traitValue": "medium",
+      "stats": [
+        {
+          "statName":"life_span",
+          "statModifier":"10"
+        }
+      ]
+    },
+    {
+      "trait":"lifespan",
+      "traitValue": "long",
+      "stats": [
+        {
+          "statName":"life_span",
+          "statModifier":"20"
+        }
+      ]
+    },
+    {
+      "trait":"mating_frequency",
+      "traitValue": "low",
+      "stats": [
+        {
+          "statName":"mating_frequency",
+          "statModifier":"5"
+        }
+      ]
+    },
+    {
+      "trait":"mating_frequency",
+      "traitValue": "medium",
+      "stats": [
+        {
+          "statName":"mating_frequency",
+          "statModifier":"3"
+        }
+      ]
+    },
+    {
+      "trait":"mating_frequency",
+      "traitValue": "high",
+      "stats": [
+        {
+          "statName":"mating_frequency",
+          "statModifier":"1"
+        }
+      ]
     }
   ]
 }
