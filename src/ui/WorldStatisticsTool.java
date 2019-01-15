@@ -6,7 +6,11 @@ import game.world.creatures.Sex;
 import game.dna.traits.Trait;
 import game.dna.traits.TraitPair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WorldStatisticsTool {
@@ -45,7 +49,8 @@ public class WorldStatisticsTool {
     public Map<String, Integer> getTraitPopularityMap(World world, boolean onlyAddVisibleTraits){
         checkCache(world);
         Map<String, Integer> traitsToUsageCount = new HashMap<>();
-        for(Creature creature : world.getCreatures()){
+		for(int i = 0; i < world.getCreatures().size(); i++){
+			Creature creature = world.getCreatures().get(i);
             Set<Trait> traitsForCreature = new HashSet<>();
 
             for(TraitPair traitPair : creature.getCreatureDNAString().getTraitString()){

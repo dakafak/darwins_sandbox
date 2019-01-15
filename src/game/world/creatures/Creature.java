@@ -2,7 +2,9 @@ package game.world.creatures;
 
 import game.dna.DNAString;
 import game.dna.stats.StatType;
-import game.dna.traits.*;
+import game.dna.traits.CreatureStatModifier;
+import game.dna.traits.TraitNameAndValuePair;
+import game.dna.traits.TraitPair;
 import game.world.units.Direction;
 import game.world.units.Location;
 import game.world.units.Size;
@@ -10,22 +12,26 @@ import game.world.units.Size;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-import static game.world.units.Direction.*;
+import static game.world.units.Direction.MOVING_EAST;
+import static game.world.units.Direction.MOVING_NORTH;
 import static game.world.units.Direction.MOVING_SOUTH;
+import static game.world.units.Direction.MOVING_WEST;
+import static game.world.units.Direction.NORTH;
 
 public class Creature {
 
     DNAString creatureDNAString;
     Map<StatType, Object> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
     Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
+	CreatureState creatureState;
 	Location location;
 	Size size;//TODO  some of these traits can be moved into creature stats once that loader is added
 	Direction direction = NORTH;
 	double speed;
 	double lifeSpan;
 	double mating_frequency;
+	double lastMatingDay;
 	double daySpawned;
 
     public Creature(double x, double y, DNAString creatureDNAString, Sex sexOfCreature, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay){
@@ -33,6 +39,7 @@ public class Creature {
     	this.sexOfCreature = sexOfCreature;
 		this.location = new Location(x, y);
 		this.daySpawned = currentDay;
+		creatureState = CreatureState.WANDERING;
 
 		creatureStats = new HashMap<>();
 
@@ -65,7 +72,16 @@ public class Creature {
 		size = new Size(sizeFromStats, sizeFromStats);
 		lifeSpan = (Double) creatureStats.get(StatType.life_span);
 		mating_frequency = (Double) creatureStats.get(StatType.mating_frequency);
+		lastMatingDay = currentDay;
     }
+
+    public boolean canMate(double currentDay){
+    	if((currentDay - lastMatingDay) > mating_frequency){
+    		return true;
+		}
+
+		return false;
+	}
 
     public DNAString getCreatureDNAString() {
         return creatureDNAString;
@@ -79,6 +95,14 @@ public class Creature {
 		return location;
 	}
 
+	public CreatureState getCreatureState() {
+		return creatureState;
+	}
+
+	public void setCreatureState(CreatureState creatureState) {
+		this.creatureState = creatureState;
+	}
+
 	public Size getSize() {
 		return size;
 	}
@@ -89,6 +113,14 @@ public class Creature {
 
 	public void setCreatureStats(Map<StatType, Object> creatureStats) {
 		this.creatureStats = creatureStats;
+	}
+
+	public double getLastMatingDay() {
+		return lastMatingDay;
+	}
+
+	public void setLastMatingDay(double currentDay) {
+		this.lastMatingDay = currentDay;
 	}
 
 	@Override
@@ -138,4 +170,27 @@ public class Creature {
 		return false;
 	}
 
+	public void moveCloserToPoint(double deltaUpdate, double x, double y) {
+		double dx = 0;
+		double dy = 0;
+
+		double distanceY = y - location.getY();
+		double distanceX = x - location.getX();
+		if(Math.abs(distanceY) > Math.abs(distanceX)){
+			if(distanceY > 0){
+				dy = 1;
+			} else if(distanceY < 0){
+				dy = -1;
+			}
+		} else {
+			if(distanceX > 0){
+				dx = 1;
+			} else if(distanceX < 0){
+				dx = -1;
+			}
+		}
+
+		location.setX(location.getX() + (dx * speed * deltaUpdate));
+		location.setY(location.getY() + (dy * speed * deltaUpdate));
+	}
 }

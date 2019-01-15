@@ -2,27 +2,21 @@ package ui;
 
 import game.World;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 
 public class SimulatorWindow extends JFrame {
 
-	World world;
-	boolean continueRunning = true;
-	Camera mainCamera;
+	SimulatorWindowComponent simulatorWindowComponent;
 
-	public SimulatorWindow(String title){
+	public SimulatorWindow(String title, World world){
 		super(title);
 		super.setSize(1200, 800);//TODO later set this to full screen
 		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		super.setLocationRelativeTo(null);
 		super.setUndecorated(true);
 		super.addKeyListener(new KeyListener() {
-
-
 			@Override
 			public void keyTyped(KeyEvent e) {
 
@@ -44,60 +38,12 @@ public class SimulatorWindow extends JFrame {
 			}
 		});
 
-		mainCamera = new Camera(0, 0, 40);
+		Camera mainCamera = new Camera(0, 0, 40);
+		simulatorWindowComponent = new SimulatorWindowComponent(mainCamera);
+		simulatorWindowComponent.setWorld(world);
+		super.add(simulatorWindowComponent);
 		setVisible(true);
+		simulatorWindowComponent.start();
 	}
 
-	@Override
-	public void paint(Graphics g){
-//		super.paint(g);
-		Graphics2D g2d = (Graphics2D) g;
-		BufferedImage worldImage = mainCamera.getBufferedWorldImage(world, getWidth(), getHeight(), deltaUpdate);
-		g2d.drawRenderedImage(worldImage, null);
-	}
-
-	long originalStartTime;
-	long lastUpdateTime;
-	long frameRateResetTime;
-	long updateTimeDifference;
-	long runningTime;
-
-	int updateCap = 7;
-	int baseDeltaTime = 10;
-	double deltaUpdate = 1;
-
-	public void start() {
-		continueRunning = true;
-		lastUpdateTime = System.currentTimeMillis();
-
-		while(continueRunning){
-			updateTimeDifference = System.currentTimeMillis() - lastUpdateTime;
-			runningTime = System.currentTimeMillis() - originalStartTime;
-
-			if(updateTimeDifference >= updateCap) {
-				deltaUpdate = ((updateTimeDifference) * 1.0f) / baseDeltaTime;
-				//TODO add speed functionality - potentially just add a multiplier for deltaUpdate so the game can run at a faster pace if chosen
-				world.tellCreaturesToWander(runningTime);
-				world.moveCreatures(deltaUpdate);
-				world.adjustDay(deltaUpdate);
-				world.checkCreatureLifeSpan();
-				world.clearRemovedCreatures();
-				refresh();
-
-				lastUpdateTime = System.currentTimeMillis();
-			}
-		}
-	}
-
-	private void refresh(){
-		repaint();
-	}
-
-	public World getWorld() {
-		return world;
-	}
-
-	public void setWorld(World world) {
-		this.world = world;
-	}
 }

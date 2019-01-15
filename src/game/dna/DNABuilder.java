@@ -18,7 +18,16 @@ public class DNABuilder {
 	}
 
 	public static DNAString getAsexualDNAString(DNAString parent){
-		return null;
+		DNAString childString = new DNAString();
+		TraitPair[] childTraits = new TraitPair[parent.getTraitString().length];
+
+		for(int i = 0; i < parent.getTraitString().length; i++){
+			TraitPair combinedTraits = combineTraits(parent.getTraitString()[i], parent.getTraitString()[i]);
+			childTraits[i] = combinedTraits;
+		}
+
+		childString.setTraitString(childTraits);
+		return childString;
 	}
 
 	//   C  c

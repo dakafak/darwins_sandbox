@@ -1,6 +1,6 @@
 package game.dna.stats;
 
-import java.awt.*;
+import java.awt.Color;
 
 public enum StatType {
 	color("color", Color.class),

@@ -32,9 +32,7 @@ public class SimulatorRunner {
 //			newWorld.printWorldStatistics(statisticsSave);
 //		}
 
-		SimulatorWindow simulatorWindow = new SimulatorWindow("World Simulator");
-		simulatorWindow.setWorld(newWorld);
-		simulatorWindow.start();
+		SimulatorWindow simulatorWindow = new SimulatorWindow("World Simulator", newWorld);
 	}
 
 }

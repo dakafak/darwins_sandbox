@@ -2,12 +2,13 @@ package ui;
 
 import game.World;
 import game.dna.stats.StatType;
-import game.dna.traits.TraitType;
 import game.world.creatures.Creature;
+import game.world.creatures.CreatureState;
 import game.world.units.ScaledLocation;
 import game.world.units.ScaledSize;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public class Camera {
@@ -72,7 +73,8 @@ public class Camera {
 	}
 
 	private void drawCreatures(Graphics2D g2d, World world){
-		for(Creature creature : world.getCreatures()){
+		for(int i = 0; i < world.getCreatures().size(); i++){
+			Creature creature = world.getCreatures().get(i);
 			if(creature.getCreatureStats().containsKey(StatType.color)){
 				g2d.setColor((Color)creature.getCreatureStats().get(StatType.color));
 			} else {
@@ -82,6 +84,13 @@ public class Camera {
 			ScaledLocation scaledLocation = creature.getLocation().getScaledLocation(cachedStandardSize);
 			ScaledSize scaledSize = creature.getSize().getScaledSize(cachedStandardSize);
 			g2d.fillOval(scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()), scaledSize.getWidth(), scaledSize.getHeight());
+
+			g2d.setColor(Color.WHITE);
+			if(creature.getCreatureState() == CreatureState.WANDERING){
+				g2d.drawString("- | " + creature.getSexOfCreature(), scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()));
+			} else if(creature.getCreatureState() == CreatureState.MATING){
+				g2d.drawString("M | " + creature.getSexOfCreature(), scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()));
+			}
 		}
 	}
 

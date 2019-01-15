@@ -1,14 +1,24 @@
 package ui;
 
 import game.dna.stats.StatType;
-import game.dna.traits.*;
+import game.dna.traits.CreatureStatModifier;
+import game.dna.traits.Trait;
+import game.dna.traits.TraitNameAndValuePair;
+import game.dna.traits.TraitPair;
+import game.dna.traits.TraitType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TraitLoader {
 
