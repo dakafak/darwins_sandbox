@@ -74,7 +74,7 @@ public class Camera {
 
 		int i = 1;
 		for(Trait trait : sortedTraits){
-			g2d.setColor(Color.white);
+			g2d.setColor(Color.decode("#" + Integer.toHexString(trait.getTraitType().hashCode()).substring(0, 5)));
 			g2d.drawString(traitsToNumberCreaturesWithTrait.get(trait) + "\t| " + trait.getTraitDefinition(), (int) cachedWindowWidth - 100,15 * i);
 			i++;
 		}
