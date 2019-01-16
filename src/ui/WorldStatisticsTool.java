@@ -18,7 +18,13 @@ public class WorldStatisticsTool {
     long lastRetrieval;
     long cacheReset = 0;//TODO probably not really necessary but may be beneficial at some point to set to the refresh rate
 
+	Map<Trait, Integer> traitsToNumberCreaturesWithTrait;
+
     private List<Creature> creatureCacheList;
+
+    public WorldStatisticsTool(){
+    	traitsToNumberCreaturesWithTrait = new HashMap<>();
+	}
 
     public int getNumberOfCreatures(World world){
         checkCache(world);
@@ -82,5 +88,37 @@ public class WorldStatisticsTool {
             lastRetrieval = System.currentTimeMillis();
         }
     }
+
+    public Map<Trait, Integer> getTraitsToNumberCreaturesWithTrait(){
+    	return traitsToNumberCreaturesWithTrait;
+	}
+
+	public void addTraitsForNewCreatures(List<Creature> creatures){
+		for(int i = 0; i < creatures.size(); i++){
+			TraitPair[] traitPairsForCreature = creatures.get(i).getCreatureDNAString().getTraitString();
+			for(int j = 0; j < traitPairsForCreature.length; j++) {
+				Trait trait = traitPairsForCreature[j].getTraits()[0];
+				if(traitsToNumberCreaturesWithTrait.containsKey(trait)) {
+					traitsToNumberCreaturesWithTrait.put(trait, traitsToNumberCreaturesWithTrait.get(trait) + 1);
+				} else {
+					traitsToNumberCreaturesWithTrait.put(trait, 1);
+				}
+			}
+		}
+	}
+
+	public void removeTraitsForNewCreatures(List<Creature> creatures){
+		for(int i = 0; i < creatures.size(); i++){
+			TraitPair[] traitPairsForCreature = creatures.get(i).getCreatureDNAString().getTraitString();
+			for(int j = 0; j < traitPairsForCreature.length; j++) {
+				Trait trait = traitPairsForCreature[j].getTraits()[0];
+				if(traitsToNumberCreaturesWithTrait.containsKey(trait)) {
+					traitsToNumberCreaturesWithTrait.put(trait, traitsToNumberCreaturesWithTrait.get(trait) - 1);
+				} else {
+					traitsToNumberCreaturesWithTrait.put(trait, -1);
+				}
+			}
+		}
+	}
 
 }

@@ -10,6 +10,7 @@ import ui.TraitLoader;
 import ui.WorldStatisticsTool;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class World {
 		movementManager.moveCreatures(deltaUpdate, getCreatures(), worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers());
 		movementManager.tellCreaturesToWander(runningTime, getCreatures());
 		movementManager.moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay, deltaUpdate);
-		movementManager.addNewChildCreaturesToWorldCreatureList(getCreatures());
+		movementManager.addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
 		clearRemovedCreatures();
@@ -64,6 +65,7 @@ public class World {
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
 		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
 		getCreatures().add(newCreature);
+		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));
 	}
 
 	public void tryMatingCreatures(){//TODO remove this - temporary method for testing - or modify for range
@@ -89,6 +91,7 @@ public class World {
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString());
 			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
 			getCreatures().add(newCreature);
+			worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));
 		}
 
 		//TODO add loop for reproducing the asexual group -- after adding the asexual reproduce function
@@ -166,8 +169,12 @@ public class World {
 
 	List<Creature> creaturesToDelete;
 	public void clearRemovedCreatures(){
+		worldStatisticsTool.removeTraitsForNewCreatures(creaturesToDelete);
 		getCreatures().removeAll(creaturesToDelete);
 		creaturesToDelete.clear();
 	}
 
+	public WorldStatisticsTool getWorldStatisticsTool() {
+		return worldStatisticsTool;
+	}
 }

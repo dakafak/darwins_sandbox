@@ -2,6 +2,7 @@ package ui;
 
 import game.World;
 import game.dna.stats.StatType;
+import game.dna.traits.Trait;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
 import game.world.units.ScaledLocation;
@@ -10,6 +11,12 @@ import game.world.units.ScaledSize;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Camera {
 
@@ -48,7 +55,29 @@ public class Camera {
 		drawBackground(g2d);
 		drawCreatures(g2d, world);
 		drawCameraInfo(g2d, world, deltaUpdate, currentFPS);
+		drawTraitUsageInfo(g2d, world);
 		return image;
+	}
+
+	private void drawTraitUsageInfo(Graphics2D g2d, World world) {
+		Map<Trait, Integer> traitsToNumberCreaturesWithTrait = world.getWorldStatisticsTool().getTraitsToNumberCreaturesWithTrait();
+		Set<Trait> keySet = traitsToNumberCreaturesWithTrait.keySet();
+
+		List<Trait> sortedTraits = new ArrayList<>();
+		sortedTraits.addAll(keySet);
+		Collections.sort(sortedTraits, new Comparator<Trait>() {
+			@Override
+			public int compare(Trait o1, Trait o2) {
+				return traitsToNumberCreaturesWithTrait.get(o1) > traitsToNumberCreaturesWithTrait.get(o2) ? -1 : 1;
+			}
+		});
+
+		int i = 1;
+		for(Trait trait : sortedTraits){
+			g2d.setColor(Color.white);
+			g2d.drawString(traitsToNumberCreaturesWithTrait.get(trait) + "\t| " + trait.getTraitDefinition(), (int) cachedWindowWidth - 100,15 * i);
+			i++;
+		}
 	}
 
 	private void drawBackground(Graphics2D g2d){

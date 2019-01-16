@@ -7,6 +7,7 @@ import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
 import game.world.creatures.MatingPair;
 import game.world.creatures.Sex;
+import ui.WorldStatisticsTool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -145,7 +146,8 @@ public class MovementManager {
 		matingPairsToRemove.clear();
 	}
 
-	public void addNewChildCreaturesToWorldCreatureList(List<Creature> creatures){
+	public void addNewChildCreaturesToWorldCreatureList(List<Creature> creatures, WorldStatisticsTool worldStatisticsTool){
+		worldStatisticsTool.addTraitsForNewCreatures(childCreaturesToAddToWorld);
 		creatures.addAll(childCreaturesToAddToWorld);
 		childCreaturesToAddToWorld.clear();
 	}
