@@ -18,28 +18,40 @@ public class SimulatorWindowComponent extends JComponent {
 
 	long originalStartTime;
 	long lastUpdateTime;
-	long frameRateResetTime;
 	long updateTimeDifference;
 	long runningTime;
 
-	int updateCap = 7;
-	int baseDeltaTime = 10;
+	final long updateCap = 700_000;
+	final long baseDeltaTime = 10_000_000;
 	double deltaUpdate = 1;
 
+	long lastFPS;
+	long currentFrames;
+	long timeSinceLastFPSupdate;
+
 	public void start() {
-		lastUpdateTime = System.currentTimeMillis();
+		originalStartTime = System.currentTimeMillis();
+		lastUpdateTime = System.nanoTime();
 
 		while(getWorld() != null){
-			updateTimeDifference = System.currentTimeMillis() - lastUpdateTime;
 			runningTime = System.currentTimeMillis() - originalStartTime;
 
+			updateTimeDifference = System.nanoTime() - lastUpdateTime;
+
 			if(updateTimeDifference >= updateCap) {
-				deltaUpdate = ((updateTimeDifference) * 1.0f) / baseDeltaTime;
-				//TODO add speed functionality - potentially just add a multiplier for deltaUpdate so the game can run at a faster pace if chosen
+				lastUpdateTime = System.nanoTime();
+
+				currentFrames++;
+				timeSinceLastFPSupdate += updateTimeDifference;
+				if(timeSinceLastFPSupdate >= 1_000_000_000){
+					timeSinceLastFPSupdate = 0;
+					lastFPS = currentFrames;
+					currentFrames = 0;
+				}
+
+				deltaUpdate = ((double)updateTimeDifference) / baseDeltaTime;
 				getWorld().runWorldUpdates(runningTime, deltaUpdate);
 				repaint();
-
-				lastUpdateTime = System.currentTimeMillis();
 			}
 		}
 	}
@@ -56,7 +68,7 @@ public class SimulatorWindowComponent extends JComponent {
 	public void paint(Graphics g){
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
-		BufferedImage worldImage = mainCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate);
+		BufferedImage worldImage = mainCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate, lastFPS);
 		g2d.drawRenderedImage(worldImage, null);
 	}
 

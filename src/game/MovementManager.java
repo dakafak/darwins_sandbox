@@ -22,7 +22,7 @@ public class MovementManager {
 	List<MatingPair> matingPairs;
 	List<Creature> childCreaturesToAddToWorld;
 
-	int creatureViewDistance = 5;
+	private final int maxCreatureViewDistance = 5;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
 	public MovementManager(){
 		matingPairs = new ArrayList<>();
@@ -30,17 +30,17 @@ public class MovementManager {
 	}
 
 	public void moveCreatures(double deltaUpdate, List<Creature> creatures, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers){
-		Map<String, List<Creature>> closestTileMapForCreatures = new HashMap<>();
+		Map<Long, List<Creature>> closestTileMapForCreatures = new HashMap<>();
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
-			String locationString = getLocationStringFromCoordinates(creature.getLocation().getX(), creature.getLocation().getY());
-			if(closestTileMapForCreatures.containsKey(locationString) && closestTileMapForCreatures.get(locationString) != null){
-				List<Creature> creaturesAtLocation = closestTileMapForCreatures.get(locationString);
+			long locationLong = getLocationLongFromCoordinates(creature.getLocation().getX(), creature.getLocation().getY());
+			if(closestTileMapForCreatures.containsKey(locationLong) && closestTileMapForCreatures.get(locationLong) != null){
+				List<Creature> creaturesAtLocation = closestTileMapForCreatures.get(locationLong);
 				creaturesAtLocation.add(creature);
 			} else {
 				List<Creature> newCreatureListForLocation = new ArrayList<>();
 				newCreatureListForLocation.add(creature);
-				closestTileMapForCreatures.put(locationString, newCreatureListForLocation);
+				closestTileMapForCreatures.put(locationLong, newCreatureListForLocation);
 			}
 		}
 
@@ -53,20 +53,20 @@ public class MovementManager {
 
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
-			checkForCreatureMating(creature, getCreaturesInRange(creature, creatureViewDistance, closestTileMapForCreatures), currentDay, traitNameAndValueToCreatureStatModifiers);
+			checkForCreatureMating(creature, getCreaturesInRange(creature, maxCreatureViewDistance, closestTileMapForCreatures), currentDay, traitNameAndValueToCreatureStatModifiers);
 		}
 	}
 
-	private List<Creature> getCreaturesInRange(Creature creature, int range, Map<String, List<Creature>> closestTileMapForCreatures){
+	private List<Creature> getCreaturesInRange(Creature creature, int range, Map<Long, List<Creature>> closestTileMapForCreatures){
 		List<Creature> creaturesInRange = new ArrayList<>();
 		int creatureX = (int) Math.round(creature.getLocation().getX());
 		int creatureY = (int) Math.round(creature.getLocation().getY());
 
 		for(int i = creatureX - range; i < creatureX + range; i++){
 			for(int j = creatureY - range; j < creatureY + range; j++){
-				String currentLocationString = getLocationStringFromCoordinates(i, j);
-				if(closestTileMapForCreatures.containsKey(currentLocationString)) {
-					creaturesInRange.addAll(closestTileMapForCreatures.get(currentLocationString));
+				long locationLong = getLocationLongFromCoordinates(i, j);
+				if(closestTileMapForCreatures.containsKey(locationLong)) {
+					creaturesInRange.addAll(closestTileMapForCreatures.get(locationLong));
 				}
 			}
 		}
@@ -74,8 +74,12 @@ public class MovementManager {
 		return creaturesInRange;
 	}
 
-	private String getLocationStringFromCoordinates(double x, double y){
-		return String.format("%04d", (int) Math.round(x)) + String.format("%04d", (int) Math.round(y));
+	private long getLocationLongFromCoordinates(double x, double y){
+		int xInt = (int) x;
+		int yInt = (int) y;
+
+		long locationLong = (xInt << 32) & yInt;
+		return locationLong;
 	}
 
 	private void checkForCreatureMating(Creature creature, List<Creature> creaturesInRange, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers){
@@ -93,7 +97,6 @@ public class MovementManager {
 	}
 
 	private void checkMatingForCreatureAndCreatureInRange(Creature creature, Creature creatureInRange, double currentDay){
-		//TODO loop through and choose creatures to move towards each other and mate
 		if(creature.getCreatureState() == CreatureState.WANDERING && creatureInRange.getCreatureState() == CreatureState.WANDERING
 			&& creature.canMate(currentDay) && creatureInRange.canMate(currentDay)){
 			if(	(creature.getSexOfCreature() == MALE && creatureInRange.getSexOfCreature() == FEMALE) ||
@@ -119,7 +122,7 @@ public class MovementManager {
 			Creature femaleCreature = matingPair.getCreature1().getSexOfCreature() == FEMALE ? matingPair.getCreature1() : matingPair.getCreature2();
 			double distanceBetweenCreatures = distanceBetweenCreatures(maleCreature, femaleCreature);
 
-			if(distanceBetweenCreatures > creatureViewDistance){
+			if(distanceBetweenCreatures > maxCreatureViewDistance){
 				maleCreature.setCreatureState(CreatureState.WANDERING);
 				femaleCreature.setCreatureState(CreatureState.WANDERING);
 				matingPairsToRemove.add(matingPair);

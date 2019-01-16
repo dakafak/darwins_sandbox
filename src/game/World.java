@@ -30,12 +30,6 @@ public class World {
 	double dayLength = 100;
 	double worldDay;
 
-	private final int maxCreatureViewDistance = 10;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
-
-	//TODO for creature location checking
-	//	sort all creatures into a hashmap for their tile coordinates -> the creature
-	//	can grab a creature and check tiles around to grab creatures nearby to test collisions and sight
-
 	public World(int width, int height){
 		tileMap = new Tile[width][height];//TODO may be more beneficial to create it with height first
 		creatures = new ArrayList();
@@ -146,8 +140,14 @@ public class World {
 	}
 
 
+	double cachedDeltaUpdate;
+	double cachedDayChange;
 	public void adjustDay(double deltaUpdate){
-		worldDay += deltaUpdate / dayLength;
+		if(deltaUpdate != cachedDeltaUpdate){
+			cachedDeltaUpdate = deltaUpdate;
+			cachedDayChange = cachedDeltaUpdate / dayLength;
+		}
+		worldDay += cachedDayChange;
 	}
 
 	public double getWorldDay(){

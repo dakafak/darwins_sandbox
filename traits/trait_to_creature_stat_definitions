@@ -6,7 +6,7 @@
         "stats": [
           {
             "statName":"color",
-            "statModifier":"#D2B48C"
+            "statModifier":"#A2944C"
           }
         ]
 	},
@@ -36,7 +36,7 @@
       "stats": [
         {
           "statName":"color",
-          "statModifier":"#7FFF00"
+          "statModifier":"#3BBB00"
         }
       ]
     },
@@ -46,7 +46,7 @@
       "stats": [
         {
           "statName":"color",
-          "statModifier":"#00FFFF"
+          "statModifier":"#008888"
         }
       ]
     },

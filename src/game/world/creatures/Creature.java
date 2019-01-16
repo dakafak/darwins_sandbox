@@ -158,8 +158,7 @@ public class Creature {
 			dx = -1;
 		}
 
-		location.setY(location.getY() + (dy * speed * deltaUpdate));
-		location.setX(location.getX() + (dx * speed * deltaUpdate));
+		move(deltaUpdate, dx, dy);
 	}
 
 	public boolean endedLifeSpan(double day){
@@ -190,7 +189,23 @@ public class Creature {
 			}
 		}
 
-		location.setX(location.getX() + (dx * speed * deltaUpdate));
-		location.setY(location.getY() + (dy * speed * deltaUpdate));
+		move(deltaUpdate, dx, dy);
+	}
+
+	double cachedLocationXChange;
+
+	double cachedLocationYChange;
+	double cachedDx;
+	double cachedDy;
+	double cachedDeltaUpdate;
+	private void move(double deltaUpdate, double dx, double dy){
+		if(dx != cachedDx || dy != cachedDy || deltaUpdate != cachedDeltaUpdate){
+			cachedLocationXChange = dx * speed * deltaUpdate;
+			cachedLocationYChange = dy * speed * deltaUpdate;
+		}
+
+
+		location.setX(location.getX() + cachedLocationXChange);
+		location.setY(location.getY() + cachedLocationYChange);
 	}
 }

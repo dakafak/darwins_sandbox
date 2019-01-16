@@ -31,7 +31,7 @@ public class Camera {
 	double cachedTileViewingDistanceWidth;
 	double cachedTileViewingDistanceHeight;
 	double cachedStandardSize;
-	public BufferedImage getBufferedWorldImage(final World world, double drawingWidth, double drawingHeight, double deltaUpdate) {
+	public BufferedImage getBufferedWorldImage(final World world, double drawingWidth, double drawingHeight, double deltaUpdate, long currentFPS) {
 		if(drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight){
 			cachedWindowWidth = drawingWidth;
 			cachedWindowHeight = drawingHeight;
@@ -47,7 +47,7 @@ public class Camera {
 		Graphics2D g2d = image.createGraphics();
 		drawBackground(g2d);
 		drawCreatures(g2d, world);
-		drawCameraInfo(g2d, world, deltaUpdate);
+		drawCameraInfo(g2d, world, deltaUpdate, currentFPS);
 		return image;
 	}
 
@@ -56,7 +56,7 @@ public class Camera {
 		g2d.fillRect(0, 0, (int) cachedWindowWidth, (int) cachedWindowHeight);
 	}
 
-	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate){
+	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate, long currentFPS){
 		g2d.setColor(Color.WHITE);
 		g2d.drawString("Window Width: " + cachedWindowWidth,5, 15);
 		g2d.drawString("Window Height: " + cachedWindowHeight, 5, 30);
@@ -67,7 +67,8 @@ public class Camera {
 		g2d.drawString("Middle Height: " + cachedWindowHeightMiddle, 5, 105);
 		g2d.drawString("Game Scale: " + cachedStandardSize, 5, 120);
 		g2d.drawString("World Day: " + world.getWorldDay(), 5, 135);
-		g2d.drawString("fps: " + 1000 / deltaUpdate, 5, 150);
+		g2d.drawString("fps: " + currentFPS, 5, 150);
+		g2d.drawString("creatures: " + world.getCreatures().size(), 5, 165);
 
 		g2d.fillRect((int)Math.ceil(cachedWindowWidthMiddle - 2), (int) Math.ceil(cachedWindowHeightMiddle - 2), 4, 4);
 	}
@@ -85,11 +86,9 @@ public class Camera {
 			ScaledSize scaledSize = creature.getSize().getScaledSize(cachedStandardSize);
 			g2d.fillOval(scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()), scaledSize.getWidth(), scaledSize.getHeight());
 
-			g2d.setColor(Color.WHITE);
-			if(creature.getCreatureState() == CreatureState.WANDERING){
-				g2d.drawString("- | " + creature.getSexOfCreature(), scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()));
-			} else if(creature.getCreatureState() == CreatureState.MATING){
-				g2d.drawString("M | " + creature.getSexOfCreature(), scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()));
+			if(creature.getCreatureState() == CreatureState.MATING){
+				g2d.setColor(Color.PINK);
+				g2d.drawOval(scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()), scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()), scaledSize.getWidth(), scaledSize.getHeight());
 			}
 		}
 	}
