@@ -5,6 +5,8 @@ import game.dna.DNAString;
 import game.dna.traits.TraitPair;
 import game.world.creatures.Creature;
 import game.world.creatures.Sex;
+import game.world.units.Location;
+import game.world.units.Size;
 import ui.StatisticsSave;
 import ui.TraitLoader;
 import ui.WorldStatisticsTool;
@@ -21,7 +23,7 @@ import static game.world.creatures.Sex.MALE;
 
 public class World {
 
-	Tile[][] tileMap;
+//	Tile[][] tileMap;
 	List<Creature> creatures;
 
 	TraitLoader traitLoader;
@@ -31,8 +33,29 @@ public class World {
 	double dayLength = 100;
 	double worldDay;
 
-	public World(int width, int height){
-		tileMap = new Tile[width][height];//TODO may be more beneficial to create it with height first
+//	int minWidth;
+//	int maxWidth;
+//	int minHeight;
+//	int maxHeight;
+
+	Location minWorldLocation;
+	Location maxWorldLocation;
+	Location worldLocation;
+	Size worldSize;
+	Size tileSize = new Size(5, 5);
+
+	public World(int minWidth, int maxWidth, int minHeight, int maxHeight){
+//		this.minWidth = minWidth;
+//		this.maxWidth = maxWidth;
+//		this.minHeight = minHeight;
+//		this.maxHeight = maxHeight;
+
+		minWorldLocation = new Location(minWidth, minHeight);
+		maxWorldLocation = new Location(maxWidth, maxHeight);
+		worldLocation = new Location(0, 0);
+		worldSize = new Size(maxWidth - minWidth, maxHeight - minHeight);
+
+//		tileMap = new Tile[width][height];//TODO may be more beneficial to create it with height first
 		creatures = new ArrayList();
 		creaturesToDelete = new LinkedList<>();
 
@@ -42,9 +65,9 @@ public class World {
 	}
 
 	public void runWorldUpdates(long runningTime, double deltaUpdate){
-		movementManager.moveCreatures(deltaUpdate, getCreatures(), worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers());
+		movementManager.moveCreatures(deltaUpdate, getCreatures(), worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), minWorldLocation, maxWorldLocation);
 		movementManager.tellCreaturesToWander(runningTime, getCreatures());
-		movementManager.moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay, deltaUpdate);
+		movementManager.moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay, deltaUpdate, minWorldLocation, maxWorldLocation);
 		movementManager.addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
@@ -176,5 +199,45 @@ public class World {
 
 	public WorldStatisticsTool getWorldStatisticsTool() {
 		return worldStatisticsTool;
+	}
+
+	public Location getMinWorldLocation() {
+		return minWorldLocation;
+	}
+
+	public void setMinWorldLocation(Location minWorldLocation) {
+		this.minWorldLocation = minWorldLocation;
+	}
+
+	public Location getMaxWorldLocation() {
+		return maxWorldLocation;
+	}
+
+	public void setMaxWorldLocation(Location maxWorldLocation) {
+		this.maxWorldLocation = maxWorldLocation;
+	}
+
+	public Size getWorldSize() {
+		return worldSize;
+	}
+
+	public void setWorldSize(Size worldSize) {
+		this.worldSize = worldSize;
+	}
+
+	public Location getWorldLocation() {
+		return worldLocation;
+	}
+
+	public void setWorldLocation(Location worldLocation) {
+		this.worldLocation = worldLocation;
+	}
+
+	public Size getTileSize() {
+		return tileSize;
+	}
+
+	public void setTileSize(Size tileSize) {
+		this.tileSize = tileSize;
 	}
 }

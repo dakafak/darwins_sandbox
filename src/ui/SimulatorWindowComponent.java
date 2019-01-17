@@ -9,11 +9,17 @@ import java.awt.image.BufferedImage;
 
 public class SimulatorWindowComponent extends JComponent {
 
-	Camera mainCamera;
+	Camera currentCamera;
+//	Camera mainCamera;
 	World world;
 
+	boolean wpressed;
+	boolean spressed;
+	boolean apressed;
+	boolean dpressed;
+
 	public SimulatorWindowComponent(Camera mainCamera){
-		this.mainCamera = mainCamera;
+		this.currentCamera = mainCamera;
 	}
 
 	long originalStartTime;
@@ -50,6 +56,7 @@ public class SimulatorWindowComponent extends JComponent {
 				}
 
 				deltaUpdate = ((double)updateTimeDifference) / baseDeltaTime;
+				adjustCameraLocation();
 				getWorld().runWorldUpdates(runningTime, deltaUpdate);
 				repaint();
 			}
@@ -64,11 +71,50 @@ public class SimulatorWindowComponent extends JComponent {
 		this.world = world;
 	}
 
+	private void adjustCameraLocation(){
+		if(apressed && !dpressed){
+			moveCamera(1 * deltaUpdate, 0);
+		} else if(!apressed && dpressed){
+			moveCamera(-1 * deltaUpdate, 0);
+		}
+
+		if(wpressed && !spressed){
+			moveCamera(0, 1 * deltaUpdate);
+		} else if(!wpressed && spressed){
+			moveCamera(0, -1 * deltaUpdate);
+		}
+	}
+
+	private void moveCamera(double dx, double dy){
+		double nextCameraX = currentCamera.getLocation().getX() + dx;
+		double nextCameraY = currentCamera.getLocation().getY() + dy;
+
+		if(nextCameraX < world.getMinWorldLocation().getX()){
+			currentCamera.getLocation().setX(world.getMinWorldLocation().getX());
+		} else if(nextCameraX > world.getMaxWorldLocation().getX()){
+			currentCamera.getLocation().setX(world.getMaxWorldLocation().getX());
+		} else if(nextCameraX >= world.getMinWorldLocation().getX()
+				&& nextCameraX <= world.getMaxWorldLocation().getX()) {
+			currentCamera.getLocation().setX(nextCameraX);
+		}
+
+		if(nextCameraY < world.getMinWorldLocation().getY()){
+			currentCamera.getLocation().setY(world.getMinWorldLocation().getY());
+		} else if(nextCameraY > world.getMaxWorldLocation().getY()){
+			currentCamera.getLocation().setY(world.getMaxWorldLocation().getY());
+		} else if(nextCameraY >= world.getMinWorldLocation().getY()
+				&& nextCameraY <= world.getMaxWorldLocation().getY()){
+			currentCamera.getLocation().setY(nextCameraY);
+		}
+
+		System.out.println(currentCamera.getLocation().getX());
+	}
+
 	@Override
 	public void paint(Graphics g){
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
-		BufferedImage worldImage = mainCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate, lastFPS);
+		BufferedImage worldImage = currentCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate, lastFPS);
 		g2d.drawRenderedImage(worldImage, null);
 	}
 

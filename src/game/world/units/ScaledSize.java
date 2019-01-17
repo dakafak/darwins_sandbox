@@ -20,4 +20,20 @@ public class ScaledSize {
 	public void setHeight(double height) {
 		this.height = height;
 	}
+
+	double cachedDrawingObjectWidthHalf;
+	double cachedDrawingObjectHeightHalf;
+	public int getMiddleWidth() {
+		if(cachedDrawingObjectWidthHalf == 0){
+			cachedDrawingObjectWidthHalf = width / 2;
+		}
+		return (int) Math.ceil(cachedDrawingObjectWidthHalf);
+	}
+
+	public int getMiddleHeight() {
+		if(cachedDrawingObjectHeightHalf == 0){
+			cachedDrawingObjectHeightHalf = height / 2;
+		}
+		return (int) Math.ceil(cachedDrawingObjectHeightHalf);
+	}
 }

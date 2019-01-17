@@ -144,7 +144,7 @@ public class Creature {
 		direction = allDirections[randomDirection];
 	}
 
-	public void wander(double deltaUpdate){
+	public void wander(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
 		double dx = 0;
 		double dy = 0;
 
@@ -158,7 +158,7 @@ public class Creature {
 			dx = -1;
 		}
 
-		move(deltaUpdate, dx, dy);
+		move(deltaUpdate, dx, dy, minWorldLocation, maxWorldLocation);
 	}
 
 	public boolean endedLifeSpan(double day){
@@ -169,7 +169,7 @@ public class Creature {
 		return false;
 	}
 
-	public void moveCloserToPoint(double deltaUpdate, double x, double y) {
+	public void moveCloserToPoint(double deltaUpdate, double x, double y, Location minWorldLocation, Location maxWorldLocation) {
 		double dx = 0;
 		double dy = 0;
 
@@ -189,7 +189,7 @@ public class Creature {
 			}
 		}
 
-		move(deltaUpdate, dx, dy);
+		move(deltaUpdate, dx, dy, minWorldLocation, maxWorldLocation);
 	}
 
 	double cachedLocationXChange;
@@ -198,14 +198,30 @@ public class Creature {
 	double cachedDx;
 	double cachedDy;
 	double cachedDeltaUpdate;
-	private void move(double deltaUpdate, double dx, double dy){
+	private void move(double deltaUpdate, double dx, double dy, Location minWorldLocation, Location maxWorldLocation){
 		if(dx != cachedDx || dy != cachedDy || deltaUpdate != cachedDeltaUpdate){
 			cachedLocationXChange = dx * speed * deltaUpdate;
 			cachedLocationYChange = dy * speed * deltaUpdate;
 		}
 
+		double nextX = location.getX() + cachedLocationXChange;
+		double nextY = location.getY() + cachedLocationYChange;
 
-		location.setX(location.getX() + cachedLocationXChange);
-		location.setY(location.getY() + cachedLocationYChange);
+		if(nextX < minWorldLocation.getX()){
+			location.setX(minWorldLocation.getX());
+		} else if(nextX > maxWorldLocation.getX()){
+			location.setX(maxWorldLocation.getX());
+		} else if(nextX >= minWorldLocation.getX() && nextX <= maxWorldLocation.getX()){
+			location.setX(nextX);
+		}
+
+		if(nextY < minWorldLocation.getY()){
+			location.setY(minWorldLocation.getY());
+		} else if(nextY > maxWorldLocation.getY()){
+			location.setY(maxWorldLocation.getY());
+		} else if(nextY >= minWorldLocation.getY() && nextY <= maxWorldLocation.getY()){
+			location.setY(nextY);
+		}
+
 	}
 }

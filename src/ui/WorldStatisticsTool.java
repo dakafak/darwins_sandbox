@@ -1,6 +1,7 @@
 package ui;
 
 import game.World;
+import game.dna.traits.TraitType;
 import game.world.creatures.Creature;
 import game.world.creatures.Sex;
 import game.dna.traits.Trait;
@@ -18,7 +19,7 @@ public class WorldStatisticsTool {
     long lastRetrieval;
     long cacheReset = 0;//TODO probably not really necessary but may be beneficial at some point to set to the refresh rate
 
-	Map<Trait, Integer> traitsToNumberCreaturesWithTrait;
+	Map<TraitType, Map<Trait, Integer>> traitsToNumberCreaturesWithTrait;
 
     private List<Creature> creatureCacheList;
 
@@ -89,7 +90,7 @@ public class WorldStatisticsTool {
         }
     }
 
-    public Map<Trait, Integer> getTraitsToNumberCreaturesWithTrait(){
+    public Map<TraitType, Map<Trait, Integer>> getTraitsToNumberCreaturesWithTrait(){
     	return traitsToNumberCreaturesWithTrait;
 	}
 
@@ -98,10 +99,14 @@ public class WorldStatisticsTool {
 			TraitPair[] traitPairsForCreature = creatures.get(i).getCreatureDNAString().getTraitString();
 			for(int j = 0; j < traitPairsForCreature.length; j++) {
 				Trait trait = traitPairsForCreature[j].getTraits()[0];
-				if(traitsToNumberCreaturesWithTrait.containsKey(trait)) {
-					traitsToNumberCreaturesWithTrait.put(trait, traitsToNumberCreaturesWithTrait.get(trait) + 1);
+				if(!traitsToNumberCreaturesWithTrait.containsKey(trait.getTraitType())){
+					traitsToNumberCreaturesWithTrait.put(trait.getTraitType(), new HashMap<>());
+				}
+
+				if(traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).containsKey(trait)) {
+					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).get(trait) + 1);
 				} else {
-					traitsToNumberCreaturesWithTrait.put(trait, 1);
+					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, 1);
 				}
 			}
 		}
@@ -113,9 +118,9 @@ public class WorldStatisticsTool {
 			for(int j = 0; j < traitPairsForCreature.length; j++) {
 				Trait trait = traitPairsForCreature[j].getTraits()[0];
 				if(traitsToNumberCreaturesWithTrait.containsKey(trait)) {
-					traitsToNumberCreaturesWithTrait.put(trait, traitsToNumberCreaturesWithTrait.get(trait) - 1);
+					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).get(trait) - 1);
 				} else {
-					traitsToNumberCreaturesWithTrait.put(trait, -1);
+					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, -1);
 				}
 			}
 		}
