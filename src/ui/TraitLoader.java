@@ -153,7 +153,7 @@ public class TraitLoader {
                 }
             }
 
-            System.out.println("traits: " + allTraits);
+//            System.out.println("traits: " + allTraits);
             return allTraits;
         } else {
             System.out.println("trait folder does not exist");

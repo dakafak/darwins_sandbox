@@ -107,7 +107,7 @@ public class SimulatorWindowComponent extends JComponent {
 			currentCamera.getLocation().setY(nextCameraY);
 		}
 
-		System.out.println(currentCamera.getLocation().getX());
+//		System.out.println(currentCamera.getLocation().getX());
 	}
 
 	@Override
