@@ -13,3 +13,5 @@ WASD - move camera
 \[ - reduce world speed multiplier
 
 \] - increase world speed multipler
+
+ESCAPE - quit the game
