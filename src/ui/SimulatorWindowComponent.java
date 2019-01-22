@@ -59,8 +59,8 @@ public class SimulatorWindowComponent extends JComponent {
 				}
 
 				deltaUpdate = ((double)updateTimeDifference) / baseDeltaTime;
-				if(deltaUpdate > 1){
-					deltaUpdate = 1;
+				if(deltaUpdate > 3){
+					deltaUpdate = 3;
 				}
 
 				if(worldSpeedMultiplier != cachedWorldSpeedMultiplier || cachedDeltaUpdateWithWorldSpeedMultiplier == 0L){
