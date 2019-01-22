@@ -4,6 +4,7 @@ import game.dna.DNABuilder;
 import game.dna.DNAString;
 import game.dna.traits.TraitPair;
 import game.tiles.Tile;
+import game.tiles.TileType;
 import game.world.creatures.Creature;
 import game.world.creatures.Sex;
 import game.world.units.Location;
@@ -26,6 +27,13 @@ public class World {
 
 	Tile[][] tileMap;
 	List<Creature> creatures;
+	//TODO create a thread object that contains a list of creatures and have each thread maintain a separate list of creatures.
+	// TODO these threads will have to control specific functionality to avoid concurrent exceptions
+	// Could also add a mutex lock and have a set of 16 worker threads that run an update when ready
+	// Maybe wrap the movement manager with threads and mutex lock the creature list
+	// Could multithread the check for potential mating method, after building the coordinate to list of creature map,
+	// that map can be read and not modified so multiple threads can run through subsections of the creature list and
+	// check what creatures need to be added to the mating list, the mating list can have a mutext lock
 
 	TraitLoader traitLoader;
 	WorldStatisticsTool worldStatisticsTool;
@@ -46,6 +54,11 @@ public class World {
 		worldSize = new Size(maxWidth - minWidth, maxHeight - minHeight);
 
 		tileMap = new Tile[(int)worldSize.getWidth()][(int)worldSize.getHeight()];//TODO may be more beneficial to create it with height first
+		for(int y = 0; y < getTileMap().length; y++) {
+			for (int x = 0; x < getTileMap()[0].length; x++) {
+				tileMap[y][x] = new Tile(x + minWidth, y + minHeight, TileType.DIRT);
+			}
+		}
 		creatures = new ArrayList();
 		creaturesToDelete = new LinkedList<>();
 
@@ -222,4 +235,11 @@ public class World {
 		this.worldLocation = worldLocation;
 	}
 
+	public Tile[][] getTileMap() {
+		return tileMap;
+	}
+
+	public void setTileMap(Tile[][] tileMap) {
+		this.tileMap = tileMap;
+	}
 }

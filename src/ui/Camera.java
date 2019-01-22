@@ -4,6 +4,7 @@ import game.World;
 import game.dna.stats.StatType;
 import game.dna.traits.Trait;
 import game.dna.traits.TraitType;
+import game.tiles.TileType;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
 import game.world.units.Location;
@@ -97,14 +98,24 @@ public class Camera {
 		g2d.fillRect(0, 0, (int) cachedWindowWidth, (int) cachedWindowHeight);
 	}
 
+	//TODO can any drawing for tiles be cached? maybe can cache the buffered image for the ground or at least just repaint the buffered image for the ground at that location
 	private void drawGround(Graphics2D g2d, World world){
-		g2d.setColor(new Color(0, 100, 0));
-		g2d.fillRect(
-				getScreenX(world.getMinWorldLocation()),
-				getScreenY(world.getMinWorldLocation()),
-				world.getWorldSize().getScaledSize(cachedStandardSize).getWidth(),
-				world.getWorldSize().getScaledSize(cachedStandardSize).getHeight()
+		for(int y = 0; y < world.getTileMap().length; y++) {
+			for (int x = 0; x < world.getTileMap()[0].length; x++) {
+				TileType currentTileType = world.getTileMap()[y][x].getType();
+				if(currentTileType.equals(TileType.DIRT)){
+					g2d.setColor(Color.decode("#8B4513"));
+				} else {
+					g2d.setColor(Color.GRAY);
+				}
+				g2d.fillRect(
+						getScreenX(world.getTileMap()[y][x].getLocation()),
+						getScreenY(world.getTileMap()[y][x].getLocation()),
+						world.getTileMap()[y][x].getSize().getScaledSize(cachedStandardSize).getWidth(),
+						world.getTileMap()[y][x].getSize().getScaledSize(cachedStandardSize).getHeight()
 				);
+			}
+		}
 	}
 
 	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate, long currentFPS, int worldSpeedMultiplier){

@@ -31,8 +31,6 @@ public class SimulatorWindowComponent extends JComponent {
 	double deltaUpdate = 1;
 
 	int worldSpeedMultiplier = 1;
-	int cachedWorldSpeedMultiplier;
-	double cachedDeltaUpdateWithWorldSpeedMultiplier;
 
 	long lastFPS;
 	long currentFrames;
@@ -63,13 +61,10 @@ public class SimulatorWindowComponent extends JComponent {
 					deltaUpdate = 3;
 				}
 
-				if(worldSpeedMultiplier != cachedWorldSpeedMultiplier || cachedDeltaUpdateWithWorldSpeedMultiplier == 0L){
-					cachedWorldSpeedMultiplier = worldSpeedMultiplier;
-					cachedDeltaUpdateWithWorldSpeedMultiplier = deltaUpdate * cachedWorldSpeedMultiplier;
-				}
+				deltaUpdate *= worldSpeedMultiplier;
 
 				adjustCameraLocation();
-				getWorld().runWorldUpdates(runningTime, cachedDeltaUpdateWithWorldSpeedMultiplier);
+				getWorld().runWorldUpdates(runningTime, deltaUpdate);
 				repaint();
 			}
 		}

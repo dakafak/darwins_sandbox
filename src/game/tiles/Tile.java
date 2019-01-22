@@ -1,15 +1,19 @@
 package game.tiles;
 
 import game.world.units.Location;
+import game.world.units.Size;
 
 public class Tile {
 
-	private TileType type;
+	private TileType tileType;
 	Location location;
 	int tileFertility;
+	Size size;
 
 	public Tile(int x, int y, TileType tileType){
+		size = new Size(1, 1);
 		location = new Location(x, y);
+		this.tileType = tileType;
 		if(tileType.equals(TileType.DIRT)){
 			tileFertility = 10;
 		} else if(tileType.equals(TileType.ROCK)){
@@ -26,11 +30,11 @@ public class Tile {
 	}
 
 	public TileType getType() {
-		return type;
+		return tileType;
 	}
 
 	public void setType(TileType type) {
-		this.type = type;
+		this.tileType = type;
 	}
 
 	public Location getLocation() {
@@ -39,5 +43,21 @@ public class Tile {
 
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+
+	public int getTileFertility() {
+		return tileFertility;
+	}
+
+	public void setTileFertility(int tileFertility) {
+		this.tileFertility = tileFertility;
+	}
+
+	public Size getSize() {
+		return size;
+	}
+
+	public void setSize(Size size) {
+		this.size = size;
 	}
 }
