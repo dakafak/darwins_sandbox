@@ -95,6 +95,14 @@ public class WorldStatisticsTool {
 	}
 
 	public void addTraitsForNewCreatures(List<Creature> creatures){
+		adjustTraitsForCreaturesWithModifier(creatures, 1);
+	}
+
+	public void removeTraitsForNewCreatures(List<Creature> creatures){
+		adjustTraitsForCreaturesWithModifier(creatures, -1);
+	}
+
+	private void adjustTraitsForCreaturesWithModifier(List<Creature> creatures, int modifier){
 		for(int i = 0; i < creatures.size(); i++){
 			TraitPair[] traitPairsForCreature = creatures.get(i).getCreatureDNAString().getTraitString();
 			for(int j = 0; j < traitPairsForCreature.length; j++) {
@@ -104,23 +112,9 @@ public class WorldStatisticsTool {
 				}
 
 				if(traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).containsKey(trait)) {
-					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).get(trait) + 1);
+					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).get(trait) + modifier);
 				} else {
-					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, 1);
-				}
-			}
-		}
-	}
-
-	public void removeTraitsForNewCreatures(List<Creature> creatures){
-		for(int i = 0; i < creatures.size(); i++){
-			TraitPair[] traitPairsForCreature = creatures.get(i).getCreatureDNAString().getTraitString();
-			for(int j = 0; j < traitPairsForCreature.length; j++) {
-				Trait trait = traitPairsForCreature[j].getTraits()[0];
-				if(traitsToNumberCreaturesWithTrait.containsKey(trait)) {
-					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).get(trait) - 1);
-				} else {
-					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, -1);
+					traitsToNumberCreaturesWithTrait.get(trait.getTraitType()).put(trait, modifier);
 				}
 			}
 		}
