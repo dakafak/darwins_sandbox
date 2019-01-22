@@ -8,7 +8,7 @@ import game.world.creatures.CreatureState;
 import game.world.creatures.MatingPair;
 import game.world.creatures.Sex;
 import game.world.units.Location;
-import game.world.units.Size;
+import ui.TraitLoader;
 import ui.WorldStatisticsTool;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class MovementManager {
 		childCreaturesToAddToWorld = new LinkedList<>();
 	}
 
-	public void moveCreatures(double deltaUpdate, List<Creature> creatures, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, Location minWorldLocation, Location maxWorldLocation){
+	public void moveCreatures(double deltaUpdate, List<Creature> creatures, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, Location minWorldLocation, Location maxWorldLocation, TraitLoader traitLoader){
 		Map<Long, List<Creature>> closestTileMapForCreatures = new HashMap<>();
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
@@ -47,16 +47,23 @@ public class MovementManager {
 			}
 		}
 
+		tellAllCreaturesToWander(creatures, deltaUpdate, minWorldLocation, maxWorldLocation);
+		checkForCreatureMatingForListOfCreatures(creatures, closestTileMapForCreatures, currentDay, traitNameAndValueToCreatureStatModifiers, traitLoader);
+	}
+
+	private void tellAllCreaturesToWander(List<Creature> creatures, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
 			if(creature.getCreatureState() == CreatureState.WANDERING) {
 				creature.wander(deltaUpdate, minWorldLocation, maxWorldLocation);
 			}
 		}
+	}
 
+	private void checkForCreatureMatingForListOfCreatures(List<Creature> creatures, Map<Long, List<Creature>> closestTileMapForCreatures, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, TraitLoader traitLoader){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
-			checkForCreatureMating(creature, getCreaturesInRange(creature, maxCreatureViewDistance, closestTileMapForCreatures), currentDay, traitNameAndValueToCreatureStatModifiers);
+			checkForCreatureMating(creature, getCreaturesInRange(creature, maxCreatureViewDistance, closestTileMapForCreatures), currentDay, traitNameAndValueToCreatureStatModifiers, traitLoader);
 		}
 	}
 
@@ -78,16 +85,16 @@ public class MovementManager {
 	}
 
 	private long getLocationLongFromCoordinates(double x, double y){
-		int xInt = (int) x;
-		int yInt = (int) y;
+		long xLong = (int) x;
+		long yLong = (int) y;
 
-		long locationLong = (xInt << 32) & yInt;
+		long locationLong = (xLong << 32) | yLong;
 		return locationLong;
 	}
 
-	private void checkForCreatureMating(Creature creature, List<Creature> creaturesInRange, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers){
+	private void checkForCreatureMating(Creature creature, List<Creature> creaturesInRange, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, TraitLoader traitLoader){
 		if(creature.getSexOfCreature() == Sex.ASEXUAL && creature.canMate(currentDay)){
-			DNAString childString = DNABuilder.getAsexualDNAString(creature.getCreatureDNAString());
+			DNAString childString = DNABuilder.getAsexualDNAString(creature.getCreatureDNAString(), traitLoader);
 			Creature newCreature = new Creature(creature.getLocation().getX(), creature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitNameAndValueToCreatureStatModifiers, currentDay);
 			childCreaturesToAddToWorld.add(newCreature);
 
@@ -118,7 +125,7 @@ public class MovementManager {
 		}
 	}
 
-	public void moveAndTryMatingCreatures(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
+	public void moveAndTryMatingCreatures(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation, TraitLoader traitLoader){
 		List<MatingPair> matingPairsToRemove = new LinkedList<>();
 		for(MatingPair matingPair : matingPairs){
 			Creature maleCreature = matingPair.getCreature1().getSexOfCreature() == MALE ? matingPair.getCreature1() : matingPair.getCreature2();
@@ -132,7 +139,7 @@ public class MovementManager {
 			} else if(distanceBetweenCreatures > maleCreature.getSize().getWidth() + femaleCreature.getSize().getWidth()){
 				maleCreature.moveCloserToPoint(deltaUpdate, femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), minWorldLocation, maxWorldLocation);
 			} else {
-				DNAString childString = DNABuilder.getChildDNAString(maleCreature.getCreatureDNAString(), femaleCreature.getCreatureDNAString());
+				DNAString childString = DNABuilder.getChildDNAString(maleCreature.getCreatureDNAString(), femaleCreature.getCreatureDNAString(), traitLoader);
 				Creature newCreature = new Creature(femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitNameAndValueToCreatureStatModifiers, currentDay);
 				childCreaturesToAddToWorld.add(newCreature);
 

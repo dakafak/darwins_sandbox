@@ -17,7 +17,7 @@ public class SimulatorRunner {
 	public SimulatorRunner(){
 		allSaves = new ArrayList<>();
 
-		World newWorld = new World(-25, 25, -25, 25);
+		World newWorld = new World(-50, 50, -50, 50);
 		newWorld.addRandomCreature(Sex.MALE);
 		newWorld.addRandomCreature(Sex.FEMALE);
 

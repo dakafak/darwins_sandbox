@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 public class SimulatorWindowComponent extends JComponent {
 
 	Camera currentCamera;
-//	Camera mainCamera;
 	World world;
 
 	boolean wpressed;
@@ -30,6 +29,10 @@ public class SimulatorWindowComponent extends JComponent {
 	final long updateCap = 700_000;
 	final long baseDeltaTime = 10_000_000;
 	double deltaUpdate = 1;
+
+	int worldSpeedMultiplier = 1;
+	int cachedWorldSpeedMultiplier;
+	double cachedDeltaUpdateWithWorldSpeedMultiplier;
 
 	long lastFPS;
 	long currentFrames;
@@ -56,8 +59,17 @@ public class SimulatorWindowComponent extends JComponent {
 				}
 
 				deltaUpdate = ((double)updateTimeDifference) / baseDeltaTime;
+				if(deltaUpdate > 1){
+					deltaUpdate = 1;
+				}
+
+				if(worldSpeedMultiplier != cachedWorldSpeedMultiplier || cachedDeltaUpdateWithWorldSpeedMultiplier == 0L){
+					cachedWorldSpeedMultiplier = worldSpeedMultiplier;
+					cachedDeltaUpdateWithWorldSpeedMultiplier = deltaUpdate * cachedWorldSpeedMultiplier;
+				}
+
 				adjustCameraLocation();
-				getWorld().runWorldUpdates(runningTime, deltaUpdate);
+				getWorld().runWorldUpdates(runningTime, cachedDeltaUpdateWithWorldSpeedMultiplier);
 				repaint();
 			}
 		}
@@ -106,15 +118,13 @@ public class SimulatorWindowComponent extends JComponent {
 				&& nextCameraY <= world.getMaxWorldLocation().getY()){
 			currentCamera.getLocation().setY(nextCameraY);
 		}
-
-//		System.out.println(currentCamera.getLocation().getX());
 	}
 
 	@Override
 	public void paint(Graphics g){
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
-		BufferedImage worldImage = currentCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate, lastFPS);
+		BufferedImage worldImage = currentCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate, lastFPS, worldSpeedMultiplier);
 		g2d.drawRenderedImage(worldImage, null);
 	}
 

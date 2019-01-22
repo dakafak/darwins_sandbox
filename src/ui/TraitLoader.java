@@ -22,7 +22,6 @@ import java.util.Map;
 
 public class TraitLoader {
 
-    private String statsFolderLocation = "";
     private String traitFolderLocation = "traits";
 
     Map<TraitType, List<Trait>> traitTypeToAllTraits;
@@ -31,12 +30,18 @@ public class TraitLoader {
     public TraitLoader(){
         loadTraitTypesAndOrder();
         loadTraits();
-        loadTraitToCreatureStatDefinitions();
+		loadTraitToStatDefinitions();
     }
 
-    Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers;
-    private void loadTraitToCreatureStatDefinitions(){
-		File traitOrderFile = new File(traitFolderLocation + "/trait_to_creature_stat_definitions");
+	Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers;
+    private void loadTraitToStatDefinitions(){
+		traitNameAndValueToCreatureStatModifiers = loadTraitToCreatureStatDefinitions(traitFolderLocation + "/trait_to_creature_stat_definitions");
+	}
+
+    private Map<String, List<CreatureStatModifier>> loadTraitToCreatureStatDefinitions(String traitOrderFileName){
+		Map<String, List<CreatureStatModifier>> traitNameAndValueToStatModifiers = new HashMap<>();
+		File traitOrderFile = new File(traitOrderFileName);
+
 		if(traitOrderFile.exists()){
 			StringBuilder jsonToParse = new StringBuilder();
 			try {
@@ -55,7 +60,7 @@ public class TraitLoader {
 			if(objectFromJsonString != null) {
 				JSONArray traitToCreatureStatDefinitions = objectFromJsonString.getJSONArray("traitToStatDefinitions");
 				if(traitToCreatureStatDefinitions != null){
-					traitNameAndValueToCreatureStatModifiers = new HashMap<>();
+					traitNameAndValueToStatModifiers = new HashMap<>();
 
 					for(int i = 0; i < traitToCreatureStatDefinitions.length(); i++){
 						JSONObject creatureStatDefinition = traitToCreatureStatDefinitions.getJSONObject(i);
@@ -86,19 +91,21 @@ public class TraitLoader {
 							newStatModifier.setStatModifiers(statModifiers);
 
 							TraitNameAndValuePair traitNameAndValuePair = new TraitNameAndValuePair(traitName, traitValue);
-							if(traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValuePair.getKey())) {
-								List<CreatureStatModifier> creatureStatList = traitNameAndValueToCreatureStatModifiers.get(traitNameAndValuePair.getKey());
+							if(traitNameAndValueToStatModifiers.containsKey(traitNameAndValuePair.getKey())) {
+								List<CreatureStatModifier> creatureStatList = traitNameAndValueToStatModifiers.get(traitNameAndValuePair.getKey());
 								creatureStatList.add(newStatModifier);
 							} else {
 								List<CreatureStatModifier> newCreatureStatList = new ArrayList<>();
 								newCreatureStatList.add(newStatModifier);
-								traitNameAndValueToCreatureStatModifiers.put(traitNameAndValuePair.getKey(), newCreatureStatList);
+								traitNameAndValueToStatModifiers.put(traitNameAndValuePair.getKey(), newCreatureStatList);
 							}
 						}
 					}
 				}
 			}
 		}
+
+		return traitNameAndValueToStatModifiers;
 	}
 
     private void loadTraitTypesAndOrder(){
@@ -153,7 +160,6 @@ public class TraitLoader {
                 }
             }
 
-//            System.out.println("traits: " + allTraits);
             return allTraits;
         } else {
             System.out.println("trait folder does not exist");
@@ -169,7 +175,7 @@ public class TraitLoader {
         return newPair;
     }
 
-    private Trait getRandomTrait(TraitType traitType){
+    public Trait getRandomTrait(TraitType traitType){
         if(traitTypeToAllTraits.containsKey(traitType)) {
             List<Trait> traitsForType = traitTypeToAllTraits.get(traitType);
             int randomTraitIndex = (int)Math.floor(Math.random()*traitsForType.size());
@@ -191,4 +197,5 @@ public class TraitLoader {
 	public void setTraitNameAndValueToCreatureStatModifiers(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers) {
 		this.traitNameAndValueToCreatureStatModifiers = traitNameAndValueToCreatureStatModifiers;
 	}
+
 }

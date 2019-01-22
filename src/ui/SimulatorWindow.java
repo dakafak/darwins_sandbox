@@ -12,7 +12,7 @@ public class SimulatorWindow extends JFrame {
 
 	public SimulatorWindow(String title, World world){
 		super(title);
-		super.setSize(1200, 600);//TODO later set this to full screen
+		super.setSize(1800, 900);//TODO later set this to full screen
 		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		super.setLocationRelativeTo(null);
 		super.setUndecorated(true);
@@ -32,6 +32,18 @@ public class SimulatorWindow extends JFrame {
 					simulatorWindowComponent.apressed = true;
 				} else if(e.getKeyCode() == KeyEvent.VK_D){
 					simulatorWindowComponent.dpressed = true;
+				}
+
+				if(e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET){
+					if(simulatorWindowComponent.worldSpeedMultiplier < 5) {
+						simulatorWindowComponent.worldSpeedMultiplier += 1;
+					}
+				}
+
+				if(e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET){
+					if(simulatorWindowComponent.worldSpeedMultiplier > 1){
+						simulatorWindowComponent.worldSpeedMultiplier -= 1;
+					}
 				}
 			}
 
@@ -54,7 +66,7 @@ public class SimulatorWindow extends JFrame {
 			}
 		});
 
-		Camera mainCamera = new Camera(5, 5, 40);
+		Camera mainCamera = new Camera(0, 0, 80);
 		simulatorWindowComponent = new SimulatorWindowComponent(mainCamera);
 		simulatorWindowComponent.setWorld(world);
 		super.add(simulatorWindowComponent);

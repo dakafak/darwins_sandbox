@@ -22,14 +22,10 @@ import java.util.Set;
 
 public class Camera {
 
-//	double x;
-//	double y;
 	Location location;
 	double viewingDistanceInTiles;
 
 	public Camera(double x, double y, double viewingDistanceInTiles){
-//		this.x = x;
-//		this.y = y;
 		location = new Location(x, y);
 		this.viewingDistanceInTiles = viewingDistanceInTiles;
 	}
@@ -42,7 +38,7 @@ public class Camera {
 	double cachedTileViewingDistanceWidth;
 	double cachedTileViewingDistanceHeight;
 	double cachedStandardSize;
-	public BufferedImage getBufferedWorldImage(final World world, double drawingWidth, double drawingHeight, double deltaUpdate, long currentFPS) {
+	public BufferedImage getBufferedWorldImage(final World world, double drawingWidth, double drawingHeight, double deltaUpdate, long currentFPS, int worldSpeedMultiplier) {
 		if(drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight){
 			cachedWindowWidth = drawingWidth;
 			cachedWindowHeight = drawingHeight;
@@ -59,7 +55,7 @@ public class Camera {
 		drawBackground(g2d);
 		drawGround(g2d, world);
 		drawCreatures(g2d, world);
-		drawCameraInfo(g2d, world, deltaUpdate, currentFPS);
+		drawCameraInfo(g2d, world, deltaUpdate, currentFPS, worldSpeedMultiplier);
 		drawTraitUsageInfo(g2d, world);
 		return image;
 	}
@@ -109,18 +105,9 @@ public class Camera {
 				world.getWorldSize().getScaledSize(cachedStandardSize).getWidth(),
 				world.getWorldSize().getScaledSize(cachedStandardSize).getHeight()
 				);
-
-//		ScaledLocation scaledLocation = world.getWorldLocation().getScaledLocation(cachedStandardSize);
-//		ScaledSize scaledSize = world.getTileSize().getScaledSize(cachedStandardSize);
-//		g2d.setColor(Color.WHITE);
-//		g2d.fillOval(
-//				scaledLocation.getX(x, cachedWindowWidthMiddle, scaledSize.getWidth()),
-//				scaledLocation.getY(y, cachedWindowHeightMiddle, scaledSize.getHeight()),
-//				scaledSize.getWidth(),
-//				scaledSize.getHeight());
 	}
 
-	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate, long currentFPS){
+	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate, long currentFPS, int worldSpeedMultiplier){
 		g2d.setColor(Color.WHITE);
 		g2d.drawString("Window Width: " + cachedWindowWidth,5, 15);
 		g2d.drawString("Window Height: " + cachedWindowHeight, 5, 30);
@@ -133,6 +120,8 @@ public class Camera {
 		g2d.drawString("World Day: " + world.getWorldDay(), 5, 135);
 		g2d.drawString("fps: " + currentFPS, 5, 150);
 		g2d.drawString("creatures: " + world.getCreatures().size(), 5, 165);
+		g2d.drawString("Delta update: " + deltaUpdate, 5, 180);
+		g2d.drawString("World Speed Multiplier: " + worldSpeedMultiplier, 5, 195);
 
 		g2d.fillRect((int)Math.ceil(cachedWindowWidthMiddle - 2), (int) Math.ceil(cachedWindowHeightMiddle - 2), 4, 4);
 	}
