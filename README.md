@@ -2,5 +2,5 @@
 
 Free for personal and educational use
 
-To run current project without an IDE, download:
-[Darwin's Sandbox Jar](darwins_sandbox.jar)
+To run current project without an IDE, download and extract this zip:
+[Darwin's Sandbox](package/darwins_sandbox.zip)
