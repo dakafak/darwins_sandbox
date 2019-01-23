@@ -15,3 +15,5 @@ WASD - move camera
 \] - increase world speed multipler
 
 ESCAPE - quit the game
+
+Mouse Scroll - Zoom in or out
