@@ -26,7 +26,7 @@ public class SimulatorWindowComponent extends JComponent {
 	long updateTimeDifference;
 	long runningTime;
 
-	final long updateCap = 700_000;
+	final long updateCap = 5_000_000;
 	final long baseDeltaTime = 10_000_000;
 	double deltaUpdate = 1;
 
@@ -57,8 +57,8 @@ public class SimulatorWindowComponent extends JComponent {
 				}
 
 				deltaUpdate = ((double)updateTimeDifference) / baseDeltaTime;
-				if(deltaUpdate > 3){
-					deltaUpdate = 3;
+				if(deltaUpdate > 2){
+					deltaUpdate = 2;
 				}
 
 				deltaUpdate *= worldSpeedMultiplier;
