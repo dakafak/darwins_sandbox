@@ -73,7 +73,6 @@ public class Camera {
 
 		BufferedImage image = new BufferedImage((int) drawingWidth, (int) drawingHeight, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = image.createGraphics();
-		drawBackground(g2d);
 		drawGround(g2d, world);
 		drawPlants(g2d, world);
 		drawCreatures(g2d, world);
@@ -114,12 +113,6 @@ public class Camera {
 		}
 	}
 
-	private void drawBackground(Graphics2D g2d){
-		g2d.setColor(Color.BLACK);
-		g2d.fillRect(0, 0, (int) cachedWindowWidth, (int) cachedWindowHeight);
-	}
-
-	//TODO can any drawing for tiles be cached? maybe can cache the buffered image for the ground or at least just repaint the buffered image for the ground at that location
 	private void drawGround(Graphics2D g2d, World world){
 		for(int y = 0; y < world.getTileMap().length; y++) {
 			for (int x = 0; x < world.getTileMap()[0].length; x++) {

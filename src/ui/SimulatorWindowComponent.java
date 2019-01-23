@@ -29,6 +29,7 @@ public class SimulatorWindowComponent extends JComponent {
 	final long updateCap = 5_000_000;
 	final long baseDeltaTime = 10_000_000;
 	double deltaUpdate = 1;
+	double deltaUpdateWithSpeedModifer = 1;
 
 	int worldSpeedMultiplier = 1;
 
@@ -61,10 +62,10 @@ public class SimulatorWindowComponent extends JComponent {
 					deltaUpdate = 2;
 				}
 
-				deltaUpdate *= worldSpeedMultiplier;
+				deltaUpdateWithSpeedModifer = deltaUpdate * worldSpeedMultiplier;
 
 				adjustCameraLocation();
-				getWorld().runWorldUpdates(runningTime, deltaUpdate);
+				getWorld().runWorldUpdates(runningTime, deltaUpdateWithSpeedModifer);
 				repaint();
 			}
 		}

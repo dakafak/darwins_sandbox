@@ -23,15 +23,6 @@ public class SimulatorRunner {
 
 		System.out.println(newWorld.getCreatures());
 
-//		for(int i = 0; i < 20; i++){
-//			System.out.println("[" + i + "]");
-//			newWorld.tryMatingCreatures();
-//
-//			StatisticsSave statisticsSave = newWorld.getStatisticsSaveForCurrentWorld();
-//			allSaves.add(statisticsSave);
-//			newWorld.printWorldStatistics(statisticsSave);
-//		}
-
 		SimulatorWindow simulatorWindow = new SimulatorWindow("World Simulator", newWorld);
 	}
 

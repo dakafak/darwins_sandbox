@@ -71,10 +71,8 @@ public class SimulatorWindow extends JFrame {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if(e.getWheelRotation() < 0){
-					System.out.println("doing things");
 					simulatorWindowComponent.getCurrentCamera().zoomIn();
 				} else if(e.getWheelRotation() > 0){
-					System.out.println("doing things");
 					simulatorWindowComponent.getCurrentCamera().zoomOut();
 				}
 			}
