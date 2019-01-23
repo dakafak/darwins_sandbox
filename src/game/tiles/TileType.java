@@ -3,7 +3,7 @@ package game.tiles;
 import java.awt.Color;
 
 public enum TileType {
-	DIRT(.01f, Color.decode("#4A2503")),
+	DIRT(.01f, Color.decode("#312516")),
 	ROCK(.001f, Color.decode("#888C8D")),
 	SAND(.001f, Color.decode("#C2B280")),
 	CLAY(.001f, Color.decode("#734222")),

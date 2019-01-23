@@ -5,6 +5,8 @@ import game.World;
 import javax.swing.JFrame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 public class SimulatorWindow extends JFrame {
 
@@ -62,6 +64,18 @@ public class SimulatorWindow extends JFrame {
 					System.exit(0);
 				} else if(e.getKeyCode() == KeyEvent.VK_M){
 					world.tryMatingCreatures();
+				}
+			}
+		});
+		super.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if(e.getWheelRotation() < 0){
+					System.out.println("doing things");
+					simulatorWindowComponent.getCurrentCamera().zoomIn();
+				} else if(e.getWheelRotation() > 0){
+					System.out.println("doing things");
+					simulatorWindowComponent.getCurrentCamera().zoomOut();
 				}
 			}
 		});

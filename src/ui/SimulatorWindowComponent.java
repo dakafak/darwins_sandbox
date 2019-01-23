@@ -93,8 +93,8 @@ public class SimulatorWindowComponent extends JComponent {
 	}
 
 	private void moveCamera(double dx, double dy){
-		double nextCameraX = currentCamera.getLocation().getX() + dx;
-		double nextCameraY = currentCamera.getLocation().getY() + dy;
+		double nextCameraX = currentCamera.getLocation().getX() + (dx * currentCamera.getViewingDistance() * .005);
+		double nextCameraY = currentCamera.getLocation().getY() + (dy * currentCamera.getViewingDistance() * .005);
 
 		if(nextCameraX < world.getMinWorldLocation().getX()){
 			currentCamera.getLocation().setX(world.getMinWorldLocation().getX());
@@ -123,4 +123,11 @@ public class SimulatorWindowComponent extends JComponent {
 		g2d.drawRenderedImage(worldImage, null);
 	}
 
+	public Camera getCurrentCamera() {
+		return currentCamera;
+	}
+
+	public void setCurrentCamera(Camera currentCamera) {
+		this.currentCamera = currentCamera;
+	}
 }

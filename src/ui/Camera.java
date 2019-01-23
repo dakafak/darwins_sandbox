@@ -26,11 +26,27 @@ import java.util.Set;
 public class Camera {
 
 	Location location;
-	double viewingDistanceInTiles;
+	double viewingDistance;
+	short minZoomLevel = 5;
+	short maxZoomLevel = 100;
 
 	public Camera(double x, double y, double viewingDistanceInTiles){
 		location = new Location(x, y);
-		this.viewingDistanceInTiles = viewingDistanceInTiles;
+		this.viewingDistance = viewingDistanceInTiles;
+	}
+
+	public void zoomIn(){
+		viewingDistance--;
+		if(viewingDistance < minZoomLevel){
+			viewingDistance = minZoomLevel;
+		}
+	}
+
+	public void zoomOut(){
+		viewingDistance++;
+		if(viewingDistance > maxZoomLevel){
+			viewingDistance = maxZoomLevel;
+		}
 	}
 
 	double cachedWindowWidth;
@@ -41,16 +57,18 @@ public class Camera {
 	double cachedTileViewingDistanceWidth;
 	double cachedTileViewingDistanceHeight;
 	double cachedStandardSize;
+	double cachedViewingDistance;
 	public BufferedImage getBufferedWorldImage(final World world, double drawingWidth, double drawingHeight, double deltaUpdate, long currentFPS, int worldSpeedMultiplier) {
-		if(drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight){
+		if(drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight || viewingDistance != cachedViewingDistance){
 			cachedWindowWidth = drawingWidth;
 			cachedWindowHeight = drawingHeight;
 			cachedWindowWidthMiddle = cachedWindowWidth * .5;
 			cachedWindowHeightMiddle = cachedWindowHeight * .5;
 			cachedMonitorResolutionScale = cachedWindowWidth / cachedWindowHeight;
-			cachedTileViewingDistanceHeight = viewingDistanceInTiles;
+			cachedTileViewingDistanceHeight = viewingDistance;
 			cachedTileViewingDistanceWidth = cachedTileViewingDistanceHeight * cachedMonitorResolutionScale;
-			cachedStandardSize = cachedWindowHeight / viewingDistanceInTiles;
+			cachedStandardSize = cachedWindowHeight / viewingDistance;
+			cachedViewingDistance = viewingDistance;
 		}
 
 		BufferedImage image = new BufferedImage((int) drawingWidth, (int) drawingHeight, BufferedImage.TYPE_INT_RGB);
@@ -197,5 +215,13 @@ public class Camera {
 
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+
+	public double getViewingDistance() {
+		return viewingDistance;
+	}
+
+	public void setViewingDistance(double viewingDistance) {
+		this.viewingDistance = viewingDistance;
 	}
 }
