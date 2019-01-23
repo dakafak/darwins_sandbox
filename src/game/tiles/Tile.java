@@ -1,32 +1,38 @@
 package game.tiles;
 
+import game.world.plantlife.Plant;
 import game.world.units.Location;
 import game.world.units.Size;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tile {
 
 	private TileType tileType;
 	Location location;
-	int tileFertility;
+	float tileFertility;
 	Size size;
+	List<Plant> plants;
 
-	public Tile(int x, int y, TileType tileType){
+	public Tile(int x, int y, TileType tileType, double currentDay){
+		plants = new ArrayList<>();
 		size = new Size(1, 1);
 		location = new Location(x, y);
 		this.tileType = tileType;
-		if(tileType.equals(TileType.DIRT)){
-			tileFertility = 10;
-		} else if(tileType.equals(TileType.ROCK)){
-			tileFertility = 1;
-		} else if(tileType.equals(TileType.SAND)){
-			tileFertility = 1;
-		} else if(tileType.equals(TileType.CLAY)){
-			tileFertility = 1;
-		} else if(tileType.equals(TileType.WATER)){
-			tileFertility = 1;
-		} else {
-			tileFertility = 0;
+		tileFertility = tileType.getFertility();
+		lastGrowthCheck = Math.random();
+	}
+
+	double lastGrowthCheck;
+	double growthFrequency = .25;
+	public boolean canGrowPlants(double worldTime){
+		if(worldTime - lastGrowthCheck >= growthFrequency){
+			lastGrowthCheck = worldTime;
+			return true;
 		}
+
+		return false;
 	}
 
 	public TileType getType() {
@@ -45,11 +51,11 @@ public class Tile {
 		this.location = location;
 	}
 
-	public int getTileFertility() {
+	public float getTileFertility() {
 		return tileFertility;
 	}
 
-	public void setTileFertility(int tileFertility) {
+	public void setTileFertility(float tileFertility) {
 		this.tileFertility = tileFertility;
 	}
 
@@ -59,5 +65,40 @@ public class Tile {
 
 	public void setSize(Size size) {
 		this.size = size;
+	}
+
+	public TileType getTileType() {
+		return tileType;
+	}
+
+	public void setTileType(TileType tileType) {
+		this.tileType = tileType;
+	}
+
+	public List<Plant> getPlants() {
+		return plants;
+	}
+
+	public void setPlants(List<Plant> plants) {
+		this.plants = plants;
+	}
+
+	public void addPlant(Plant plant){
+		plants.add(plant);
+	}
+
+	float tileFertilityModifier = .01f;
+	public void removeFertility() {
+		tileFertility -= tileFertilityModifier;
+		if(tileFertility < 0f){
+			tileFertility = 0f;
+		}
+	}
+
+	public void addFertility() {
+		tileFertility += tileFertilityModifier;
+		if(tileFertility > 1f){
+			tileFertility = 1f;
+		}
 	}
 }

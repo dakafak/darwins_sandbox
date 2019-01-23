@@ -4,9 +4,11 @@ import game.World;
 import game.dna.stats.StatType;
 import game.dna.traits.Trait;
 import game.dna.traits.TraitType;
+import game.tiles.Tile;
 import game.tiles.TileType;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
+import game.world.plantlife.Plant;
 import game.world.units.Location;
 import game.world.units.ScaledSize;
 
@@ -55,6 +57,7 @@ public class Camera {
 		Graphics2D g2d = image.createGraphics();
 		drawBackground(g2d);
 		drawGround(g2d, world);
+		drawPlants(g2d, world);
 		drawCreatures(g2d, world);
 		drawCameraInfo(g2d, world, deltaUpdate, currentFPS, worldSpeedMultiplier);
 		drawTraitUsageInfo(g2d, world);
@@ -102,18 +105,34 @@ public class Camera {
 	private void drawGround(Graphics2D g2d, World world){
 		for(int y = 0; y < world.getTileMap().length; y++) {
 			for (int x = 0; x < world.getTileMap()[0].length; x++) {
-				TileType currentTileType = world.getTileMap()[y][x].getType();
-				if(currentTileType.equals(TileType.DIRT)){
-					g2d.setColor(Color.decode("#8B4513"));
-				} else {
-					g2d.setColor(Color.GRAY);
-				}
+				Tile currentTile = world.getTileMap()[y][x];
+				TileType currentTileType = currentTile.getType();
+				g2d.setColor(currentTileType.getColor());
 				g2d.fillRect(
-						getScreenX(world.getTileMap()[y][x].getLocation()),
-						getScreenY(world.getTileMap()[y][x].getLocation()),
-						world.getTileMap()[y][x].getSize().getScaledSize(cachedStandardSize).getWidth(),
-						world.getTileMap()[y][x].getSize().getScaledSize(cachedStandardSize).getHeight()
+						getScreenX(currentTile.getLocation()),
+						getScreenY(currentTile.getLocation()),
+						currentTile.getSize().getScaledSize(cachedStandardSize).getWidth(),
+						currentTile.getSize().getScaledSize(cachedStandardSize).getHeight()
 				);
+			}
+		}
+	}
+
+	private void drawPlants(Graphics2D g2d, World world){
+		for(int y = 0; y < world.getTileMap().length; y++) {
+			for (int x = 0; x < world.getTileMap()[0].length; x++) {
+				Tile currentTile = world.getTileMap()[y][x];
+				for(int i = 0; i < currentTile.getPlants().size(); i++){
+					Plant currentPlant = currentTile.getPlants().get(i);
+					Color plantColor = currentPlant.getPlantType().getColor();
+					g2d.setColor(plantColor);
+					g2d.fillRect(
+							getScreenX(currentPlant.getLocation()),
+							getScreenY(currentPlant.getLocation()),
+							currentPlant.getSize().getScaledSize(cachedStandardSize).getWidth(),
+							currentPlant.getSize().getScaledSize(cachedStandardSize).getHeight()
+					);
+				}
 			}
 		}
 	}

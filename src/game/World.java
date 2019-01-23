@@ -7,6 +7,8 @@ import game.tiles.Tile;
 import game.tiles.TileType;
 import game.world.creatures.Creature;
 import game.world.creatures.Sex;
+import game.world.plantlife.Plant;
+import game.world.plantlife.PlantType;
 import game.world.units.Location;
 import game.world.units.Size;
 import ui.StatisticsSave;
@@ -39,8 +41,9 @@ public class World {
 	WorldStatisticsTool worldStatisticsTool;
 	MovementManager movementManager;
 
-	double dayLength = 1000;
+	double dayLength = 10000;
 	double worldDay;
+	short maxPlantsPerTile = 5;
 	Location minWorldLocation;
 
 	Location maxWorldLocation;
@@ -56,7 +59,7 @@ public class World {
 		tileMap = new Tile[(int)worldSize.getWidth()][(int)worldSize.getHeight()];//TODO may be more beneficial to create it with height first
 		for(int y = 0; y < getTileMap().length; y++) {
 			for (int x = 0; x < getTileMap()[0].length; x++) {
-				tileMap[y][x] = new Tile(x + minWidth, y + minHeight, TileType.DIRT);
+				tileMap[y][x] = new Tile(x + minWidth, y + minHeight, TileType.DIRT, worldDay);
 			}
 		}
 		creatures = new ArrayList();
@@ -75,6 +78,24 @@ public class World {
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
 		clearRemovedCreatures();
+		addPlantsToTileMap();
+	}
+
+	private void addPlantsToTileMap() {
+		for(int i = 0; i < tileMap.length; i++){
+			for(int j = 0; j < tileMap[0].length; j++){
+				Tile currentTile = tileMap[i][j];
+				if(currentTile.canGrowPlants(worldDay) && currentTile.getPlants().size() < maxPlantsPerTile){
+					boolean shouldGrowPlant = Math.random() < currentTile.getTileFertility();
+					PlantType plantTypeToGrow = PlantType.GRASS;
+					if(shouldGrowPlant){
+						Plant newPlant = new Plant(currentTile.getLocation().getX() + Math.random(), currentTile.getLocation().getY() + Math.random(), plantTypeToGrow);
+						currentTile.addPlant(newPlant);
+						currentTile.removeFertility();
+					}
+				}
+			}
+		}
 	}
 
 	public void addRandomCreature(Sex sexOfCreature){

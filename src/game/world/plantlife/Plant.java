@@ -9,9 +9,10 @@ public class Plant {
 	Location location;
 	Size size;
 
-	public Plant(double x, double y){
+	public Plant(double x, double y, PlantType plantType){
 		location = new Location(x, y);
 		size = new Size(.25,.25);
+		this.plantType = plantType;
 	}
 
 	public Location getLocation() {
@@ -30,4 +31,11 @@ public class Plant {
 		this.size = size;
 	}
 
+	public PlantType getPlantType() {
+		return plantType;
+	}
+
+	public void setPlantType(PlantType plantType) {
+		this.plantType = plantType;
+	}
 }
