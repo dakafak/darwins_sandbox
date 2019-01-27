@@ -1,4 +1,4 @@
-package game;
+package game.world;
 
 import game.dna.DNABuilder;
 import game.dna.DNAString;
@@ -6,7 +6,8 @@ import game.dna.traits.TraitPair;
 import game.tiles.Tile;
 import game.tiles.TileType;
 import game.world.creatures.Creature;
-import game.world.creatures.Sex;
+import game.dna.stats.Sex;
+import game.world.movement.MovementManager;
 import game.world.plantlife.Plant;
 import game.world.plantlife.PlantType;
 import game.world.units.Location;
@@ -21,13 +22,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static game.world.creatures.Sex.ASEXUAL;
-import static game.world.creatures.Sex.FEMALE;
-import static game.world.creatures.Sex.MALE;
+import static game.dna.stats.Sex.ASEXUAL;
+import static game.dna.stats.Sex.FEMALE;
+import static game.dna.stats.Sex.MALE;
 
 public class World {
 
-	Tile[][] tileMap;
+	Tile[][] tileMap;//TODO move this to a worldMap class with methods for retrieving tiles by coordinates
 	List<Creature> creatures;
 	//TODO create a thread object that contains a list of creatures and have each thread maintain a separate list of creatures.
 	// TODO these threads will have to control specific functionality to avoid concurrent exceptions
@@ -70,11 +71,40 @@ public class World {
 		movementManager = new MovementManager();
 	}
 
+	public Tile getTileFromCoordinates(int x, int y){
+		try {
+			if(coordinateExistsOnMap(x, y)) {
+				int adjustedX = x - (int) minWorldLocation.getX();
+				int adjustedY = y - (int) minWorldLocation.getY();
+
+				return tileMap[adjustedY][adjustedX];
+			}
+		} catch (Exception e){
+			System.out.println(e.getStackTrace().toString());
+		}
+
+		return null;
+	}
+
+	private boolean coordinateExistsOnMap(int x, int y){
+		return x >= minWorldLocation.getX() && x < maxWorldLocation.getX() && y >= minWorldLocation.getY() && y < maxWorldLocation.getY();
+	}
+
 	public void runWorldUpdates(long runningTime, double deltaUpdate){
-		movementManager.moveCreatures(deltaUpdate, getCreatures(), worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), minWorldLocation, maxWorldLocation, traitLoader);
-		movementManager.tellCreaturesToWander(runningTime, getCreatures());
+		Map<Long, List<Creature>> closestTileMapForCreatures = movementManager.getClosestTileMapForCreaturesMap(getCreatures());
+
+		movementManager.setWanderDirectionForCreatures(runningTime, getCreatures());
+		movementManager.tellAllCreaturesToWander(getCreatures(), deltaUpdate, minWorldLocation, maxWorldLocation);
+
+		movementManager.checkForCreatureMatingForListOfCreatures(getCreatures(), closestTileMapForCreatures, worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), traitLoader);
 		movementManager.moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay, deltaUpdate, minWorldLocation, maxWorldLocation, traitLoader);
 		movementManager.addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
+
+		movementManager.checkForHerbivoreFeeding(getCreatures(), this);
+		movementManager.checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures, worldDay);
+		movementManager.moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
+		creaturesToDelete.addAll(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
+
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
 		clearRemovedCreatures();
@@ -89,7 +119,7 @@ public class World {
 					boolean shouldGrowPlant = Math.random() < currentTile.getTileFertility();
 					PlantType plantTypeToGrow = PlantType.GRASS;
 					if(shouldGrowPlant){
-						Plant newPlant = new Plant(currentTile.getLocation().getX() + Math.random(), currentTile.getLocation().getY() + Math.random(), plantTypeToGrow);
+						Plant newPlant = new Plant(currentTile.getLocation().getX() + Math.random(), currentTile.getLocation().getY() + Math.random(), plantTypeToGrow, currentTile);
 						currentTile.addPlant(newPlant);
 						currentTile.removeFertility();
 					}
@@ -206,7 +236,7 @@ public class World {
 	public void checkCreatureLifeSpan(){
 		for(int i = 0; i < getCreatures().size(); i++){
 			Creature creature = getCreatures().get(i);
-			boolean creatureDies = creature.endedLifeSpan(worldDay);
+			boolean creatureDies = creature.shouldDie(worldDay);
 			if(creatureDies){
 				creaturesToDelete.add(creature);
 			}
@@ -215,6 +245,14 @@ public class World {
 
 	List<Creature> creaturesToDelete;
 	public void clearRemovedCreatures(){
+		for(int i = 0; i < creaturesToDelete.size(); i++){
+			Creature creatureToDelete = creaturesToDelete.get(i);
+			Tile tileForCreature = getTileFromCoordinates((int) Math.round(creatureToDelete.getLocation().getX()), (int) Math.round(creatureToDelete.getLocation().getY()));
+			if(tileForCreature != null) {
+				tileForCreature.addFertility();
+			}
+		}
+
 		worldStatisticsTool.removeTraitsForNewCreatures(creaturesToDelete);
 		getCreatures().removeAll(creaturesToDelete);
 		creaturesToDelete.clear();

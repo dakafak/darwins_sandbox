@@ -1,6 +1,8 @@
 package game.world.creatures;
 
 import game.dna.DNAString;
+import game.dna.stats.Diet;
+import game.dna.stats.Sex;
 import game.dna.stats.StatType;
 import game.dna.traits.CreatureStatModifier;
 import game.dna.traits.TraitNameAndValuePair;
@@ -23,18 +25,28 @@ public class Creature {
 
     DNAString creatureDNAString;
     Map<StatType, Object> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
-    Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
 	CreatureState creatureState;
+	double daySpawned;
+	private double energyRestoration;
+
+	Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
 	Location location;
 	Size size;//TODO  some of these traits can be moved into creature stats once that loader is added
+	Diet diet;
 	Direction direction = NORTH;
 	double speed;
 	double lifeSpan;
 	double mating_frequency;
 	double lastMatingDay;
-	double daySpawned;
+	double energy;
+	double hungerThreshold;
 
-    public Creature(double x, double y, DNAString creatureDNAString, Sex sexOfCreature, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay){
+    public Creature(double x,
+					double y,
+					DNAString creatureDNAString,
+					Sex sexOfCreature,
+					Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers,
+					double currentDay){
     	this.creatureDNAString = creatureDNAString;
     	this.sexOfCreature = sexOfCreature;
 		this.location = new Location(x, y);
@@ -73,6 +85,9 @@ public class Creature {
 		lifeSpan = (Double) creatureStats.get(StatType.life_span);
 		mating_frequency = (Double) creatureStats.get(StatType.mating_frequency);
 		lastMatingDay = currentDay;
+		diet =  Diet.valueOf(creatureStats.get(StatType.diet).toString());
+		energy = (Double) creatureStats.get(StatType.energy);
+		hungerThreshold = (Double) creatureStats.get(StatType.hunger_threshold);
     }
 
     public boolean canMate(double currentDay){
@@ -83,44 +98,12 @@ public class Creature {
 		return false;
 	}
 
-    public DNAString getCreatureDNAString() {
-        return creatureDNAString;
-    }
-
-    public Sex getSexOfCreature() {
-        return sexOfCreature;
-    }
-
-	public Location getLocation() {
-		return location;
+	public boolean isHungry(){
+    	return energy < hungerThreshold;
 	}
 
-	public CreatureState getCreatureState() {
-		return creatureState;
-	}
-
-	public void setCreatureState(CreatureState creatureState) {
-		this.creatureState = creatureState;
-	}
-
-	public Size getSize() {
-		return size;
-	}
-
-	public Map<StatType, Object> getCreatureStats() {
-		return creatureStats;
-	}
-
-	public void setCreatureStats(Map<StatType, Object> creatureStats) {
-		this.creatureStats = creatureStats;
-	}
-
-	public double getLastMatingDay() {
-		return lastMatingDay;
-	}
-
-	public void setLastMatingDay(double currentDay) {
-		this.lastMatingDay = currentDay;
+	public void addEnergy(double energyAddition){
+    	energy += energyAddition;
 	}
 
 	@Override
@@ -161,8 +144,8 @@ public class Creature {
 		move(deltaUpdate, dx, dy, minWorldLocation, maxWorldLocation);
 	}
 
-	public boolean endedLifeSpan(double day){
-		if(day - daySpawned > lifeSpan){
+	public boolean shouldDie(double day){
+		if(energy < 0 || day - daySpawned > lifeSpan){
 			return true;
 		}
 
@@ -223,5 +206,198 @@ public class Creature {
 			location.setY(nextY);
 		}
 
+		energy -= .0025 * deltaUpdate;//TODO placeholder, should create something that scales off of distance traveled
+	}
+
+	public DNAString getCreatureDNAString() {
+		return creatureDNAString;
+	}
+
+	public Sex getSexOfCreature() {
+		return sexOfCreature;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public CreatureState getCreatureState() {
+		return creatureState;
+	}
+
+	public void setCreatureState(CreatureState creatureState) {
+		this.creatureState = creatureState;
+	}
+
+	public Size getSize() {
+		return size;
+	}
+
+	public Map<StatType, Object> getCreatureStats() {
+		return creatureStats;
+	}
+
+	public void setCreatureStats(Map<StatType, Object> creatureStats) {
+		this.creatureStats = creatureStats;
+	}
+
+	public double getLastMatingDay() {
+		return lastMatingDay;
+	}
+
+	public void setLastMatingDay(double currentDay) {
+		this.lastMatingDay = currentDay;
+	}
+
+	public void setCreatureDNAString(DNAString creatureDNAString) {
+		this.creatureDNAString = creatureDNAString;
+	}
+
+	public void setSexOfCreature(Sex sexOfCreature) {
+		this.sexOfCreature = sexOfCreature;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
+	public void setSize(Size size) {
+		this.size = size;
+	}
+
+	public Diet getDiet() {
+		return diet;
+	}
+
+	public void setDiet(Diet diet) {
+		this.diet = diet;
+	}
+
+	public Direction getDirection() {
+		return direction;
+	}
+
+	public void setDirection(Direction direction) {
+		this.direction = direction;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+
+	public double getLifeSpan() {
+		return lifeSpan;
+	}
+
+	public void setLifeSpan(double lifeSpan) {
+		this.lifeSpan = lifeSpan;
+	}
+
+	public double getMating_frequency() {
+		return mating_frequency;
+	}
+
+	public void setMating_frequency(double mating_frequency) {
+		this.mating_frequency = mating_frequency;
+	}
+
+	public double getDaySpawned() {
+		return daySpawned;
+	}
+
+	public void setDaySpawned(double daySpawned) {
+		this.daySpawned = daySpawned;
+	}
+
+	public long getNextDirectionChange() {
+		return nextDirectionChange;
+	}
+
+	public void setNextDirectionChange(long nextDirectionChange) {
+		this.nextDirectionChange = nextDirectionChange;
+	}
+
+	public int getWanderTimeInMilliseconds() {
+		return wanderTimeInMilliseconds;
+	}
+
+	public void setWanderTimeInMilliseconds(int wanderTimeInMilliseconds) {
+		this.wanderTimeInMilliseconds = wanderTimeInMilliseconds;
+	}
+
+	public int getWanderTimeAdditionInMilliseconds() {
+		return wanderTimeAdditionInMilliseconds;
+	}
+
+	public void setWanderTimeAdditionInMilliseconds(int wanderTimeAdditionInMilliseconds) {
+		this.wanderTimeAdditionInMilliseconds = wanderTimeAdditionInMilliseconds;
+	}
+
+	public double getCachedLocationXChange() {
+		return cachedLocationXChange;
+	}
+
+	public void setCachedLocationXChange(double cachedLocationXChange) {
+		this.cachedLocationXChange = cachedLocationXChange;
+	}
+
+	public double getCachedLocationYChange() {
+		return cachedLocationYChange;
+	}
+
+	public void setCachedLocationYChange(double cachedLocationYChange) {
+		this.cachedLocationYChange = cachedLocationYChange;
+	}
+
+	public double getCachedDx() {
+		return cachedDx;
+	}
+
+	public void setCachedDx(double cachedDx) {
+		this.cachedDx = cachedDx;
+	}
+
+	public double getCachedDy() {
+		return cachedDy;
+	}
+
+	public void setCachedDy(double cachedDy) {
+		this.cachedDy = cachedDy;
+	}
+
+	public double getCachedDeltaUpdate() {
+		return cachedDeltaUpdate;
+	}
+
+	public void setCachedDeltaUpdate(double cachedDeltaUpdate) {
+		this.cachedDeltaUpdate = cachedDeltaUpdate;
+	}
+
+	public double getEnergy() {
+		return energy;
+	}
+
+	public void setEnergy(double energy) {
+		this.energy = energy;
+	}
+
+	public double getHungerThreshold() {
+		return hungerThreshold;
+	}
+
+	public void setHungerThreshold(double hungerThreshold) {
+		this.hungerThreshold = hungerThreshold;
+	}
+
+	public double getEnergyRestoration() {
+		return energyRestoration;
+	}
+
+	public void setEnergyRestoration(double energyRestoration) {
+		this.energyRestoration = energyRestoration;
 	}
 }

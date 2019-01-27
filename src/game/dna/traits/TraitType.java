@@ -8,7 +8,9 @@ public enum TraitType {
 	diet("diet"),
 	social("social"),
 	speed("speed"),
-	lifespan("lifespan");
+	lifespan("lifespan"),
+	energy("energy"),
+	hunger_threshold("hunger_threshold");
 
 	private String value;
 	TraitType(String value){

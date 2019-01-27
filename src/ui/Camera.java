@@ -1,6 +1,6 @@
 package ui;
 
-import game.World;
+import game.world.World;
 import game.dna.stats.StatType;
 import game.dna.traits.Trait;
 import game.dna.traits.TraitType;
@@ -185,6 +185,13 @@ public class Camera {
 
 			if(creature.getCreatureState() == CreatureState.MATING){
 				g2d.setColor(Color.PINK);
+				g2d.drawOval(
+						getScreenX(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleWidth(),
+						getScreenY(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleHeight(),
+						scaledSize.getWidth(),
+						scaledSize.getHeight());
+			} else if(creature.getCreatureState() == CreatureState.EATING){
+				g2d.setColor(Color.WHITE);
 				g2d.drawOval(
 						getScreenX(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleWidth(),
 						getScreenY(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleHeight(),

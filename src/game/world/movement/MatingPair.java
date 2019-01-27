@@ -1,4 +1,6 @@
-package game.world.creatures;
+package game.world.movement;
+
+import game.world.creatures.Creature;
 
 public class MatingPair {
 

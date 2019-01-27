@@ -14,6 +14,7 @@ public class Tile {
 	float tileFertility;
 	Size size;
 	List<Plant> plants;
+	double growthFrequency = .1;
 
 	public Tile(int x, int y, TileType tileType, double currentDay){
 		plants = new ArrayList<>();
@@ -25,7 +26,6 @@ public class Tile {
 	}
 
 	double lastGrowthCheck;
-	double growthFrequency = .25;
 	public boolean canGrowPlants(double worldTime){
 		if(worldTime - lastGrowthCheck >= growthFrequency){
 			lastGrowthCheck = worldTime;

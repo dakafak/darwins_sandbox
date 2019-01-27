@@ -1,6 +1,6 @@
 package ui;
 
-import game.World;
+import game.world.World;
 
 import javax.swing.JComponent;
 import java.awt.Graphics;
@@ -101,8 +101,7 @@ public class SimulatorWindowComponent extends JComponent {
 			currentCamera.getLocation().setX(world.getMinWorldLocation().getX());
 		} else if(nextCameraX > world.getMaxWorldLocation().getX()){
 			currentCamera.getLocation().setX(world.getMaxWorldLocation().getX());
-		} else if(nextCameraX >= world.getMinWorldLocation().getX()
-				&& nextCameraX <= world.getMaxWorldLocation().getX()) {
+		} else {
 			currentCamera.getLocation().setX(nextCameraX);
 		}
 
@@ -110,8 +109,7 @@ public class SimulatorWindowComponent extends JComponent {
 			currentCamera.getLocation().setY(world.getMinWorldLocation().getY());
 		} else if(nextCameraY > world.getMaxWorldLocation().getY()){
 			currentCamera.getLocation().setY(world.getMaxWorldLocation().getY());
-		} else if(nextCameraY >= world.getMinWorldLocation().getY()
-				&& nextCameraY <= world.getMaxWorldLocation().getY()){
+		} else {
 			currentCamera.getLocation().setY(nextCameraY);
 		}
 	}

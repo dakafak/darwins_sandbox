@@ -1,24 +1,25 @@
 package ui;
 
-import game.World;
+import game.world.World;
+import game.dna.stats.Sex;
 
 import javax.swing.JFrame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 public class SimulatorWindow extends JFrame {
 
 	SimulatorWindowComponent simulatorWindowComponent;
+	World world;
 
-	public SimulatorWindow(String title, World world){
-		super(title);
-		super.setSize(1800, 900);//TODO later set this to full screen
-		super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		super.setLocationRelativeTo(null);
-		super.setUndecorated(true);
-		super.addKeyListener(new KeyListener() {
+	public SimulatorWindow(String title){
+		setTitle(title);
+		setSize(1800, 900);//TODO later set this to full screen
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setUndecorated(true);
+
+		addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 
@@ -67,21 +68,28 @@ public class SimulatorWindow extends JFrame {
 				}
 			}
 		});
-		super.addMouseWheelListener(new MouseWheelListener() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				if(e.getWheelRotation() < 0){
-					simulatorWindowComponent.getCurrentCamera().zoomIn();
-				} else if(e.getWheelRotation() > 0){
-					simulatorWindowComponent.getCurrentCamera().zoomOut();
-				}
+		addMouseWheelListener(e -> {
+			if(e.getWheelRotation() < 0){
+				simulatorWindowComponent.getCurrentCamera().zoomIn();
+			} else if(e.getWheelRotation() > 0){
+				simulatorWindowComponent.getCurrentCamera().zoomOut();
 			}
 		});
+
+		prepareNewWorld();
+	}
+
+	private void prepareNewWorld(){
+//		removeAll();
+		world = new World(-50, 80, -50, 80);
+		world.addRandomCreature(Sex.MALE);
+		world.addRandomCreature(Sex.FEMALE);
+		System.out.println(world.getCreatures());
 
 		Camera mainCamera = new Camera(0, 0, 80);
 		simulatorWindowComponent = new SimulatorWindowComponent(mainCamera);
 		simulatorWindowComponent.setWorld(world);
-		super.add(simulatorWindowComponent);
+		add(simulatorWindowComponent);
 		setVisible(true);
 		simulatorWindowComponent.start();
 	}

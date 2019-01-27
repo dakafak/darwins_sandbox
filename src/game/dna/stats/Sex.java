@@ -1,4 +1,4 @@
-package game.world.creatures;
+package game.dna.stats;
 
 public enum Sex {
     MALE("Male"), FEMALE("Female"), ASEXUAL("Asexual");

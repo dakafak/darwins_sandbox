@@ -7,7 +7,10 @@ public enum StatType {
 	size("size", Double.class),
 	speed("speed", Double.class),
 	mating_frequency("mating_frequency", Double.class),
-	life_span("life_span", Double.class);
+	life_span("life_span", Double.class),
+	diet("diet", Diet.class),
+	energy("energy", Double.class),
+	hunger_threshold("hunger_threshold", Double.class);
 
 	String value;
 	Object classType;
