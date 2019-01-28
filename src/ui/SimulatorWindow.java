@@ -81,7 +81,7 @@ public class SimulatorWindow extends JFrame {
 
 	private void prepareNewWorld(){
 //		removeAll();
-		world = new World(-50, 80, -50, 80);
+		world = new World(-20, 20, -20, 20);
 		world.addRandomCreature(Sex.MALE);
 		world.addRandomCreature(Sex.FEMALE);
 		System.out.println(world.getCreatures());

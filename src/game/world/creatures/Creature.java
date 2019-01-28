@@ -206,7 +206,7 @@ public class Creature {
 			location.setY(nextY);
 		}
 
-		energy -= .0025 * deltaUpdate;//TODO placeholder, should create something that scales off of distance traveled
+		energy -= .005 * deltaUpdate;//TODO placeholder, should create something that scales off of distance traveled
 	}
 
 	public DNAString getCreatureDNAString() {
