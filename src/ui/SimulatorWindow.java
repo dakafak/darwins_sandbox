@@ -65,6 +65,13 @@ public class SimulatorWindow extends JFrame {
 					System.exit(0);
 				} else if(e.getKeyCode() == KeyEvent.VK_M){
 					world.tryMatingCreatures();
+				} else if(e.getKeyCode() == KeyEvent.VK_P){
+					if(simulatorWindowComponent.worldSpeedMultiplier == 0) {
+						simulatorWindowComponent.worldSpeedMultiplier = 1;
+					}
+					else {
+						simulatorWindowComponent.worldSpeedMultiplier = 0;
+					}
 				}
 			}
 		});
