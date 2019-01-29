@@ -7,6 +7,9 @@ import game.world.units.Size;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A singular square area on the map
+ */
 public class Tile {
 
 	private TileType tileType;

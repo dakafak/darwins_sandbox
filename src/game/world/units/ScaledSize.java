@@ -1,5 +1,8 @@
 package game.world.units;
 
+/**
+ * The on-screen size
+ */
 public class ScaledSize {
 
 	double width;

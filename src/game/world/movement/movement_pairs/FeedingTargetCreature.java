@@ -1,7 +1,10 @@
-package game.world.movement;
+package game.world.movement.movement_pairs;
 
 import game.world.creatures.Creature;
 
+/**
+ * A predator and prey pair, used to determine whether a predator is currently hunting
+ */
 public class FeedingTargetCreature {
 
 	Creature predator;

@@ -9,6 +9,9 @@ import game.world.World;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
 import game.dna.stats.Sex;
+import game.world.movement.movement_pairs.FeedingTargetCreature;
+import game.world.movement.movement_pairs.FeedingTargetPlant;
+import game.world.movement.movement_pairs.MatingPair;
 import game.world.plantlife.Plant;
 import game.world.units.Location;
 import ui.TraitLoader;
@@ -40,6 +43,12 @@ public class MovementManager {
 		childCreaturesToAddToWorld = new LinkedList<>();
 	}
 
+	/**
+	 * Creates a map, location->all creatures at that location
+	 *
+	 * @param creatures
+	 * @return
+	 */
 	public Map<Long, List<Creature>> getClosestTileMapForCreaturesMap(List<Creature> creatures){
 		Map<Long, List<Creature>> closestTileMapForCreatures = new HashMap<>();
 
@@ -62,6 +71,14 @@ public class MovementManager {
 	//TODO create a loop to iterate through a surrounding area STARTING AT THE CENTER
 	// 		TODO also consider just returning first plant found
 	//			TODO this does not currently choose the nearest plant, needs work
+
+	/**
+	 * Searches in the creatures max view distance for the closest plant
+	 *
+	 * @param creature
+	 * @param world
+	 * @return
+	 */
 	private Plant getNearestPlantToCreature(Creature creature, World world) {
 		List<Plant> plantsInRange = new ArrayList<>();
 		int creatureX = (int) Math.round(creature.getLocation().getX());
@@ -82,6 +99,12 @@ public class MovementManager {
 		return null;
 	}
 
+	/**
+	 * For a list of herbivore creatures, check if any can eat and are nearby a plant, if so create a new FeedingTargetPlant
+	 *
+	 * @param creatures
+	 * @param world
+	 */
 	public void checkForHerbivoreFeeding(List<Creature> creatures, World world){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
@@ -96,15 +119,29 @@ public class MovementManager {
 		}
 	}
 
-	public void checkForCarnivoreFeeding(List<Creature> creatures, Map<Long, List<Creature>> closestTileMapForCreatures, double currentDay){
+	/**
+	 * For a list of carnivore creatures, check if any can eat and are nearby another creature
+	 *
+	 * @param creatures
+	 * @param closestTileMapForCreatures
+	 */
+	public void checkForCarnivoreFeeding(List<Creature> creatures, Map<Long, List<Creature>> closestTileMapForCreatures){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
 			if(creature.getDiet() == Diet.CARNIVORE && creature.isHungry()) {
-				checkForCarnvioreFeedingPairsInRange(creature, getCreaturesInRange(creature, closestTileMapForCreatures), currentDay);
+				checkForCarnvioreFeedingPairsInRange(creature, getCreaturesInRange(creature, closestTileMapForCreatures));
 			}
 		}
 	}
 
+	/**
+	 * For all creatures in a list, checks whether a creature is in a wandering state and then move that creature
+	 *
+	 * @param creatures
+	 * @param deltaUpdate
+	 * @param minWorldLocation
+	 * @param maxWorldLocation
+	 */
 	public void tellAllCreaturesToWander(List<Creature> creatures, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
@@ -114,6 +151,15 @@ public class MovementManager {
 		}
 	}
 
+	/**
+	 * For each creature in a list of creatures, call checkForCreatureMating(creature, ...)
+	 *
+	 * @param creatures
+	 * @param closestTileMapForCreatures
+	 * @param currentDay
+	 * @param traitNameAndValueToCreatureStatModifiers
+	 * @param traitLoader
+	 */
 	public void checkForCreatureMatingForListOfCreatures(List<Creature> creatures, Map<Long, List<Creature>> closestTileMapForCreatures, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, TraitLoader traitLoader){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
@@ -121,6 +167,13 @@ public class MovementManager {
 		}
 	}
 
+	/**
+	 * For a given creature, return a list of creatures within the max view distance range
+	 *
+	 * @param creature
+	 * @param closestTileMapForCreatures
+	 * @return
+	 */
 	private List<Creature> getCreaturesInRange(Creature creature, Map<Long, List<Creature>> closestTileMapForCreatures){
 		List<Creature> creaturesInRange = new ArrayList<>();
 		int creatureX = (int) Math.round(creature.getLocation().getX());
@@ -138,6 +191,13 @@ public class MovementManager {
 		return creaturesInRange;
 	}
 
+	/**
+	 * Given an x and y coordinate, return a long with the two coordinates appended together in a unique key
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	private long getLocationLongFromCoordinates(double x, double y){
 		long xLong = (int) x;
 		long yLong = (int) y;
@@ -147,6 +207,16 @@ public class MovementManager {
 	}
 
 	//TODO update this to grab the nearest creature and pass that to checkMatingForCreatureAndCreatureInRange
+
+	/**
+	 * For a given creature, iterate through all creatures in range and look for a potential mate
+	 *
+	 * @param creature
+	 * @param creaturesInRange
+	 * @param currentDay
+	 * @param traitNameAndValueToCreatureStatModifiers
+	 * @param traitLoader
+	 */
 	private void checkForCreatureMating(Creature creature, List<Creature> creaturesInRange, double currentDay, Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, TraitLoader traitLoader){
 		if(creature.getSexOfCreature() == Sex.ASEXUAL && creature.canMate(currentDay)){
 			DNAString childString = DNABuilder.getAsexualDNAString(creature.getCreatureDNAString(), traitLoader);
@@ -161,8 +231,13 @@ public class MovementManager {
 		}
 	}
 
-	//TODO change to grab closest creature in list of creatures
-	private void checkForCarnvioreFeedingPairsInRange(Creature creature, List<Creature> creatures, double currentDay){
+	/**
+	 * For a given carnivore, check if any creatures within range are potential food
+	 *
+	 * @param creature
+	 * @param creatures
+	 */
+	private void checkForCarnvioreFeedingPairsInRange(Creature creature, List<Creature> creatures){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature potentialPrey = creatures.get(i);
 			//TODO add if checks for species once that's added
@@ -173,6 +248,13 @@ public class MovementManager {
 		}
 	}
 
+	/**
+	 * For a given creature and a potential mate in range, determine if a mating is possible
+	 *
+	 * @param creature
+	 * @param creatureInRange
+	 * @param currentDay
+	 */
 	private void checkMatingForCreatureAndCreatureInRange(Creature creature, Creature creatureInRange, double currentDay){
 		if(creature.getCreatureState() == CreatureState.WANDERING && creatureInRange.getCreatureState() == CreatureState.WANDERING
 			&& creature.canMate(currentDay) && creatureInRange.canMate(currentDay)){
@@ -185,6 +267,12 @@ public class MovementManager {
 		}
 	}
 
+	/**
+	 * For all creatures, try to set a new wandering direction
+	 *
+	 * @param currentTime
+	 * @param creatures
+	 */
 	public void setWanderDirectionForCreatures(long currentTime, List<Creature> creatures){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
@@ -192,6 +280,16 @@ public class MovementManager {
 		}
 	}
 
+	/**
+	 * For all mating pairs, try mating. If the creatures are too far apart, move closer.
+	 *
+	 * @param traitNameAndValueToCreatureStatModifiers
+	 * @param currentDay
+	 * @param deltaUpdate
+	 * @param minWorldLocation
+	 * @param maxWorldLocation
+	 * @param traitLoader
+	 */
 	public void moveAndTryMatingCreatures(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation, TraitLoader traitLoader){
 		List<MatingPair> matingPairsToRemove = new LinkedList<>();
 		for(MatingPair matingPair : matingPairs){
@@ -221,6 +319,13 @@ public class MovementManager {
 		matingPairs.removeAll(matingPairsToRemove);
 	}
 
+	/**
+	 * For all herbivore and plant pairs, try eating. If too far, move closer.
+	 *
+	 * @param deltaUpdate
+	 * @param minWorldLocation
+	 * @param maxWorldLocation
+	 */
 	public void moveAndTryEatingForHerbivores(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
 		List<FeedingTargetPlant> herbivoreFeedingPairsToRemove = new LinkedList<>();
 		List<Plant> plantsToRemove = new ArrayList<>();
@@ -252,6 +357,14 @@ public class MovementManager {
 		}
 	}
 
+	/**
+	 * For all carnivore pairs, try to eat. If too far, move closer.
+	 *
+	 * @param deltaUpdate
+	 * @param minWorldLocation
+	 * @param maxWorldLocation
+	 * @return
+	 */
 	public List<Creature> moveAndTryEatingForCarnivores(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
 		List<FeedingTargetCreature> carnivoreFeedingPairsToRemove = new LinkedList<>();
 		List<Creature> creaturestoRemove = new ArrayList<>();
@@ -279,16 +392,36 @@ public class MovementManager {
 		return creaturestoRemove;
 	}
 
+	/**
+	 * Adds a list of creatures to the queue childCreaturesToAddToWorld
+	 *
+	 * @param creatures
+	 * @param worldStatisticsTool
+	 */
 	public void addNewChildCreaturesToWorldCreatureList(List<Creature> creatures, WorldStatisticsTool worldStatisticsTool){
-		worldStatisticsTool.addTraitsForNewCreatures(childCreaturesToAddToWorld);
+		worldStatisticsTool.addTraitsForNewCreatures(childCreaturesToAddToWorld);//TODO STAT determine if this is in the correct location
 		creatures.addAll(childCreaturesToAddToWorld);
 		childCreaturesToAddToWorld.clear();
 	}
 
+	/**
+	 * Determines the distance between two creatures
+	 *
+	 * @param creature1
+	 * @param creature2
+	 * @return
+	 */
 	private double distanceBetweenCreatures(Creature creature1, Creature creature2){
 		return Math.sqrt(Math.pow(creature2.getLocation().getX() - creature1.getLocation().getX(), 2) + Math.pow(creature2.getLocation().getY() - creature1.getLocation().getY(), 2));
 	}
 
+	/**
+	 * Determines the distance between a given creature and plant
+	 *
+	 * @param creature
+	 * @param plant
+	 * @return
+	 */
 	private double distanceBetweenCreatureAndPlant(Creature creature, Plant plant){
 		return Math.sqrt(Math.pow(plant.getLocation().getX() - creature.getLocation().getX(), 2) + Math.pow(plant.getLocation().getY() - creature.getLocation().getY(), 2));
 	}

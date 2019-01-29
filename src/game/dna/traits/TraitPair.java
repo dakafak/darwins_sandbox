@@ -1,5 +1,8 @@
 package game.dna.traits;
 
+/**
+ * A combination of two traits of the same type, used for holding dominant and recessive traits
+ */
 public class TraitPair {
 	char[] characterRepresentation;
 	Trait[] traits;

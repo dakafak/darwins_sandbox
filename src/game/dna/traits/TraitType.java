@@ -1,5 +1,8 @@
 package game.dna.traits;
 
+/**
+ * Defines the type of a trait
+ */
 public enum TraitType {
 	color("color"),
 	size("size"),

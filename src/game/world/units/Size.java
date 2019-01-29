@@ -4,6 +4,8 @@ public class Size {
 
 	double width;
 	double height;
+	double cachedStandardScale;
+	ScaledSize cachedScaledSize;
 
 	public Size(double width, double height){
 		this.width = width;
@@ -18,8 +20,12 @@ public class Size {
 		return height;
 	}
 
-	double cachedStandardScale;
-	ScaledSize cachedScaledSize;
+	/**
+	 * Used to determine the on-screen size
+	 *
+	 * @param standardScale
+	 * @return
+	 */
 	public ScaledSize getScaledSize(double standardScale){
 		if(cachedStandardScale != standardScale){
 			cachedStandardScale = standardScale;

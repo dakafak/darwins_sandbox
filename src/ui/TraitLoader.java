@@ -35,7 +35,7 @@ public class TraitLoader {
 
 	Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers;
     private void loadTraitToStatDefinitions(){
-		traitNameAndValueToCreatureStatModifiers = loadTraitToCreatureStatDefinitions(traitFolderLocation + "/trait_to_creature_stat_definitions");
+		traitNameAndValueToCreatureStatModifiers = loadTraitToCreatureStatDefinitions(traitFolderLocation + "/trait_to_creature_stat_definitions.json");
 	}
 
     private Map<String, List<CreatureStatModifier>> loadTraitToCreatureStatDefinitions(String traitOrderFileName){

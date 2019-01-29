@@ -71,6 +71,13 @@ public class World {
 		movementManager = new MovementManager();
 	}
 
+	/**
+	 * Given coordinates, returns the corresponding tile, if it exists
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public Tile getTileFromCoordinates(int x, int y){
 		try {
 			if(coordinateExistsOnMap(x, y)) {
@@ -86,10 +93,23 @@ public class World {
 		return null;
 	}
 
+	/**
+	 * Determines whether or not the given coordinates exist on the map (if the coordinates are not out of bounds of the array)
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	private boolean coordinateExistsOnMap(int x, int y){
 		return x >= minWorldLocation.getX() && x < maxWorldLocation.getX() && y >= minWorldLocation.getY() && y < maxWorldLocation.getY();
 	}
 
+	/**
+	 * Processes all updates for the world and anything within the world. LET'S PLAY GOD. MUAHAHAHAHAHAHA
+	 *
+	 * @param runningTime
+	 * @param deltaUpdate
+	 */
 	public void runWorldUpdates(long runningTime, double deltaUpdate){
 		Map<Long, List<Creature>> closestTileMapForCreatures = movementManager.getClosestTileMapForCreaturesMap(getCreatures());
 
@@ -101,21 +121,26 @@ public class World {
 		movementManager.addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
 
 		movementManager.checkForHerbivoreFeeding(getCreatures(), this);
-		movementManager.checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures, worldDay);
+		movementManager.checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures);
 		movementManager.moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
 		creaturesToDelete.addAll(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
 
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
 		clearRemovedCreatures();
-		addPlantsToTileMap();
+		addPlantsToTileMap(worldDay);
 	}
 
-	private void addPlantsToTileMap() {
+	/**
+	 * Given the current day, iterate through the tile map and attempt to grow plants on each tile
+	 *
+	 * @param currentDay
+	 */
+	private void addPlantsToTileMap(double currentDay) {
 		for(int i = 0; i < tileMap.length; i++){
 			for(int j = 0; j < tileMap[0].length; j++){
 				Tile currentTile = tileMap[i][j];
-				if(currentTile.canGrowPlants(worldDay) && currentTile.getPlants().size() < maxPlantsPerTile){
+				if(currentTile.canGrowPlants(currentDay) && currentTile.getPlants().size() < maxPlantsPerTile){
 					boolean shouldGrowPlant = Math.random() < currentTile.getTileFertility();
 					PlantType plantTypeToGrow = PlantType.GRASS;
 					if(shouldGrowPlant){
@@ -128,6 +153,11 @@ public class World {
 		}
 	}
 
+	/**
+	 * Adds a random creature, of the given sex, to the world
+	 *
+	 * @param sexOfCreature
+	 */
 	public void addRandomCreature(Sex sexOfCreature){
 		DNAString newDNAStringForCreature = new DNAString();
 		TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
@@ -139,19 +169,27 @@ public class World {
 		addRandomCreature(newDNAStringForCreature, sexOfCreature);
 	}
 
+	/**
+	 * Adds a random creature, of the given sex and DNAString, to the world
+	 *
+	 * @param dnaString
+	 * @param sexOfCreature
+	 */
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
 		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
 		getCreatures().add(newCreature);
 		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));
 	}
 
+	/**
+	 * TODO remove this - temporary method for testing - or modify for range
+	 * A manual method of iterating through all creatures and mating random pairs
+	 */
 	public void tryMatingCreatures(){//TODO remove this - temporary method for testing - or modify for range
 		List<Creature> malesToMate = new ArrayList<>();
 		List<Creature> femalesToMate = new ArrayList<>();
 		List<Creature> asexualToMate = new ArrayList<>();
 
-		//TODO eventually this should be changed to just check around the creature
-		//TODO add a timer for creatures so they only mate so often, not every cycle
 		for(int i = 0; i < getCreatures().size(); i++){
 				Creature creature = getCreatures().get(i);
 			if(creature.getSexOfCreature().equals(MALE)){
@@ -170,57 +208,25 @@ public class World {
 			getCreatures().add(newCreature);
 			worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));
 		}
-
-		//TODO add loop for reproducing the asexual group -- after adding the asexual reproduce function
 	}
 
+	/**
+	 * Returns all creatures for the world
+	 *
+	 * @return
+	 */
 	public List<Creature> getCreatures() {
 		return creatures;
 	}
 
-	public void setCreatures(List<Creature> creatures) {
-		this.creatures = creatures;
-	}
-
-	public void printWorldStatistics(StatisticsSave statisticsSave){
-		System.out.println("---- World Statistics ----");
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(statisticsSave.getTotalNumberOfCreatures());
-		stringBuilder.append("(");
-		stringBuilder.append(statisticsSave.getNumberMaleCreatures());
-		stringBuilder.append("M ");
-		stringBuilder.append(statisticsSave.getNumberFemaleCreatures());
-		stringBuilder.append("F ");
-		stringBuilder.append(statisticsSave.getNumberAsexualCreatures());
-		stringBuilder.append("A");
-		stringBuilder.append(")");
-		stringBuilder.append(System.lineSeparator());
-
-		Map<String, Integer> traitPopularityMap = statisticsSave.getTraitPopularityMap();
-		for(String traitKey : traitPopularityMap.keySet()){
-			stringBuilder.append(traitKey);
-			stringBuilder.append("\t");
-			stringBuilder.append(traitPopularityMap.get(traitKey));
-			stringBuilder.append(System.lineSeparator());
-		}
-
-		System.out.println(stringBuilder.toString());
-	}
-
-	public StatisticsSave getStatisticsSaveForCurrentWorld(){
-		StatisticsSave save = new StatisticsSave();
-
-		save.setTotalNumberOfCreatures(worldStatisticsTool.getNumberOfCreatures(this));
-		save.setNumberMaleCreatures(worldStatisticsTool.getNumberMaleCreatures(this));
-		save.setNumberFemaleCreatures(worldStatisticsTool.getNumberFemaleCreatures(this));
-		save.setNumberAsexualCreatures(worldStatisticsTool.getNumberAsexualCreatures(this));
-		save.setTraitPopularityMap(worldStatisticsTool.getTraitPopularityMap(this, true));
-
-		return save;
-	}
-
 	double cachedDeltaUpdate;
 	double cachedDayChange;
+
+	/**
+	 * Given a delta update, adjust the day by the scaled amount
+	 *
+	 * @param deltaUpdate
+	 */
 	public void adjustDay(double deltaUpdate){
 		if(deltaUpdate != cachedDeltaUpdate){
 			cachedDeltaUpdate = deltaUpdate;
@@ -229,10 +235,18 @@ public class World {
 		worldDay += cachedDayChange;
 	}
 
+	/**
+	 * Returns the current day of the world
+	 *
+	 * @return
+	 */
 	public double getWorldDay(){
 		return worldDay;
 	}
 
+	/**
+	 * Iterates through all creatures and determines of any should die of old age :(
+	 */
 	public void checkCreatureLifeSpan(){
 		for(int i = 0; i < getCreatures().size(); i++){
 			Creature creature = getCreatures().get(i);
@@ -244,6 +258,10 @@ public class World {
 	}
 
 	List<Creature> creaturesToDelete;
+
+	/**
+	 * Removes creatures from the delete queue and updates the trait statistics
+	 */
 	public void clearRemovedCreatures(){
 		for(int i = 0; i < creaturesToDelete.size(); i++){
 			Creature creatureToDelete = creaturesToDelete.get(i);
@@ -253,7 +271,7 @@ public class World {
 			}
 		}
 
-		worldStatisticsTool.removeTraitsForNewCreatures(creaturesToDelete);
+		worldStatisticsTool.removeTraitsForNewCreatures(creaturesToDelete);//TODO STAT determine if this is in the correct location
 		getCreatures().removeAll(creaturesToDelete);
 		creaturesToDelete.clear();
 	}

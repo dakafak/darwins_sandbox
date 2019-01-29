@@ -1,7 +1,10 @@
-package game.world.movement;
+package game.world.movement.movement_pairs;
 
 import game.world.creatures.Creature;
 
+/**
+ * A pair of two creatures, which are going to mate once they reach each other
+ */
 public class MatingPair {
 
 	Creature creature1;

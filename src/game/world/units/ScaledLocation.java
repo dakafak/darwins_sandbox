@@ -1,5 +1,8 @@
 package game.world.units;
 
+/**
+ * The on-screen location
+ */
 public class ScaledLocation {
 
 	double x;

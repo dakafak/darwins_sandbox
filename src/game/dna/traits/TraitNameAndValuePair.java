@@ -1,5 +1,8 @@
 package game.dna.traits;
 
+/**
+ * A string, combination of a given trait name and value, used as a key for trait-to-stat-modifications
+ */
 public class TraitNameAndValuePair {
 
 	String key;

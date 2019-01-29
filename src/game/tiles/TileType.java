@@ -2,6 +2,9 @@ package game.tiles;
 
 import java.awt.Color;
 
+/**
+ * Used to define what type of ground a tile is. Also defines the fertility and color of the tile using this type
+ */
 public enum TileType {
 	DIRT(.01f, Color.decode("#312516")),
 	ROCK(.001f, Color.decode("#888C8D")),

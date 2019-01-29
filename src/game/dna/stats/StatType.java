@@ -2,6 +2,9 @@ package game.dna.stats;
 
 import java.awt.Color;
 
+/**
+ * Used to determine "stat" values for a creature. The values of stats will be managed by the file "trait_to_creature_stat_definitions.json"
+ */
 public enum StatType {
 	color("color", Color.class),
 	size("size", Double.class),

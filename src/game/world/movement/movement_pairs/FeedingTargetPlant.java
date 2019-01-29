@@ -1,8 +1,11 @@
-package game.world.movement;
+package game.world.movement.movement_pairs;
 
 import game.world.creatures.Creature;
 import game.world.plantlife.Plant;
 
+/**
+ * A creature and plant pair, used to determine if a creature is currently moving towards a plant to eat
+ */
 public class FeedingTargetPlant {
 
 	Creature creature;

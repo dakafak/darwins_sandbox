@@ -2,6 +2,9 @@ package game.dna.traits;
 
 import java.util.Objects;
 
+/**
+ * Used to define one specific trait for a creature, for instance, color, size, etc.
+ */
 public class Trait {
 
     char traitCharacter;

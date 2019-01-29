@@ -1,9 +1,14 @@
 package game.world.units;
 
+/**
+ * World location
+ */
 public class Location {
 
 	double x;
 	double y;
+	double cachedStandardScale;
+	ScaledLocation cachedScaledLocation;
 
 	public Location(double x, double y){
 		this.x = x;
@@ -26,8 +31,12 @@ public class Location {
 		this.y = y;
 	}
 
-	double cachedStandardScale;
-	ScaledLocation cachedScaledLocation;
+	/**
+	 * Returns a scaled location, which is used for determining the on-screen location
+	 *
+	 * @param standardScale
+	 * @return
+	 */
 	public ScaledLocation getScaledLocation(double standardScale){
 		if(cachedStandardScale != standardScale){
 			cachedStandardScale = standardScale;
