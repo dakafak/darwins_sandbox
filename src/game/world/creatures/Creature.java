@@ -145,7 +145,7 @@ public class Creature {
 	}
 
 	public boolean shouldDie(double day){
-		if(energy < 0 || day - daySpawned > lifeSpan){
+		if(energy <= 0 || day - daySpawned > lifeSpan){
 			return true;
 		}
 
