@@ -273,7 +273,7 @@ public class MovementManager {
 	 * @param currentTime
 	 * @param creatures
 	 */
-	public void setWanderDirectionForCreatures(long currentTime, List<Creature> creatures){
+	public void setWanderDirectionForCreatures(long currentTime, List<Creature> creatures){//TODO change this to use game time (world day) which is modified by deltaUpdate
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
 			creature.setWanderDirection(currentTime);

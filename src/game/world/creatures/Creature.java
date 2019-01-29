@@ -112,8 +112,8 @@ public class Creature {
     }
 
     long nextDirectionChange;
-    int wanderTimeInMilliseconds = 1000;
-    int wanderTimeAdditionInMilliseconds = 4000;
+    int wanderTimeInMilliseconds = 500;
+    int wanderTimeAdditionInMilliseconds = 1000;
 	public void setWanderDirection(long currentTime) {
 		if(currentTime > nextDirectionChange){
 			setRandomDirection();
@@ -192,16 +192,20 @@ public class Creature {
 
 		if(nextX < minWorldLocation.getX()){
 			location.setX(minWorldLocation.getX());
+			direction = MOVING_EAST;
 		} else if(nextX > maxWorldLocation.getX()){
 			location.setX(maxWorldLocation.getX());
+			direction = MOVING_WEST;
 		} else if(nextX >= minWorldLocation.getX() && nextX <= maxWorldLocation.getX()){
 			location.setX(nextX);
 		}
 
 		if(nextY < minWorldLocation.getY()){
 			location.setY(minWorldLocation.getY());
+			direction = MOVING_SOUTH;
 		} else if(nextY > maxWorldLocation.getY()){
 			location.setY(maxWorldLocation.getY());
+			direction = MOVING_NORTH;
 		} else if(nextY >= minWorldLocation.getY() && nextY <= maxWorldLocation.getY()){
 			location.setY(nextY);
 		}
