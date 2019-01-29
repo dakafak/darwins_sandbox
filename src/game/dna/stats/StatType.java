@@ -10,7 +10,8 @@ public enum StatType {
 	life_span("life_span", Double.class),
 	diet("diet", Diet.class),
 	energy("energy", Double.class),
-	hunger_threshold("hunger_threshold", Double.class);
+	hunger_threshold("hunger_threshold", Double.class),
+	energy_restoration("energy_restoration", Double.class);
 
 	String value;
 	Object classType;

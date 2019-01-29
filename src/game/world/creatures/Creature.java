@@ -27,7 +27,7 @@ public class Creature {
     Map<StatType, Object> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
 	CreatureState creatureState;
 	double daySpawned;
-	private double energyRestoration;
+	private double energyRestoration = 150;
 
 	Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
 	Location location;
