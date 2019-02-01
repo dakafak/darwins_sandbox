@@ -106,18 +106,22 @@ public class Creature {
     	energy += energyAddition;
 	}
 
+	public void reduceEnergyFromMating(){
+    	energy -= 20;
+	}
+
 	@Override
     public String toString(){
         return sexOfCreature.getSexString().substring(0, 1) + "{" + location.getX() + ", " + location.getY() + "}" + "(" + creatureDNAString.toString() + ")";
     }
 
-    long nextDirectionChange;
-    int wanderTimeInMilliseconds = 500;
-    int wanderTimeAdditionInMilliseconds = 1000;
-	public void setWanderDirection(long currentTime) {
+    double nextDirectionChange;
+    double inGameDaysToWander = .01;
+    double wanderTimeAdditionInMilliseconds = .01;
+	public void setWanderDirection(double currentTime) {
 		if(currentTime > nextDirectionChange){
 			setRandomDirection();
-			nextDirectionChange = currentTime + wanderTimeInMilliseconds + (int)(Math.random()*wanderTimeAdditionInMilliseconds);
+			nextDirectionChange = currentTime + inGameDaysToWander + (Math.random()*wanderTimeAdditionInMilliseconds);
 		}
 	}
 
@@ -241,28 +245,8 @@ public class Creature {
 		return creatureStats;
 	}
 
-	public void setCreatureStats(Map<StatType, Object> creatureStats) {
-		this.creatureStats = creatureStats;
-	}
-
-	public double getLastMatingDay() {
-		return lastMatingDay;
-	}
-
 	public void setLastMatingDay(double currentDay) {
 		this.lastMatingDay = currentDay;
-	}
-
-	public void setCreatureDNAString(DNAString creatureDNAString) {
-		this.creatureDNAString = creatureDNAString;
-	}
-
-	public void setSexOfCreature(Sex sexOfCreature) {
-		this.sexOfCreature = sexOfCreature;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
 	}
 
 	public void setSize(Size size) {
@@ -271,130 +255,6 @@ public class Creature {
 
 	public Diet getDiet() {
 		return diet;
-	}
-
-	public void setDiet(Diet diet) {
-		this.diet = diet;
-	}
-
-	public Direction getDirection() {
-		return direction;
-	}
-
-	public void setDirection(Direction direction) {
-		this.direction = direction;
-	}
-
-	public double getSpeed() {
-		return speed;
-	}
-
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-
-	public double getLifeSpan() {
-		return lifeSpan;
-	}
-
-	public void setLifeSpan(double lifeSpan) {
-		this.lifeSpan = lifeSpan;
-	}
-
-	public double getMating_frequency() {
-		return mating_frequency;
-	}
-
-	public void setMating_frequency(double mating_frequency) {
-		this.mating_frequency = mating_frequency;
-	}
-
-	public double getDaySpawned() {
-		return daySpawned;
-	}
-
-	public void setDaySpawned(double daySpawned) {
-		this.daySpawned = daySpawned;
-	}
-
-	public long getNextDirectionChange() {
-		return nextDirectionChange;
-	}
-
-	public void setNextDirectionChange(long nextDirectionChange) {
-		this.nextDirectionChange = nextDirectionChange;
-	}
-
-	public int getWanderTimeInMilliseconds() {
-		return wanderTimeInMilliseconds;
-	}
-
-	public void setWanderTimeInMilliseconds(int wanderTimeInMilliseconds) {
-		this.wanderTimeInMilliseconds = wanderTimeInMilliseconds;
-	}
-
-	public int getWanderTimeAdditionInMilliseconds() {
-		return wanderTimeAdditionInMilliseconds;
-	}
-
-	public void setWanderTimeAdditionInMilliseconds(int wanderTimeAdditionInMilliseconds) {
-		this.wanderTimeAdditionInMilliseconds = wanderTimeAdditionInMilliseconds;
-	}
-
-	public double getCachedLocationXChange() {
-		return cachedLocationXChange;
-	}
-
-	public void setCachedLocationXChange(double cachedLocationXChange) {
-		this.cachedLocationXChange = cachedLocationXChange;
-	}
-
-	public double getCachedLocationYChange() {
-		return cachedLocationYChange;
-	}
-
-	public void setCachedLocationYChange(double cachedLocationYChange) {
-		this.cachedLocationYChange = cachedLocationYChange;
-	}
-
-	public double getCachedDx() {
-		return cachedDx;
-	}
-
-	public void setCachedDx(double cachedDx) {
-		this.cachedDx = cachedDx;
-	}
-
-	public double getCachedDy() {
-		return cachedDy;
-	}
-
-	public void setCachedDy(double cachedDy) {
-		this.cachedDy = cachedDy;
-	}
-
-	public double getCachedDeltaUpdate() {
-		return cachedDeltaUpdate;
-	}
-
-	public void setCachedDeltaUpdate(double cachedDeltaUpdate) {
-		this.cachedDeltaUpdate = cachedDeltaUpdate;
-	}
-
-	public double getEnergy() {
-		return energy;
-	}
-
-	public void setEnergy(double energy) {
-		this.energy = energy;
-	}
-
-	public double getHungerThreshold() {
-		return hungerThreshold;
-	}
-
-	public void setHungerThreshold(double hungerThreshold) {
-		this.hungerThreshold = hungerThreshold;
 	}
 
 	public double getEnergyRestoration() {

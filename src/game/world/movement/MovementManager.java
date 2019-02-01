@@ -222,7 +222,7 @@ public class MovementManager {
 			DNAString childString = DNABuilder.getAsexualDNAString(creature.getCreatureDNAString(), traitLoader);
 			Creature newCreature = new Creature(creature.getLocation().getX(), creature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitNameAndValueToCreatureStatModifiers, currentDay);
 			childCreaturesToAddToWorld.add(newCreature);
-
+			creature.reduceEnergyFromMating();
 			creature.setLastMatingDay(currentDay);
 		} else {
 			for (Creature creatureInRange : creaturesInRange) {
@@ -273,7 +273,7 @@ public class MovementManager {
 	 * @param currentTime
 	 * @param creatures
 	 */
-	public void setWanderDirectionForCreatures(long currentTime, List<Creature> creatures){//TODO change this to use game time (world day) which is modified by deltaUpdate
+	public void setWanderDirectionForCreatures(double currentTime, List<Creature> creatures){//TODO change this to use game time (world day) which is modified by deltaUpdate
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
 			creature.setWanderDirection(currentTime);
@@ -308,6 +308,8 @@ public class MovementManager {
 				Creature newCreature = new Creature(femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitNameAndValueToCreatureStatModifiers, currentDay);
 				childCreaturesToAddToWorld.add(newCreature);
 
+				maleCreature.reduceEnergyFromMating();
+				femaleCreature.reduceEnergyFromMating();
 				maleCreature.setLastMatingDay(currentDay);
 				femaleCreature.setLastMatingDay(currentDay);
 				maleCreature.setCreatureState(CreatureState.WANDERING);

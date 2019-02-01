@@ -65,7 +65,7 @@ public class SimulatorWindowComponent extends JComponent {
 				deltaUpdateWithSpeedModifer = deltaUpdate * worldSpeedMultiplier;
 
 				adjustCameraLocation();
-				getWorld().runWorldUpdates(runningTime, deltaUpdateWithSpeedModifer);
+				getWorld().runWorldUpdates(deltaUpdateWithSpeedModifer);
 				repaint();
 			}
 		}

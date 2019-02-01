@@ -12,7 +12,6 @@ import game.world.plantlife.Plant;
 import game.world.plantlife.PlantType;
 import game.world.units.Location;
 import game.world.units.Size;
-import ui.StatisticsSave;
 import ui.TraitLoader;
 import ui.WorldStatisticsTool;
 
@@ -107,13 +106,12 @@ public class World {
 	/**
 	 * Processes all updates for the world and anything within the world. LET'S PLAY GOD. MUAHAHAHAHAHAHA
 	 *
-	 * @param runningTime
 	 * @param deltaUpdate
 	 */
-	public void runWorldUpdates(long runningTime, double deltaUpdate){
+	public void runWorldUpdates(double deltaUpdate){
 		Map<Long, List<Creature>> closestTileMapForCreatures = movementManager.getClosestTileMapForCreaturesMap(getCreatures());
 
-		movementManager.setWanderDirectionForCreatures(runningTime, getCreatures());
+		movementManager.setWanderDirectionForCreatures(worldDay, getCreatures());
 		movementManager.tellAllCreaturesToWander(getCreatures(), deltaUpdate, minWorldLocation, maxWorldLocation);
 
 		movementManager.checkForCreatureMatingForListOfCreatures(getCreatures(), closestTileMapForCreatures, worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), traitLoader);
@@ -178,7 +176,7 @@ public class World {
 	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
 		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
 		getCreatures().add(newCreature);
-		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));
+		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
 	}
 
 	/**
@@ -206,7 +204,7 @@ public class World {
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString(), traitLoader);
 			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
 			getCreatures().add(newCreature);
-			worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));
+			worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
 		}
 	}
 
@@ -269,11 +267,11 @@ public class World {
 			if(tileForCreature != null) {
 				tileForCreature.addFertility();
 			}
-		}
 
-		worldStatisticsTool.removeTraitsForNewCreatures(creaturesToDelete);//TODO STAT determine if this is in the correct location
-		getCreatures().removeAll(creaturesToDelete);
-		creaturesToDelete.clear();
+			worldStatisticsTool.removeTraitsForNewCreatures(Collections.singletonList(creatureToDelete));
+			getCreatures().remove(creatureToDelete);
+			creaturesToDelete.remove(creatureToDelete);
+		}
 	}
 
 	public WorldStatisticsTool getWorldStatisticsTool() {
