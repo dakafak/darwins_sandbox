@@ -14,6 +14,7 @@ import game.world.units.Size;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static game.world.units.Direction.MOVING_EAST;
 import static game.world.units.Direction.MOVING_NORTH;
@@ -179,6 +180,29 @@ public class Creature {
 		move(deltaUpdate, dx, dy, minWorldLocation, maxWorldLocation);
 	}
 
+	public void moveAwayFromPoint(double deltaUpdate, double x, double y, Location minWorldLocation, Location maxWorldLocation) {
+		double dx = 0;
+		double dy = 0;
+
+		double distanceY = y - location.getY();
+		double distanceX = x - location.getX();
+		if(Math.abs(distanceY) > Math.abs(distanceX)){
+			if(distanceY > 0){
+				dy = 1;
+			} else if(distanceY < 0){
+				dy = -1;
+			}
+		} else {
+			if(distanceX > 0){
+				dx = 1;
+			} else if(distanceX < 0){
+				dx = -1;
+			}
+		}
+
+		move(deltaUpdate, -dx, -dy, minWorldLocation, maxWorldLocation);
+	}
+
 	double cachedLocationXChange;
 
 	double cachedLocationYChange;
@@ -263,5 +287,42 @@ public class Creature {
 
 	public void setEnergyRestoration(double energyRestoration) {
 		this.energyRestoration = energyRestoration;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Creature creature = (Creature) o;
+		return Double.compare(creature.daySpawned, daySpawned) == 0 &&
+				Double.compare(creature.energyRestoration, energyRestoration) == 0 &&
+				Double.compare(creature.speed, speed) == 0 &&
+				Double.compare(creature.lifeSpan, lifeSpan) == 0 &&
+				Double.compare(creature.mating_frequency, mating_frequency) == 0 &&
+				Double.compare(creature.lastMatingDay, lastMatingDay) == 0 &&
+				Double.compare(creature.energy, energy) == 0 &&
+				Double.compare(creature.hungerThreshold, hungerThreshold) == 0 &&
+				Double.compare(creature.nextDirectionChange, nextDirectionChange) == 0 &&
+				Double.compare(creature.inGameDaysToWander, inGameDaysToWander) == 0 &&
+				Double.compare(creature.wanderTimeAdditionInMilliseconds, wanderTimeAdditionInMilliseconds) == 0 &&
+				Double.compare(creature.cachedLocationXChange, cachedLocationXChange) == 0 &&
+				Double.compare(creature.cachedLocationYChange, cachedLocationYChange) == 0 &&
+				Double.compare(creature.cachedDx, cachedDx) == 0 &&
+				Double.compare(creature.cachedDy, cachedDy) == 0 &&
+				Double.compare(creature.cachedDeltaUpdate, cachedDeltaUpdate) == 0 &&
+				Objects.equals(creatureDNAString, creature.creatureDNAString) &&
+				Objects.equals(creatureStats, creature.creatureStats) &&
+				creatureState == creature.creatureState &&
+				sexOfCreature == creature.sexOfCreature &&
+				Objects.equals(location, creature.location) &&
+				Objects.equals(size, creature.size) &&
+				diet == creature.diet &&
+				direction == creature.direction;
+	}
+
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(creatureDNAString, creatureStats, creatureState, daySpawned, energyRestoration, sexOfCreature, location, size, diet, direction, speed, lifeSpan, mating_frequency, lastMatingDay, energy, hungerThreshold, nextDirectionChange, inGameDaysToWander, wanderTimeAdditionInMilliseconds, cachedLocationXChange, cachedLocationYChange, cachedDx, cachedDy, cachedDeltaUpdate);
 	}
 }

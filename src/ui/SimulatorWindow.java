@@ -1,5 +1,6 @@
 package ui;
 
+import game.tiles.Tile;
 import game.world.World;
 import game.dna.stats.Sex;
 
@@ -38,7 +39,7 @@ public class SimulatorWindow extends JFrame {
 				}
 
 				if(e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET){
-					if(simulatorWindowComponent.worldSpeedMultiplier < 5) {
+					if(simulatorWindowComponent.worldSpeedMultiplier < 10) {
 						simulatorWindowComponent.worldSpeedMultiplier += 1;
 					}
 				}
@@ -86,12 +87,17 @@ public class SimulatorWindow extends JFrame {
 		prepareNewWorld();
 	}
 
+	int creatureSpacingDistance = 10;
 	private void prepareNewWorld(){
 //		removeAll();
 		world = new World(-20, 20, -20, 20);
-		world.addRandomCreature(Sex.MALE);
-		world.addRandomCreature(Sex.FEMALE);
-		System.out.println(world.getCreatures());
+		for(int j = (int) world.getMinWorldLocation().getY() + creatureSpacingDistance; j < world.getMaxWorldLocation().getY(); j += creatureSpacingDistance) {
+			for(int i = (int) world.getMinWorldLocation().getX() + creatureSpacingDistance; i < world.getMaxWorldLocation().getX(); i += creatureSpacingDistance) {
+				world.addRandomCreature(Sex.MALE, i, j);
+				world.addRandomCreature(Sex.FEMALE, i, j);
+				System.out.println(world.getCreatures());
+			}
+		}
 
 		Camera mainCamera = new Camera(0, 0, 80);
 		simulatorWindowComponent = new SimulatorWindowComponent(mainCamera);

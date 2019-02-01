@@ -6,7 +6,7 @@ import java.awt.Color;
  * Used to define the color and energy restoration for a given plant, for each type
  */
 public enum PlantType {
-	GRASS(Color.GREEN, 50);
+	GRASS(Color.GREEN, 5);
 
 	private Color color;
 	private double energyRestoration;

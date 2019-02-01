@@ -98,7 +98,7 @@ public class WorldStatisticsTool {
 		adjustTraitsForCreaturesWithModifier(creatures, 1);
 	}
 
-	public void removeTraitsForNewCreatures(List<Creature> creatures){
+	public void removeTraitsForCreatures(List<Creature> creatures){
 		adjustTraitsForCreaturesWithModifier(creatures, -1);
 	}
 

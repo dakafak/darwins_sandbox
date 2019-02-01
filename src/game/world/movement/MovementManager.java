@@ -241,7 +241,9 @@ public class MovementManager {
 		for(int i = 0; i < creatures.size(); i++){
 			Creature potentialPrey = creatures.get(i);
 			//TODO add if checks for species once that's added
-			if(potentialPrey != null){
+			if(potentialPrey != null && creature != potentialPrey){
+				creature.setCreatureState(CreatureState.EATING);
+				potentialPrey.setCreatureState(CreatureState.FLEEING);
 				carnivorePairs.add(new FeedingTargetCreature(creature, potentialPrey));
 				break;
 			}
@@ -382,6 +384,7 @@ public class MovementManager {
 				carnivoreFeedingPairsToRemove.add(feedingTargetCreature);
 			} else if (distanceBetweenCreatures > predator.getSize().getWidth() + prey.getSize().getWidth()){
 				predator.moveCloserToPoint(deltaUpdate, prey.getLocation().getX(), prey.getLocation().getY(), minWorldLocation, maxWorldLocation);
+				prey.moveAwayFromPoint(deltaUpdate, predator.getLocation().getX(), predator.getLocation().getY(), minWorldLocation, maxWorldLocation);
 			} else {
 				predator.addEnergy(prey.getEnergyRestoration());
 				creaturestoRemove.add(prey);

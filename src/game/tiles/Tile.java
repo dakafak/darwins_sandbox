@@ -17,7 +17,7 @@ public class Tile {
 	float tileFertility;
 	Size size;
 	List<Plant> plants;
-	double growthFrequency = .1;
+	double growthFrequency = .01;
 
 	public Tile(int x, int y, TileType tileType, double currentDay){
 		plants = new ArrayList<>();
@@ -25,7 +25,7 @@ public class Tile {
 		location = new Location(x, y);
 		this.tileType = tileType;
 		tileFertility = tileType.getFertility();
-		lastGrowthCheck = Math.random();
+		lastGrowthCheck = -growthFrequency * Math.random();
 	}
 
 	double lastGrowthCheck;
@@ -91,6 +91,7 @@ public class Tile {
 	}
 
 	float tileFertilityModifier = .01f;
+	float deathTileFertilityModifier = .1f;
 	public void removeFertility() {
 		tileFertility -= tileFertilityModifier;
 		if(tileFertility < 0f){
@@ -98,8 +99,19 @@ public class Tile {
 		}
 	}
 
+	public boolean canGrowPlant(){
+		return tileFertility >= tileFertilityModifier;
+	}
+
 	public void addFertility() {
 		tileFertility += tileFertilityModifier;
+		if(tileFertility > 1f){
+			tileFertility = 1f;
+		}
+	}
+
+	public void addFertilityFromDeath() {
+		tileFertility += deathTileFertilityModifier;
 		if(tileFertility > 1f){
 			tileFertility = 1f;
 		}

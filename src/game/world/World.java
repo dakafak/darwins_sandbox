@@ -121,7 +121,7 @@ public class World {
 		movementManager.checkForHerbivoreFeeding(getCreatures(), this);
 		movementManager.checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures);
 		movementManager.moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
-		creaturesToDelete.addAll(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
+		addCreaturesToDelete(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation), "ate by a carnivore");
 
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
@@ -139,9 +139,8 @@ public class World {
 			for(int j = 0; j < tileMap[0].length; j++){
 				Tile currentTile = tileMap[i][j];
 				if(currentTile.canGrowPlants(currentDay) && currentTile.getPlants().size() < maxPlantsPerTile){
-					boolean shouldGrowPlant = Math.random() < currentTile.getTileFertility();
 					PlantType plantTypeToGrow = PlantType.GRASS;
-					if(shouldGrowPlant){
+					if(currentTile.canGrowPlant()){
 						Plant newPlant = new Plant(currentTile.getLocation().getX() + Math.random(), currentTile.getLocation().getY() + Math.random(), plantTypeToGrow, currentTile);
 						currentTile.addPlant(newPlant);
 						currentTile.removeFertility();
@@ -156,15 +155,17 @@ public class World {
 	 *
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(Sex sexOfCreature){
-		DNAString newDNAStringForCreature = new DNAString();
-		TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
-		for(int i = 0; i < traitLoader.getTraitTypesInOrder().size(); i++){
-			allTraitsForDNAString[i] = traitLoader.getRandomTraitPair(traitLoader.getTraitTypesInOrder().get(i));
-		}
-		newDNAStringForCreature.setTraitString(allTraitsForDNAString);
+	public void addRandomCreature(Sex sexOfCreature, double x, double y){
+		if(coordinateExistsOnMap((int)x, (int)y)) {
+			DNAString newDNAStringForCreature = new DNAString();
+			TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
+			for (int i = 0; i < traitLoader.getTraitTypesInOrder().size(); i++) {
+				allTraitsForDNAString[i] = traitLoader.getRandomTraitPair(traitLoader.getTraitTypesInOrder().get(i));
+			}
+			newDNAStringForCreature.setTraitString(allTraitsForDNAString);
 
-		addRandomCreature(newDNAStringForCreature, sexOfCreature);
+			addRandomCreature(newDNAStringForCreature, sexOfCreature, x, y);
+		}
 	}
 
 	/**
@@ -173,8 +174,8 @@ public class World {
 	 * @param dnaString
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature){
-		Creature newCreature = new Creature(Math.random()*5 - 2.5, Math.random()*5 - 2.5, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
+	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y){
+		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
 		getCreatures().add(newCreature);
 		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
 	}
@@ -250,12 +251,25 @@ public class World {
 			Creature creature = getCreatures().get(i);
 			boolean creatureDies = creature.shouldDie(worldDay);
 			if(creatureDies){
-				creaturesToDelete.add(creature);
+				addCreatureToDelete(creature, "old age");
 			}
 		}
 	}
 
 	List<Creature> creaturesToDelete;
+
+	public void addCreaturesToDelete(List<Creature> creatures, String reason){
+		for(int i = 0; i < creatures.size(); i++){
+			addCreatureToDelete(creatures.get(i), reason);
+		}
+	}
+
+	public void addCreatureToDelete(Creature creature, String reason){
+		if(!creaturesToDelete.contains(creature)){
+			System.out.println(creature + " | " + reason + " | worldSizeWithCreature: " + getCreatures().size());
+			creaturesToDelete.add(creature);
+		}
+	}
 
 	/**
 	 * Removes creatures from the delete queue and updates the trait statistics
@@ -263,14 +277,16 @@ public class World {
 	public void clearRemovedCreatures(){
 		for(int i = 0; i < creaturesToDelete.size(); i++){
 			Creature creatureToDelete = creaturesToDelete.get(i);
-			Tile tileForCreature = getTileFromCoordinates((int) Math.round(creatureToDelete.getLocation().getX()), (int) Math.round(creatureToDelete.getLocation().getY()));
-			if(tileForCreature != null) {
-				tileForCreature.addFertility();
+			for(int tileToAddY = (int) creatureToDelete.getLocation().getY() - 1; tileToAddY <= creatureToDelete.getLocation().getY() + 1; tileToAddY++){
+				for(int tileToAddX = (int) creatureToDelete.getLocation().getX() - 1; tileToAddX <= creatureToDelete.getLocation().getX() + 1; tileToAddX++){
+					if(coordinateExistsOnMap(tileToAddX, tileToAddY)){
+						getTileFromCoordinates(tileToAddX, tileToAddY).addFertilityFromDeath();
+					}
+				}
 			}
-
-			worldStatisticsTool.removeTraitsForNewCreatures(Collections.singletonList(creatureToDelete));
-			getCreatures().remove(creatureToDelete);
+//			worldStatisticsTool.removeTraitsForCreatures(Collections.singletonList(creatureToDelete));
 			creaturesToDelete.remove(creatureToDelete);
+			getCreatures().remove(creatureToDelete);
 		}
 	}
 
