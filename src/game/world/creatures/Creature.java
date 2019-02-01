@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static game.world.units.Direction.MOVING_EAST;
-import static game.world.units.Direction.MOVING_NORTH;
-import static game.world.units.Direction.MOVING_SOUTH;
-import static game.world.units.Direction.MOVING_WEST;
+//import static game.world.units.Direction.MOVING_EAST;
+//import static game.world.units.Direction.MOVING_NORTH;
+//import static game.world.units.Direction.MOVING_SOUTH;
+//import static game.world.units.Direction.MOVING_WEST;
 import static game.world.units.Direction.NORTH;
 
 public class Creature {
@@ -41,6 +41,7 @@ public class Creature {
 	double lastMatingDay;
 	double energy;
 	double hungerThreshold;
+	double matingEnergyRequirement;
 
     public Creature(double x,
 					double y,
@@ -89,7 +90,12 @@ public class Creature {
 		diet =  Diet.valueOf(creatureStats.get(StatType.diet).toString());
 		energy = (Double) creatureStats.get(StatType.energy);
 		hungerThreshold = (Double) creatureStats.get(StatType.hunger_threshold);
+		matingEnergyRequirement = (Double) creatureStats.get(StatType.mating_energy_requirement);
     }
+
+    public boolean isDoingNothing(){
+    	return creatureState == CreatureState.WANDERING;
+	}
 
     public boolean canMate(double currentDay){
     	if((currentDay - lastMatingDay) > mating_frequency){
@@ -108,7 +114,7 @@ public class Creature {
 	}
 
 	public void reduceEnergyFromMating(){
-    	energy -= 20;
+    	energy -= matingEnergyRequirement;
 	}
 
 	@Override
@@ -136,15 +142,15 @@ public class Creature {
 		double dx = 0;
 		double dy = 0;
 
-		if(direction == MOVING_NORTH){
-			dy = -1;
-		} else if(direction == MOVING_EAST){
-			dx = 1;
-		} else if(direction == MOVING_SOUTH){
-			dy = 1;
-		} else if(direction == MOVING_WEST){
-			dx = -1;
-		}
+//		if(direction == MOVING_NORTH){
+//			dy = -1;
+//		} else if(direction == MOVING_EAST){
+//			dx = 1;
+//		} else if(direction == MOVING_SOUTH){
+//			dy = 1;
+//		} else if(direction == MOVING_WEST){
+//			dx = -1;
+//		}
 
 		move(deltaUpdate, dx, dy, minWorldLocation, maxWorldLocation);
 	}
@@ -220,20 +226,20 @@ public class Creature {
 
 		if(nextX < minWorldLocation.getX()){
 			location.setX(minWorldLocation.getX());
-			direction = MOVING_EAST;
+//			direction = MOVING_EAST;
 		} else if(nextX > maxWorldLocation.getX()){
 			location.setX(maxWorldLocation.getX());
-			direction = MOVING_WEST;
+//			direction = MOVING_WEST;
 		} else if(nextX >= minWorldLocation.getX() && nextX <= maxWorldLocation.getX()){
 			location.setX(nextX);
 		}
 
 		if(nextY < minWorldLocation.getY()){
 			location.setY(minWorldLocation.getY());
-			direction = MOVING_SOUTH;
+//			direction = MOVING_SOUTH;
 		} else if(nextY > maxWorldLocation.getY()){
 			location.setY(maxWorldLocation.getY());
-			direction = MOVING_NORTH;
+//			direction = MOVING_NORTH;
 		} else if(nextY >= minWorldLocation.getY() && nextY <= maxWorldLocation.getY()){
 			location.setY(nextY);
 		}

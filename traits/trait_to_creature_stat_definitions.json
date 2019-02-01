@@ -89,6 +89,10 @@
         {
           "statName":"size",
           "statModifier":".4"
+        },
+        {
+          "statName":"mating_energy_requirement",
+          "statModifier":"20"
         }
       ]
     },
@@ -99,6 +103,10 @@
         {
           "statName":"size",
           "statModifier":".5"
+        },
+        {
+          "statName":"mating_energy_requirement",
+          "statModifier":"30"
         }
       ]
     },
@@ -109,6 +117,10 @@
         {
           "statName":"size",
           "statModifier":".6"
+        },
+        {
+          "statName":"mating_energy_requirement",
+          "statModifier":"40"
         }
       ]
     },
@@ -119,6 +131,10 @@
         {
           "statName":"size",
           "statModifier":".7"
+        },
+        {
+          "statName":"mating_energy_requirement",
+          "statModifier":"50"
         }
       ]
     },
@@ -160,7 +176,7 @@
       "stats": [
         {
           "statName":"mating_frequency",
-          "statModifier":"5"
+          "statModifier":"1"
         }
       ]
     },
@@ -170,7 +186,7 @@
       "stats": [
         {
           "statName":"mating_frequency",
-          "statModifier":"3"
+          "statModifier":".75"
         }
       ]
     },
@@ -180,7 +196,7 @@
       "stats": [
         {
           "statName":"mating_frequency",
-          "statModifier":"1"
+          "statModifier":".5"
         }
       ]
     },

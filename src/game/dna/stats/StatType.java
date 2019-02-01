@@ -14,7 +14,8 @@ public enum StatType {
 	diet("diet", Diet.class),
 	energy("energy", Double.class),
 	hunger_threshold("hunger_threshold", Double.class),
-	energy_restoration("energy_restoration", Double.class);
+	energy_restoration("energy_restoration", Double.class),
+	mating_energy_requirement("mating_energy_requirement", Double.class);
 
 	String value;
 	Object classType;

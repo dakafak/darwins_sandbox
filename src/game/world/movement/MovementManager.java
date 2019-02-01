@@ -80,20 +80,45 @@ public class MovementManager {
 	 * @return
 	 */
 	private Plant getNearestPlantToCreature(Creature creature, World world) {
-		List<Plant> plantsInRange = new ArrayList<>();
+//		List<Plant> plantsInRange = new ArrayList<>();
 		int creatureX = (int) Math.round(creature.getLocation().getX());
 		int creatureY = (int) Math.round(creature.getLocation().getY());
 
-		for(int x = creatureX - maxCreatureViewDistance; x < creatureX + maxCreatureViewDistance; x++){
-			for(int y = creatureY - maxCreatureViewDistance; y < creatureY + maxCreatureViewDistance; y++){
-				Tile tileWithPlants = world.getTileFromCoordinates(x, y);
-				if(tileWithPlants != null) {
-					plantsInRange.addAll(tileWithPlants.getPlants());
-					if (!tileWithPlants.getPlants().isEmpty()) {
-						return tileWithPlants.getPlants().get(0);
+//		for(int x = creatureX - maxCreatureViewDistance; x < creatureX + maxCreatureViewDistance; x++){
+//			for(int y = creatureY - maxCreatureViewDistance; y < creatureY + maxCreatureViewDistance; y++){
+//				Tile tileWithPlants = world.getTileFromCoordinates(x, y);
+//				if(tileWithPlants != null) {
+//					plantsInRange.addAll(tileWithPlants.getPlants());
+//					if (!tileWithPlants.getPlants().isEmpty()) {
+//						return tileWithPlants.getPlants().get(0);
+//					}
+//				}
+//			}
+//		}
+
+		// center is (h, k)
+		//(x – h)2 + (y – k)2 = r2
+		//TODO consider adding a circle check instead of square
+		for(int radius = 0; radius < maxCreatureViewDistance; radius++){
+			// Top and bottom bar of square
+			for(int y = creatureY - radius; y <= creatureY + radius; y += radius != 0 ? radius*2 : 1) {
+				for (int x = creatureX - radius; x <= creatureX + radius; x++) {
+					Tile currentTile = world.getTileFromCoordinates(x, y);
+					if (currentTile != null && !currentTile.getPlants().isEmpty()) {
+						return currentTile.getPlants().get(0);
 					}
 				}
 			}
+
+			for(int y = creatureY - radius + 1; y < creatureY + radius; y ++) {
+				for (int x = creatureX - radius + 1; x < creatureX + radius; x += radius != 0 ? radius*2 : 1) {
+					Tile currentTile = world.getTileFromCoordinates(x, y);
+					if (currentTile != null && !currentTile.getPlants().isEmpty()) {
+						return currentTile.getPlants().get(0);
+					}
+				}
+			}
+
 		}
 
 		return null;
@@ -108,7 +133,7 @@ public class MovementManager {
 	public void checkForHerbivoreFeeding(List<Creature> creatures, World world){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
-			if(creature.getDiet() == Diet.HERBIVORE && creature.getCreatureState() == CreatureState.WANDERING && creature.isHungry()) {
+			if(creature.getDiet() == Diet.HERBIVORE && creature.isDoingNothing() && creature.isHungry()) {
 				Plant nearestPlantToCreature = getNearestPlantToCreature(creature, world);
 				if(nearestPlantToCreature != null) {
 					creature.setCreatureState(CreatureState.EATING);
@@ -145,7 +170,7 @@ public class MovementManager {
 	public void tellAllCreaturesToWander(List<Creature> creatures, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
 		for(int i = 0; i < creatures.size(); i++){
 			Creature creature = creatures.get(i);
-			if(creature.getCreatureState() == CreatureState.WANDERING) {
+			if(creature.isDoingNothing()) {
 				creature.wander(deltaUpdate, minWorldLocation, maxWorldLocation);
 			}
 		}
@@ -258,7 +283,7 @@ public class MovementManager {
 	 * @param currentDay
 	 */
 	private void checkMatingForCreatureAndCreatureInRange(Creature creature, Creature creatureInRange, double currentDay){
-		if(creature.getCreatureState() == CreatureState.WANDERING && creatureInRange.getCreatureState() == CreatureState.WANDERING
+		if(creature.isDoingNothing() && creatureInRange.isDoingNothing()
 			&& creature.canMate(currentDay) && creatureInRange.canMate(currentDay)){
 			if(	(creature.getSexOfCreature() == MALE && creatureInRange.getSexOfCreature() == FEMALE) ||
 				(creature.getSexOfCreature() == FEMALE && creatureInRange.getSexOfCreature() == MALE)){
