@@ -28,7 +28,6 @@ public class Creature {
     Map<StatType, Object> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
 	CreatureState creatureState;
 	double daySpawned;
-	private double energyRestoration = 150;
 
 	Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
 	Location location;
@@ -42,6 +41,8 @@ public class Creature {
 	double energy;
 	double hungerThreshold;
 	double matingEnergyRequirement;
+	double movementEnergyDrain;
+	private double energyRestoration;
 
     public Creature(double x,
 					double y,
@@ -91,6 +92,8 @@ public class Creature {
 		energy = (Double) creatureStats.get(StatType.energy);
 		hungerThreshold = (Double) creatureStats.get(StatType.hunger_threshold);
 		matingEnergyRequirement = (Double) creatureStats.get(StatType.mating_energy_requirement);
+		movementEnergyDrain = (Double) creatureStats.get(StatType.movement_energy_drain);
+		energyRestoration = (Double) creatureStats.get(StatType.energy_restoration);
     }
 
     public boolean isDoingNothing(){
@@ -244,7 +247,7 @@ public class Creature {
 			location.setY(nextY);
 		}
 
-		energy -= .005 * deltaUpdate;//TODO placeholder, should create something that scales off of distance traveled
+		energy -= movementEnergyDrain * deltaUpdate;//TODO placeholder, should create something that scales off of distance traveled
 	}
 
 	public DNAString getCreatureDNAString() {

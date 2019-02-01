@@ -15,6 +15,7 @@ public enum StatType {
 	energy("energy", Double.class),
 	hunger_threshold("hunger_threshold", Double.class),
 	energy_restoration("energy_restoration", Double.class),
+	movement_energy_drain("movement_energy_drain", Double.class),
 	mating_energy_requirement("mating_energy_requirement", Double.class);
 
 	String value;

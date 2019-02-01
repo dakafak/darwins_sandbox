@@ -29,6 +29,8 @@ public class World {
 
 	Tile[][] tileMap;//TODO move this to a worldMap class with methods for retrieving tiles by coordinates
 	List<Creature> creatures;
+	//TODO change this list to be multiple queues
+
 	//TODO create a thread object that contains a list of creatures and have each thread maintain a separate list of creatures.
 	// TODO these threads will have to control specific functionality to avoid concurrent exceptions
 	// Could also add a mutex lock and have a set of 16 worker threads that run an update when ready
@@ -121,7 +123,7 @@ public class World {
 		movementManager.checkForHerbivoreFeeding(getCreatures(), this);
 		movementManager.checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures);
 		movementManager.moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
-		addCreaturesToDelete(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation), "ate by a carnivore");
+		addCreaturesToDelete(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
 
 		adjustDay(deltaUpdate);
 		checkCreatureLifeSpan();
@@ -251,22 +253,21 @@ public class World {
 			Creature creature = getCreatures().get(i);
 			boolean creatureDies = creature.shouldDie(worldDay);
 			if(creatureDies){
-				addCreatureToDelete(creature, "old age");
+				addCreatureToDelete(creature);
 			}
 		}
 	}
 
 	List<Creature> creaturesToDelete;
 
-	public void addCreaturesToDelete(List<Creature> creatures, String reason){
+	public void addCreaturesToDelete(List<Creature> creatures){
 		for(int i = 0; i < creatures.size(); i++){
-			addCreatureToDelete(creatures.get(i), reason);
+			addCreatureToDelete(creatures.get(i));
 		}
 	}
 
-	public void addCreatureToDelete(Creature creature, String reason){
+	public void addCreatureToDelete(Creature creature){
 		if(!creaturesToDelete.contains(creature)){
-			System.out.println(creature + " | " + reason + " | worldSizeWithCreature: " + getCreatures().size());
 			creaturesToDelete.add(creature);
 		}
 	}

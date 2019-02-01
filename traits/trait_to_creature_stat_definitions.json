@@ -58,6 +58,10 @@
         {
           "statName":"speed",
           "statModifier":".01"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".001"
         }
       ]
     },
@@ -68,6 +72,10 @@
         {
           "statName":"speed",
           "statModifier":".02"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".002"
         }
       ]
     },
@@ -78,6 +86,10 @@
         {
           "statName":"speed",
           "statModifier":".04"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".003"
         }
       ]
     },
@@ -93,6 +105,14 @@
         {
           "statName":"mating_energy_requirement",
           "statModifier":"20"
+        },
+        {
+          "statName":"energy_restoration",
+          "statModifier":"50"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".004"
         }
       ]
     },
@@ -107,6 +127,14 @@
         {
           "statName":"mating_energy_requirement",
           "statModifier":"30"
+        },
+        {
+          "statName":"energy_restoration",
+          "statModifier":"60"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".005"
         }
       ]
     },
@@ -121,6 +149,14 @@
         {
           "statName":"mating_energy_requirement",
           "statModifier":"40"
+        },
+        {
+          "statName":"energy_restoration",
+          "statModifier":"70"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".006"
         }
       ]
     },
@@ -135,6 +171,14 @@
         {
           "statName":"mating_energy_requirement",
           "statModifier":"50"
+        },
+        {
+          "statName":"energy_restoration",
+          "statModifier":"80"
+        },
+        {
+          "statName":"movement_energy_drain",
+          "statModifier":".007"
         }
       ]
     },
