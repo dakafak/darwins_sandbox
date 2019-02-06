@@ -4,6 +4,7 @@ import game.dna.DNABuilder;
 import game.dna.DNAString;
 import game.dna.stats.Diet;
 import game.dna.traits.CreatureStatModifier;
+import game.dna.traits.TraitPair;
 import game.tiles.Tile;
 import game.world.World;
 import game.world.creatures.Creature;
@@ -12,12 +13,15 @@ import game.dna.stats.Sex;
 import game.world.movement.movement_pairs.FeedingTargetCreature;
 import game.world.movement.movement_pairs.FeedingTargetPlant;
 import game.world.movement.movement_pairs.MatingPair;
+import game.world.movement.submanagers.FeedingManager;
+import game.world.movement.submanagers.MatingManager;
 import game.world.plantlife.Plant;
 import game.world.units.Location;
 import ui.TraitLoader;
 import ui.WorldStatisticsTool;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,21 +30,58 @@ import java.util.Map;
 import static game.dna.stats.Sex.FEMALE;
 import static game.dna.stats.Sex.MALE;
 
-public class MovementManager {
+public class CreatureManager {
 
-	List<MatingPair> matingPairs;
-	List<FeedingTargetPlant> herbivorePairs;
-	List<FeedingTargetCreature> carnivorePairs;
-	List<Creature> childCreaturesToAddToWorld;
+	List<Creature> creatures;
+	List<Creature> creaturesToDelete;
 
+	private List<MatingPair> matingPairs;
+	private List<FeedingTargetPlant> herbivorePairs;
+	private List<FeedingTargetCreature> carnivorePairs;
+	private List<Creature> childCreaturesToAddToWorld;
+
+	private FeedingManager feedingManager;
+	private MatingManager matingManager;
+
+	private Thread feedingManagerThread;
+	private Thread matingManagerThread;
 
 	private final int maxCreatureViewDistance = 5;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
-	public MovementManager(){
+	public CreatureManager(){
+		creatures = new LinkedList<>();
+		creaturesToDelete = new LinkedList<>();
+		feedingManager = new FeedingManager();
+		matingManager = new MatingManager();
+
 		matingPairs = new ArrayList<>();
 		herbivorePairs = new ArrayList<>();
 		carnivorePairs = new ArrayList<>();
 		childCreaturesToAddToWorld = new LinkedList<>();
+	}
+
+	public void runMovementManagerUpdates(double currentDay,
+										  double deltaUpdate,
+										  Location minWorldLocation,
+										  Location maxWorldLocation,
+										  World world,
+										  WorldStatisticsTool worldStatisticsTool,
+										  TraitLoader traitLoader){
+		Map<Long, List<Creature>> closestTileMapForCreatures = getClosestTileMapForCreaturesMap(getCreatures());
+
+		setWanderDirectionForCreatures(currentDay, getCreatures());
+		tellAllCreaturesToWander(getCreatures(), deltaUpdate, minWorldLocation, maxWorldLocation);
+
+		checkForCreatureMatingForListOfCreatures(getCreatures(), closestTileMapForCreatures, currentDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), traitLoader);
+		moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, deltaUpdate, minWorldLocation, maxWorldLocation, traitLoader);
+		addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
+
+		checkForHerbivoreFeeding(getCreatures(), world);
+		checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures);
+		moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
+		addCreaturesToDelete(moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
+
+		checkCreatureLifeSpan(currentDay);
 	}
 
 	/**
@@ -80,21 +121,8 @@ public class MovementManager {
 	 * @return
 	 */
 	private Plant getNearestPlantToCreature(Creature creature, World world) {
-//		List<Plant> plantsInRange = new ArrayList<>();
 		int creatureX = (int) Math.round(creature.getLocation().getX());
 		int creatureY = (int) Math.round(creature.getLocation().getY());
-
-//		for(int x = creatureX - maxCreatureViewDistance; x < creatureX + maxCreatureViewDistance; x++){
-//			for(int y = creatureY - maxCreatureViewDistance; y < creatureY + maxCreatureViewDistance; y++){
-//				Tile tileWithPlants = world.getTileFromCoordinates(x, y);
-//				if(tileWithPlants != null) {
-//					plantsInRange.addAll(tileWithPlants.getPlants());
-//					if (!tileWithPlants.getPlants().isEmpty()) {
-//						return tileWithPlants.getPlants().get(0);
-//					}
-//				}
-//			}
-//		}
 
 		// center is (h, k)
 		//(x – h)2 + (y – k)2 = r2
@@ -456,4 +484,82 @@ public class MovementManager {
 		return Math.sqrt(Math.pow(plant.getLocation().getX() - creature.getLocation().getX(), 2) + Math.pow(plant.getLocation().getY() - creature.getLocation().getY(), 2));
 	}
 
+	public List<Creature> getCreatures() {
+		return creatures;
+	}
+
+	public void setCreatures(List<Creature> creatures) {
+		this.creatures = creatures;
+	}
+
+	public void addCreaturesToDelete(List<Creature> creatures){
+		for(int i = 0; i < creatures.size(); i++){
+			addCreatureToDelete(creatures.get(i));
+		}
+	}
+
+	public void addCreatureToDelete(Creature creature){
+		if(!creaturesToDelete.contains(creature)){
+			creaturesToDelete.add(creature);
+		}
+	}
+
+	/**
+	 * Removes creatures from the delete queue and updates the trait statistics
+	 */
+	public List<Location> clearCreaturesToDeleteAndGetTilesToAddFertility(){
+		List<Location> locationsToAddFertility = new LinkedList<>();
+		for(int i = 0; i < creaturesToDelete.size(); i++){
+			Creature creatureToDelete = creaturesToDelete.get(i);
+			for(int tileToAddY = (int) creatureToDelete.getLocation().getY() - 1; tileToAddY <= creatureToDelete.getLocation().getY() + 1; tileToAddY++){
+				for(int tileToAddX = (int) creatureToDelete.getLocation().getX() - 1; tileToAddX <= creatureToDelete.getLocation().getX() + 1; tileToAddX++){
+					locationsToAddFertility.add(new Location(tileToAddX, tileToAddY));
+				}
+			}
+		}
+
+		creaturesToDelete.clear();
+		return locationsToAddFertility;
+	}
+
+	/**
+	 * Iterates through all creatures and determines of any should die of old age :(
+	 */
+	public void checkCreatureLifeSpan(double currentDay){
+		for(int i = 0; i < getCreatures().size(); i++){
+			Creature creature = getCreatures().get(i);
+			boolean creatureDies = creature.shouldDie(currentDay);
+			if(creatureDies){
+				addCreatureToDelete(creature);
+			}
+		}
+	}
+
+	/**
+	 * Adds a random creature, of the given sex, to the world
+	 *
+	 * @param sexOfCreature
+	 */
+	public void addRandomCreature(Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool){
+		DNAString newDNAStringForCreature = new DNAString();
+		TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
+		for (int i = 0; i < traitLoader.getTraitTypesInOrder().size(); i++) {
+			allTraitsForDNAString[i] = traitLoader.getRandomTraitPair(traitLoader.getTraitTypesInOrder().get(i));
+		}
+		newDNAStringForCreature.setTraitString(allTraitsForDNAString);
+
+		addRandomCreature(newDNAStringForCreature, sexOfCreature, x, y, traitLoader, currentDay, worldStatisticsTool);
+	}
+
+	/**
+	 * Adds a random creature, of the given sex and DNAString, to the world
+	 *
+	 * @param dnaString
+	 * @param sexOfCreature
+	 */
+	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool){
+		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay);
+		getCreatures().add(newCreature);
+		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
+	}
 }

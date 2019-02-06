@@ -2,12 +2,11 @@ package game.world;
 
 import game.dna.DNABuilder;
 import game.dna.DNAString;
-import game.dna.traits.TraitPair;
 import game.tiles.Tile;
 import game.tiles.TileType;
 import game.world.creatures.Creature;
 import game.dna.stats.Sex;
-import game.world.movement.MovementManager;
+import game.world.movement.CreatureManager;
 import game.world.plantlife.Plant;
 import game.world.plantlife.PlantType;
 import game.world.units.Location;
@@ -17,9 +16,7 @@ import ui.WorldStatisticsTool;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static game.dna.stats.Sex.ASEXUAL;
 import static game.dna.stats.Sex.FEMALE;
@@ -27,30 +24,20 @@ import static game.dna.stats.Sex.MALE;
 
 public class World {
 
-	Tile[][] tileMap;//TODO move this to a worldMap class with methods for retrieving tiles by coordinates
-	List<Creature> creatures;
-	//TODO change this list to be multiple queues
+	private Tile[][] tileMap;//TODO move this to a worldMap class with methods for retrieving tiles by coordinates
 
-	//TODO create a thread object that contains a list of creatures and have each thread maintain a separate list of creatures.
-	// TODO these threads will have to control specific functionality to avoid concurrent exceptions
-	// Could also add a mutex lock and have a set of 16 worker threads that run an update when ready
-	// Maybe wrap the movement manager with threads and mutex lock the creature list
-	// Could multithread the check for potential mating method, after building the coordinate to list of creature map,
-	// that map can be read and not modified so multiple threads can run through subsections of the creature list and
-	// check what creatures need to be added to the mating list, the mating list can have a mutext lock
+	private TraitLoader traitLoader;
+	private WorldStatisticsTool worldStatisticsTool;
+	private CreatureManager movementManager;
 
-	TraitLoader traitLoader;
-	WorldStatisticsTool worldStatisticsTool;
-	MovementManager movementManager;
+	private double dayLength = 10000;
+	private double worldDay;
+	private short maxPlantsPerTile = 5;
+	private Location minWorldLocation;
 
-	double dayLength = 10000;
-	double worldDay;
-	short maxPlantsPerTile = 5;
-	Location minWorldLocation;
-
-	Location maxWorldLocation;
-	Location worldLocation;
-	Size worldSize;
+	private Location maxWorldLocation;
+	private Location worldLocation;
+	private Size worldSize;
 
 	public World(int minWidth, int maxWidth, int minHeight, int maxHeight){
 		minWorldLocation = new Location(minWidth, minHeight);
@@ -64,12 +51,10 @@ public class World {
 				tileMap[y][x] = new Tile(x + minWidth, y + minHeight, TileType.DIRT, worldDay);
 			}
 		}
-		creatures = new ArrayList();
-		creaturesToDelete = new LinkedList<>();
 
 		traitLoader = new TraitLoader();
 		worldStatisticsTool = new WorldStatisticsTool();
-		movementManager = new MovementManager();
+		movementManager = new CreatureManager();
 	}
 
 	/**
@@ -111,23 +96,18 @@ public class World {
 	 * @param deltaUpdate
 	 */
 	public void runWorldUpdates(double deltaUpdate){
-		Map<Long, List<Creature>> closestTileMapForCreatures = movementManager.getClosestTileMapForCreaturesMap(getCreatures());
-
-		movementManager.setWanderDirectionForCreatures(worldDay, getCreatures());
-		movementManager.tellAllCreaturesToWander(getCreatures(), deltaUpdate, minWorldLocation, maxWorldLocation);
-
-		movementManager.checkForCreatureMatingForListOfCreatures(getCreatures(), closestTileMapForCreatures, worldDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), traitLoader);
-		movementManager.moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay, deltaUpdate, minWorldLocation, maxWorldLocation, traitLoader);
-		movementManager.addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
-
-		movementManager.checkForHerbivoreFeeding(getCreatures(), this);
-		movementManager.checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures);
-		movementManager.moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
-		addCreaturesToDelete(movementManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
+		movementManager.runMovementManagerUpdates(worldDay, deltaUpdate, minWorldLocation, maxWorldLocation, this, worldStatisticsTool, traitLoader);
 
 		adjustDay(deltaUpdate);
-		checkCreatureLifeSpan();
-		clearRemovedCreatures();
+
+		List<Location> locationsToAddFertility = movementManager.clearCreaturesToDeleteAndGetTilesToAddFertility();
+		for(int i = 0; i < locationsToAddFertility.size(); i++){
+			Location currentLocationToCheck = locationsToAddFertility.get(i);
+			if(coordinateExistsOnMap((int) currentLocationToCheck.getX(), (int) currentLocationToCheck.getY())){
+				getTileFromCoordinates((int) currentLocationToCheck.getX(), (int) currentLocationToCheck.getY()).addFertilityFromDeath();
+			}
+		}
+
 		addPlantsToTileMap(worldDay);
 	}
 
@@ -150,36 +130,6 @@ public class World {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Adds a random creature, of the given sex, to the world
-	 *
-	 * @param sexOfCreature
-	 */
-	public void addRandomCreature(Sex sexOfCreature, double x, double y){
-		if(coordinateExistsOnMap((int)x, (int)y)) {
-			DNAString newDNAStringForCreature = new DNAString();
-			TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
-			for (int i = 0; i < traitLoader.getTraitTypesInOrder().size(); i++) {
-				allTraitsForDNAString[i] = traitLoader.getRandomTraitPair(traitLoader.getTraitTypesInOrder().get(i));
-			}
-			newDNAStringForCreature.setTraitString(allTraitsForDNAString);
-
-			addRandomCreature(newDNAStringForCreature, sexOfCreature, x, y);
-		}
-	}
-
-	/**
-	 * Adds a random creature, of the given sex and DNAString, to the world
-	 *
-	 * @param dnaString
-	 * @param sexOfCreature
-	 */
-	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y){
-		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
-		getCreatures().add(newCreature);
-		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
 	}
 
 	/**
@@ -217,7 +167,7 @@ public class World {
 	 * @return
 	 */
 	public List<Creature> getCreatures() {
-		return creatures;
+		return movementManager.getCreatures();
 	}
 
 	double cachedDeltaUpdate;
@@ -237,58 +187,23 @@ public class World {
 	}
 
 	/**
+	 * Adds a random creature, of the given sex, to the world
+	 *
+	 * @param sexOfCreature
+	 */
+	public void addRandomCreature(Sex sexOfCreature, double x, double y){
+		if(coordinateExistsOnMap((int)x, (int)y)) {
+			movementManager.addRandomCreature(sexOfCreature, x, y, traitLoader, worldDay, worldStatisticsTool);
+		}
+	}
+
+	/**
 	 * Returns the current day of the world
 	 *
 	 * @return
 	 */
 	public double getWorldDay(){
 		return worldDay;
-	}
-
-	/**
-	 * Iterates through all creatures and determines of any should die of old age :(
-	 */
-	public void checkCreatureLifeSpan(){
-		for(int i = 0; i < getCreatures().size(); i++){
-			Creature creature = getCreatures().get(i);
-			boolean creatureDies = creature.shouldDie(worldDay);
-			if(creatureDies){
-				addCreatureToDelete(creature);
-			}
-		}
-	}
-
-	List<Creature> creaturesToDelete;
-
-	public void addCreaturesToDelete(List<Creature> creatures){
-		for(int i = 0; i < creatures.size(); i++){
-			addCreatureToDelete(creatures.get(i));
-		}
-	}
-
-	public void addCreatureToDelete(Creature creature){
-		if(!creaturesToDelete.contains(creature)){
-			creaturesToDelete.add(creature);
-		}
-	}
-
-	/**
-	 * Removes creatures from the delete queue and updates the trait statistics
-	 */
-	public void clearRemovedCreatures(){
-		for(int i = 0; i < creaturesToDelete.size(); i++){
-			Creature creatureToDelete = creaturesToDelete.get(i);
-			for(int tileToAddY = (int) creatureToDelete.getLocation().getY() - 1; tileToAddY <= creatureToDelete.getLocation().getY() + 1; tileToAddY++){
-				for(int tileToAddX = (int) creatureToDelete.getLocation().getX() - 1; tileToAddX <= creatureToDelete.getLocation().getX() + 1; tileToAddX++){
-					if(coordinateExistsOnMap(tileToAddX, tileToAddY)){
-						getTileFromCoordinates(tileToAddX, tileToAddY).addFertilityFromDeath();
-					}
-				}
-			}
-//			worldStatisticsTool.removeTraitsForCreatures(Collections.singletonList(creatureToDelete));
-			creaturesToDelete.remove(creatureToDelete);
-			getCreatures().remove(creatureToDelete);
-		}
 	}
 
 	public WorldStatisticsTool getWorldStatisticsTool() {
