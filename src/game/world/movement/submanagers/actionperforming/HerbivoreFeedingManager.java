@@ -37,6 +37,10 @@ public class HerbivoreFeedingManager {
 		herbivorePairs = new LinkedList<>();
 	}
 
+	synchronized  public void addAllHerbivoreFeedingPairs(List<FeedingTargetPlant> feedingTargetPlants){
+		herbivorePairs.addAll(feedingTargetPlants);
+	}
+
 	synchronized public void addHerbivoreFeedingPair(FeedingTargetPlant herbivoreFeedingPair){
 		herbivorePairs.add(herbivoreFeedingPair);
 	}

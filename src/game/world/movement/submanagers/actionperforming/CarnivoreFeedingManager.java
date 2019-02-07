@@ -26,6 +26,10 @@ public class CarnivoreFeedingManager {
 		carnivorePairs.add(feedingTargetCreature);
 	}
 
+	synchronized  public void addAllCarnivoreFeedingPairs(List<FeedingTargetCreature> feedingTargetCreatures){
+		carnivorePairs.addAll(feedingTargetCreatures);
+	}
+
 	/**
 	 * For all carnivore pairs, try to eat. If too far, move closer.
 	 *
