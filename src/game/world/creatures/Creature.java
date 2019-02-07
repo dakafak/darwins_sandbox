@@ -89,7 +89,7 @@ public class Creature {
 		mating_frequency = (Double) creatureStats.get(StatType.mating_frequency);
 		lastMatingDay = currentDay;
 		diet =  Diet.valueOf(creatureStats.get(StatType.diet).toString());
-		energy = (Double) creatureStats.get(StatType.energy);
+		energy = diet == Diet.CARNIVORE ? (Double) creatureStats.get(StatType.energy) * .5 : (Double) creatureStats.get(StatType.energy) * .5;
 		hungerThreshold = (Double) creatureStats.get(StatType.hunger_threshold);
 		matingEnergyRequirement = (Double) creatureStats.get(StatType.mating_energy_requirement);
 		movementEnergyDrain = (Double) creatureStats.get(StatType.movement_energy_drain);
@@ -292,10 +292,6 @@ public class Creature {
 
 	public double getEnergyRestoration() {
 		return energyRestoration;
-	}
-
-	public void setEnergyRestoration(double energyRestoration) {
-		this.energyRestoration = energyRestoration;
 	}
 
 	@Override

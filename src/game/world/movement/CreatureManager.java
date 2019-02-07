@@ -13,8 +13,10 @@ import game.dna.stats.Sex;
 import game.world.movement.movement_pairs.FeedingTargetCreature;
 import game.world.movement.movement_pairs.FeedingTargetPlant;
 import game.world.movement.movement_pairs.MatingPair;
-import game.world.movement.submanagers.FeedingManager;
+import game.world.movement.submanagers.actionperforming.CarnivoreFeedingManager;
+import game.world.movement.submanagers.actionperforming.HerbivoreFeedingManager;
 import game.world.movement.submanagers.MatingManager;
+import game.world.movement.submanagers.synchronizedchecks.CreatureActionProcessor;
 import game.world.plantlife.Plant;
 import game.world.units.Location;
 import ui.TraitLoader;
@@ -36,27 +38,25 @@ public class CreatureManager {
 	List<Creature> creaturesToDelete;
 
 	private List<MatingPair> matingPairs;
-	private List<FeedingTargetPlant> herbivorePairs;
-	private List<FeedingTargetCreature> carnivorePairs;
 	private List<Creature> childCreaturesToAddToWorld;
 
-	private FeedingManager feedingManager;
+	private HerbivoreFeedingManager herbivoreFeedingManager;
+	private CarnivoreFeedingManager carnivoreFeedingManager;
 	private MatingManager matingManager;
 
-	private Thread feedingManagerThread;
-	private Thread matingManagerThread;
+//	private Thread feedingManagerThread;
+//	private Thread matingManagerThread;
 
 	private final int maxCreatureViewDistance = 5;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
 	public CreatureManager(){
-		creatures = new LinkedList<>();
+		creatures = new ArrayList<>();
 		creaturesToDelete = new LinkedList<>();
-		feedingManager = new FeedingManager();
+		herbivoreFeedingManager = new HerbivoreFeedingManager();
+		carnivoreFeedingManager = new CarnivoreFeedingManager();
 		matingManager = new MatingManager();
 
 		matingPairs = new ArrayList<>();
-		herbivorePairs = new ArrayList<>();
-		carnivorePairs = new ArrayList<>();
 		childCreaturesToAddToWorld = new LinkedList<>();
 	}
 
@@ -66,20 +66,30 @@ public class CreatureManager {
 										  Location maxWorldLocation,
 										  World world,
 										  WorldStatisticsTool worldStatisticsTool,
-										  TraitLoader traitLoader){
+										  TraitLoader traitLoader,
+										  Map<Long, CreatureActionProcessor> creatureActionProcessorMap){
 		Map<Long, List<Creature>> closestTileMapForCreatures = getClosestTileMapForCreaturesMap(getCreatures());
 
 		setWanderDirectionForCreatures(currentDay, getCreatures());
 		tellAllCreaturesToWander(getCreatures(), deltaUpdate, minWorldLocation, maxWorldLocation);
 
+		// move these checks to action processors -------
 		checkForCreatureMatingForListOfCreatures(getCreatures(), closestTileMapForCreatures, currentDay, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), traitLoader);
 		moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, deltaUpdate, minWorldLocation, maxWorldLocation, traitLoader);
 		addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
 
-		checkForHerbivoreFeeding(getCreatures(), world);
-		checkForCarnivoreFeeding(getCreatures(), closestTileMapForCreatures);
-		moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation);
-		addCreaturesToDelete(moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation));
+		checkForNewHerbivoreFeedingPairs(getCreatures(), world);
+		checkForNewCarnivoreFeedingPairs(getCreatures(), closestTileMapForCreatures);
+		// ----------------------------------------------
+
+		herbivoreFeedingManager.moveAndTryEatingForHerbivores(deltaUpdate, minWorldLocation, maxWorldLocation, maxCreatureViewDistance);
+		creatures.addAll(herbivoreFeedingManager.getCreaturesDoneEating());
+		herbivoreFeedingManager.clearDisposableLists();
+
+		carnivoreFeedingManager.moveAndTryEatingForCarnivores(deltaUpdate, minWorldLocation, maxWorldLocation, deltaUpdate);
+		creatures.addAll(carnivoreFeedingManager.getCreaturesDoneEating());
+		addCreaturesToDelete(carnivoreFeedingManager.getEatenCreatures());
+		carnivoreFeedingManager.clearDisposableLists();
 
 		checkCreatureLifeSpan(currentDay);
 	}
@@ -108,10 +118,6 @@ public class CreatureManager {
 
 		return closestTileMapForCreatures;
 	}
-
-	//TODO create a loop to iterate through a surrounding area STARTING AT THE CENTER
-	// 		TODO also consider just returning first plant found
-	//			TODO this does not currently choose the nearest plant, needs work
 
 	/**
 	 * Searches in the creatures max view distance for the closest plant
@@ -150,41 +156,6 @@ public class CreatureManager {
 		}
 
 		return null;
-	}
-
-	/**
-	 * For a list of herbivore creatures, check if any can eat and are nearby a plant, if so create a new FeedingTargetPlant
-	 *
-	 * @param creatures
-	 * @param world
-	 */
-	public void checkForHerbivoreFeeding(List<Creature> creatures, World world){
-		for(int i = 0; i < creatures.size(); i++){
-			Creature creature = creatures.get(i);
-			if(creature.getDiet() == Diet.HERBIVORE && creature.isDoingNothing() && creature.isHungry()) {
-				Plant nearestPlantToCreature = getNearestPlantToCreature(creature, world);
-				if(nearestPlantToCreature != null) {
-					creature.setCreatureState(CreatureState.EATING);
-					herbivorePairs.add(new FeedingTargetPlant(creature, nearestPlantToCreature));
-				}
-			}
-
-		}
-	}
-
-	/**
-	 * For a list of carnivore creatures, check if any can eat and are nearby another creature
-	 *
-	 * @param creatures
-	 * @param closestTileMapForCreatures
-	 */
-	public void checkForCarnivoreFeeding(List<Creature> creatures, Map<Long, List<Creature>> closestTileMapForCreatures){
-		for(int i = 0; i < creatures.size(); i++){
-			Creature creature = creatures.get(i);
-			if(creature.getDiet() == Diet.CARNIVORE && creature.isHungry()) {
-				checkForCarnvioreFeedingPairsInRange(creature, getCreaturesInRange(creature, closestTileMapForCreatures));
-			}
-		}
 	}
 
 	/**
@@ -251,7 +222,7 @@ public class CreatureManager {
 	 * @param y
 	 * @return
 	 */
-	private long getLocationLongFromCoordinates(double x, double y){
+	public long getLocationLongFromCoordinates(double x, double y){
 		long xLong = (int) x;
 		long yLong = (int) y;
 
@@ -297,7 +268,7 @@ public class CreatureManager {
 			if(potentialPrey != null && creature != potentialPrey){
 				creature.setCreatureState(CreatureState.EATING);
 				potentialPrey.setCreatureState(CreatureState.FLEEING);
-				carnivorePairs.add(new FeedingTargetCreature(creature, potentialPrey));
+				carnivoreFeedingManager.addCarnivoreFeedingPair(new FeedingTargetCreature(creature, potentialPrey));
 				break;
 			}
 		}
@@ -377,80 +348,6 @@ public class CreatureManager {
 	}
 
 	/**
-	 * For all herbivore and plant pairs, try eating. If too far, move closer.
-	 *
-	 * @param deltaUpdate
-	 * @param minWorldLocation
-	 * @param maxWorldLocation
-	 */
-	public void moveAndTryEatingForHerbivores(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
-		List<FeedingTargetPlant> herbivoreFeedingPairsToRemove = new LinkedList<>();
-		List<Plant> plantsToRemove = new ArrayList<>();
-		for(FeedingTargetPlant feedingTargetPlant : herbivorePairs){
-			Creature creature = feedingTargetPlant.getCreature();
-			Plant plant = feedingTargetPlant.getPlant();
-
-			double distanceFromPlant = distanceBetweenCreatureAndPlant(creature, plant);
-
-			if(distanceFromPlant > maxCreatureViewDistance){
-				creature.setCreatureState(CreatureState.WANDERING);
-				herbivoreFeedingPairsToRemove.add(feedingTargetPlant);
-			} else if (distanceFromPlant > creature.getSize().getWidth() + plant.getSize().getWidth()){
-				creature.moveCloserToPoint(deltaUpdate, plant.getLocation().getX(), plant.getLocation().getY(), minWorldLocation, maxWorldLocation);
-			} else {
-				creature.addEnergy(plant.getPlantType().getEnergyRestoration());
-				plantsToRemove.add(plant);
-				creature.setCreatureState(CreatureState.WANDERING);
-				herbivoreFeedingPairsToRemove.add(feedingTargetPlant);
-			}
-		}
-
-		herbivorePairs.removeAll(herbivoreFeedingPairsToRemove);
-
-		for(int i = 0; i < plantsToRemove.size(); i++){
-			Plant plantToRemove = plantsToRemove.get(i);
-			List<Plant> plantsForTileForCreature =plantToRemove.getTileForPlant().getPlants();
-			plantsForTileForCreature.remove(plantToRemove);
-		}
-	}
-
-	/**
-	 * For all carnivore pairs, try to eat. If too far, move closer.
-	 *
-	 * @param deltaUpdate
-	 * @param minWorldLocation
-	 * @param maxWorldLocation
-	 * @return
-	 */
-	public List<Creature> moveAndTryEatingForCarnivores(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
-		List<FeedingTargetCreature> carnivoreFeedingPairsToRemove = new LinkedList<>();
-		List<Creature> creaturestoRemove = new ArrayList<>();
-		for(FeedingTargetCreature feedingTargetCreature : carnivorePairs){
-			Creature predator = feedingTargetCreature.getPredator();
-			Creature prey = feedingTargetCreature.getPrey();
-
-			double distanceBetweenCreatures = distanceBetweenCreatures(predator, prey);
-
-			if(distanceBetweenCreatures > maxCreatureViewDistance){
-				predator.setCreatureState(CreatureState.WANDERING);
-				prey.setCreatureState(CreatureState.WANDERING);
-				carnivoreFeedingPairsToRemove.add(feedingTargetCreature);
-			} else if (distanceBetweenCreatures > predator.getSize().getWidth() + prey.getSize().getWidth()){
-				predator.moveCloserToPoint(deltaUpdate, prey.getLocation().getX(), prey.getLocation().getY(), minWorldLocation, maxWorldLocation);
-				prey.moveAwayFromPoint(deltaUpdate, predator.getLocation().getX(), predator.getLocation().getY(), minWorldLocation, maxWorldLocation);
-			} else {
-				predator.addEnergy(prey.getEnergyRestoration());
-				creaturestoRemove.add(prey);
-				predator.setCreatureState(CreatureState.WANDERING);
-				carnivoreFeedingPairsToRemove.add(feedingTargetCreature);
-			}
-		}
-
-		carnivorePairs.removeAll(carnivoreFeedingPairsToRemove);
-		return creaturestoRemove;
-	}
-
-	/**
 	 * Adds a list of creatures to the queue childCreaturesToAddToWorld
 	 *
 	 * @param creatures
@@ -462,34 +359,8 @@ public class CreatureManager {
 		childCreaturesToAddToWorld.clear();
 	}
 
-	/**
-	 * Determines the distance between two creatures
-	 *
-	 * @param creature1
-	 * @param creature2
-	 * @return
-	 */
-	private double distanceBetweenCreatures(Creature creature1, Creature creature2){
-		return Math.sqrt(Math.pow(creature2.getLocation().getX() - creature1.getLocation().getX(), 2) + Math.pow(creature2.getLocation().getY() - creature1.getLocation().getY(), 2));
-	}
-
-	/**
-	 * Determines the distance between a given creature and plant
-	 *
-	 * @param creature
-	 * @param plant
-	 * @return
-	 */
-	private double distanceBetweenCreatureAndPlant(Creature creature, Plant plant){
-		return Math.sqrt(Math.pow(plant.getLocation().getX() - creature.getLocation().getX(), 2) + Math.pow(plant.getLocation().getY() - creature.getLocation().getY(), 2));
-	}
-
 	public List<Creature> getCreatures() {
 		return creatures;
-	}
-
-	public void setCreatures(List<Creature> creatures) {
-		this.creatures = creatures;
 	}
 
 	public void addCreaturesToDelete(List<Creature> creatures){
@@ -561,5 +432,16 @@ public class CreatureManager {
 		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay);
 		getCreatures().add(newCreature);
 		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
+	}
+
+	/**
+	 * Determines the distance between two creatures
+	 *
+	 * @param creature1
+	 * @param creature2
+	 * @return
+	 */
+	private double distanceBetweenCreatures(Creature creature1, Creature creature2){
+		return Math.sqrt(Math.pow(creature2.getLocation().getX() - creature1.getLocation().getX(), 2) + Math.pow(creature2.getLocation().getY() - creature1.getLocation().getY(), 2));
 	}
 }

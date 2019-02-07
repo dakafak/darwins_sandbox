@@ -1,6 +1,5 @@
 package ui;
 
-import game.tiles.Tile;
 import game.world.World;
 import game.dna.stats.Sex;
 
@@ -89,7 +88,6 @@ public class SimulatorWindow extends JFrame {
 
 	int creatureSpacingDistance = 10;
 	private void prepareNewWorld(){
-//		removeAll();
 		world = new World(-20, 20, -20, 20);
 		for(int j = (int) world.getMinWorldLocation().getY() + creatureSpacingDistance; j < world.getMaxWorldLocation().getY(); j += creatureSpacingDistance) {
 			for(int i = (int) world.getMinWorldLocation().getX() + creatureSpacingDistance; i < world.getMaxWorldLocation().getX(); i += creatureSpacingDistance) {

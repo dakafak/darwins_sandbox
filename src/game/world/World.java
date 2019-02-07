@@ -7,6 +7,7 @@ import game.tiles.TileType;
 import game.world.creatures.Creature;
 import game.dna.stats.Sex;
 import game.world.movement.CreatureManager;
+import game.world.movement.submanagers.synchronizedchecks.CreatureActionProcessor;
 import game.world.plantlife.Plant;
 import game.world.plantlife.PlantType;
 import game.world.units.Location;
@@ -16,7 +17,9 @@ import ui.WorldStatisticsTool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static game.dna.stats.Sex.ASEXUAL;
 import static game.dna.stats.Sex.FEMALE;
@@ -25,6 +28,8 @@ import static game.dna.stats.Sex.MALE;
 public class World {
 
 	private Tile[][] tileMap;//TODO move this to a worldMap class with methods for retrieving tiles by coordinates
+	List<Thread> creatureActionProcessorThreads;
+	Map<Long, CreatureActionProcessor> threadsForEachTile;
 
 	private TraitLoader traitLoader;
 	private WorldStatisticsTool worldStatisticsTool;
@@ -36,25 +41,30 @@ public class World {
 	private Location minWorldLocation;
 
 	private Location maxWorldLocation;
-	private Location worldLocation;
 	private Size worldSize;
 
 	public World(int minWidth, int maxWidth, int minHeight, int maxHeight){
 		minWorldLocation = new Location(minWidth, minHeight);
 		maxWorldLocation = new Location(maxWidth, maxHeight);
-		worldLocation = new Location(0, 0);
 		worldSize = new Size(maxWidth - minWidth, maxHeight - minHeight);
-
-		tileMap = new Tile[(int)worldSize.getWidth()][(int)worldSize.getHeight()];//TODO may be more beneficial to create it with height first
-		for(int y = 0; y < getTileMap().length; y++) {
-			for (int x = 0; x < getTileMap()[0].length; x++) {
-				tileMap[y][x] = new Tile(x + minWidth, y + minHeight, TileType.DIRT, worldDay);
-			}
-		}
 
 		traitLoader = new TraitLoader();
 		worldStatisticsTool = new WorldStatisticsTool();
 		movementManager = new CreatureManager();
+
+		threadsForEachTile = new HashMap<>();
+		tileMap = new Tile[(int)worldSize.getWidth()][(int)worldSize.getHeight()];//TODO may be more beneficial to create it with height first
+		for(int y = 0; y < getTileMap().length; y++) {
+			for (int x = 0; x < getTileMap()[0].length; x++) {
+				Tile newTile = new Tile(x + minWidth, y + minHeight, TileType.DIRT, worldDay);
+				tileMap[y][x] = newTile;
+
+				CreatureActionProcessor creatureActionProcessor = new CreatureActionProcessor();
+				Thread newThread = new Thread(creatureActionProcessor);
+				threadsForEachTile.put(movementManager.getLocationLongFromCoordinates(x + minWidth, y + minHeight), creatureActionProcessor);
+				creatureActionProcessorThreads.add(newThread);
+			}
+		}
 	}
 
 	/**
@@ -214,39 +224,11 @@ public class World {
 		return minWorldLocation;
 	}
 
-	public void setMinWorldLocation(Location minWorldLocation) {
-		this.minWorldLocation = minWorldLocation;
-	}
-
 	public Location getMaxWorldLocation() {
 		return maxWorldLocation;
 	}
 
-	public void setMaxWorldLocation(Location maxWorldLocation) {
-		this.maxWorldLocation = maxWorldLocation;
-	}
-
-	public Size getWorldSize() {
-		return worldSize;
-	}
-
-	public void setWorldSize(Size worldSize) {
-		this.worldSize = worldSize;
-	}
-
-	public Location getWorldLocation() {
-		return worldLocation;
-	}
-
-	public void setWorldLocation(Location worldLocation) {
-		this.worldLocation = worldLocation;
-	}
-
 	public Tile[][] getTileMap() {
 		return tileMap;
-	}
-
-	public void setTileMap(Tile[][] tileMap) {
-		this.tileMap = tileMap;
 	}
 }
