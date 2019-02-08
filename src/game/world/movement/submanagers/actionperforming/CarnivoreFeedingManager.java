@@ -3,7 +3,6 @@ package game.world.movement.submanagers.actionperforming;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
 import game.world.movement.movement_pairs.FeedingTargetCreature;
-import game.world.movement.movement_pairs.FeedingTargetPlant;
 import game.world.units.Location;
 
 import java.util.ArrayList;

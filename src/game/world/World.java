@@ -44,7 +44,6 @@ public class World {
 	private Location maxWorldLocation;
 	private Size worldSize;
 
-//	List<Thread> creatureActionProcessorThreads;
 	Map<Long, CreatureActionProcessor> creatureActionProcessorMap;
 
 	public World(int minWidth, int maxWidth, int minHeight, int maxHeight){
@@ -57,7 +56,6 @@ public class World {
 		movementManager = new CreatureManager();
 
 		creatureActionProcessorMap = new HashMap<>();
-//		creatureActionProcessorThreads = new LinkedList<>();
 		tileMap = new Tile[(int)worldSize.getWidth()][(int)worldSize.getHeight()];//TODO may be more beneficial to create it with height first
 		for(int y = 0; y < getTileMap().length; y++) {
 			for (int x = 0; x < getTileMap()[0].length; x++) {
@@ -65,14 +63,7 @@ public class World {
 				tileMap[y][x] = newTile;
 
 				CreatureActionProcessor creatureActionProcessor = new CreatureActionProcessor();
-				Thread newThread = new Thread(creatureActionProcessor);
 				creatureActionProcessorMap.put(movementManager.getLocationLongFromCoordinates(x + minWidth, y + minHeight), creatureActionProcessor);
-//				creatureActionProcessorThreads.add(newThread);
-				try {
-					newThread.join(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 	}
