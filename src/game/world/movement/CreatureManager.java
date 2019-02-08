@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static game.dna.stats.Sex.FEMALE;
 import static game.dna.stats.Sex.MALE;
@@ -44,6 +47,9 @@ public class CreatureManager {
 //	private Thread feedingManagerThread;
 //	private Thread matingManagerThread;
 
+	ExecutorService executorService;
+	int numberOfThreads = 128;
+
 	public static final int MAX_CREATURE_VIEWING_DISTANCE = 5;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
 	public CreatureManager(){
@@ -58,6 +64,13 @@ public class CreatureManager {
 		childCreaturesToAddToWorld = new LinkedList<>();
 	}
 
+	long timeTakenPreparingDataForMethod;
+	long timeTakenPreparingThreads;
+	long timeTakenStartingThreads;
+	long timeTakenWaitingForThreads;
+	long timeTakenRetrievingData;
+	long timeTakenForRestOfMethod;
+	long totalTimeForMethod;
 	public void runMovementManagerUpdates(double currentDay,
 										  double deltaUpdate,
 										  Location minWorldLocation,
@@ -65,36 +78,39 @@ public class CreatureManager {
 										  World world,
 										  WorldStatisticsTool worldStatisticsTool,
 										  TraitLoader traitLoader,
-										  Map<Long, CreatureActionProcessor> creatureActionProcessorMap,
-										  List<Thread> threads){
-		Map<Long, LinkedList<Creature>> closestTileMapForCreatures = getClosestTileMapForCreaturesMap(getCreatures());
+										  Map<Long, CreatureActionProcessor> creatureActionProcessorMap){
+long startTimeOfMethod = System.nanoTime();
 
+		Map<Long, LinkedList<Creature>> closestTileMapForCreatures = getClosestTileMapForCreaturesMap(getCreatures());
 		setWanderDirectionForCreatures(currentDay, getCreatures());
 		tellAllCreaturesToWander(getCreatures(), deltaUpdate, minWorldLocation, maxWorldLocation);
+timeTakenPreparingDataForMethod += System.nanoTime() - startTimeOfMethod;
 
 		// queue up all creature action processors and threads -------
+		executorService = Executors.newFixedThreadPool(numberOfThreads);
+long startTimeOfPreparingThreads = System.nanoTime();
 			for(Long tileCoordinateKey : closestTileMapForCreatures.keySet()){
 				LinkedList<Creature> creaturesForTile = closestTileMapForCreatures.get(tileCoordinateKey);
 				CreatureActionProcessor creatureActionProcessor = creatureActionProcessorMap.get(tileCoordinateKey);
 
 				if(creatureActionProcessor != null && creaturesForTile != null) {//TODO -- somehow a coordinate key of 85899345925 was created
 					creatureActionProcessor.prepareProcessorWithNewData(currentDay, creaturesForTile, closestTileMapForCreatures, world);
+					executorService.execute(creatureActionProcessor);
 				}
 			}
+timeTakenPreparingThreads += System.nanoTime() - startTimeOfPreparingThreads;
 
-			for(Thread thread : threads){
-				thread.run();
-			}
+long startTimeWaitingForThreads = System.nanoTime();
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(1, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			System.out.println("Exception when waiting for executor service to complete.");
+			e.printStackTrace();
+		}
+timeTakenWaitingForThreads += System.nanoTime() - startTimeWaitingForThreads;
 
-			for(Thread thread : threads){
-				try {
-					thread.join(100);
-				} catch (InterruptedException e) {
-					System.out.println("Was not able to join thread: " + thread.getName());
-					e.printStackTrace();
-				}
-			}
-
+long startTimeRetrievingData = System.nanoTime();
 			for(Long actionProcessorKey : creatureActionProcessorMap.keySet()){
 				CreatureActionProcessor creatureActionProcessor = creatureActionProcessorMap.get(actionProcessorKey);
 
@@ -103,8 +119,10 @@ public class CreatureManager {
 				carnivoreFeedingManager.addAllCarnivoreFeedingPairs(creatureActionProcessor.getCarnivorePairs());
 				matingPairs.addAll(creatureActionProcessor.getMatingPairs());
 			}
+timeTakenRetrievingData += System.nanoTime() - startTimeRetrievingData;
 		// ----------------------------------------------
 
+long startOfRemainderMethod = System.nanoTime();
 		reproduceAsexualCreatures(traitLoader, currentDay);
 		moveAndTryMatingCreatures(traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, deltaUpdate, minWorldLocation, maxWorldLocation, traitLoader);
 		addNewChildCreaturesToWorldCreatureList(getCreatures(), worldStatisticsTool);
@@ -119,6 +137,18 @@ public class CreatureManager {
 		carnivoreFeedingManager.clearDisposableLists();
 
 		checkCreatureLifeSpan(currentDay);
+timeTakenForRestOfMethod += System.nanoTime() - startOfRemainderMethod;
+
+totalTimeForMethod += System.nanoTime() - startTimeOfMethod;
+
+		System.out.println(
+			"PreparingDataForMethod: " + (timeTakenPreparingDataForMethod * 100) / (totalTimeForMethod) + "% | " +
+			"PreparingThreads: " + (timeTakenPreparingThreads * 100) / (totalTimeForMethod) + "% | " +
+			"StartingThreads: " + (timeTakenStartingThreads * 100) / (totalTimeForMethod) + "% | " +
+			"WaitingForThreads: " + (timeTakenWaitingForThreads * 100) / (totalTimeForMethod) + "% | " +
+			"RetrievingData: " + (timeTakenRetrievingData * 100) / (totalTimeForMethod) + "% | " +
+			"RemainderOfMethod: " + (timeTakenForRestOfMethod * 100) / (totalTimeForMethod) + "% | " +
+			"totalTimeForMethod: " + totalTimeForMethod);
 	}
 
 	/**

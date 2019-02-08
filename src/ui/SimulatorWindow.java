@@ -97,7 +97,7 @@ public class SimulatorWindow extends JFrame {
 			}
 		}
 
-		Camera mainCamera = new Camera(0, 0, 80);
+		Camera mainCamera = new Camera(0, 0, 80, getWidth(), getHeight());
 		simulatorWindowComponent = new SimulatorWindowComponent(mainCamera);
 		simulatorWindowComponent.setWorld(world);
 		add(simulatorWindowComponent);
