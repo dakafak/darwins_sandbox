@@ -121,9 +121,9 @@ public class CreatureActionProcessor implements Runnable{
 				&& creature.canMate(currentDay) && creatureInRange.canMate(currentDay)){
 			if(	(creature.getSexOfCreature() == MALE && creatureInRange.getSexOfCreature() == FEMALE) ||
 					(creature.getSexOfCreature() == FEMALE && creatureInRange.getSexOfCreature() == MALE)){
-				matingPairs.add(new MatingPair(creature, creatureInRange));
 				creature.setCreatureState(CreatureState.MATING);
 				creatureInRange.setCreatureState(CreatureState.MATING);
+				matingPairs.add(new MatingPair(creature, creatureInRange));
 			}
 		}
 	}

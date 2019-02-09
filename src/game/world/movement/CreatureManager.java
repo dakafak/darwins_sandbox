@@ -214,6 +214,13 @@ public class CreatureManager {
 		for(MatingPair matingPair : matingPairs){
 			Creature maleCreature = matingPair.getCreature1().getSexOfCreature() == MALE ? matingPair.getCreature1() : matingPair.getCreature2();
 			Creature femaleCreature = matingPair.getCreature1().getSexOfCreature() == FEMALE ? matingPair.getCreature1() : matingPair.getCreature2();
+
+			if(maleCreature.getCreatureState() != CreatureState.MATING || femaleCreature.getCreatureState() != CreatureState.MATING){
+				maleCreature.setCreatureState(CreatureState.WANDERING);
+				femaleCreature.setCreatureState(CreatureState.WANDERING);
+				matingPairsToRemove.add(matingPair);
+			}
+
 			double distanceBetweenCreatures = distanceBetweenCreatures(maleCreature, femaleCreature);
 
 			if(distanceBetweenCreatures > MAX_CREATURE_VIEWING_DISTANCE){

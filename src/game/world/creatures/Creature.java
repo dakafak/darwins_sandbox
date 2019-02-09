@@ -101,7 +101,7 @@ public class Creature {
 	}
 
     public boolean canMate(double currentDay){
-    	if(energy > matingEnergyRequirement && (currentDay - lastMatingDay) > mating_frequency){
+    	if(creatureState == CreatureState.WANDERING && energy > matingEnergyRequirement && (currentDay - lastMatingDay) > mating_frequency){
     		return true;
 		}
 
