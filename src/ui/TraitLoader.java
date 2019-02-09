@@ -194,8 +194,4 @@ public class TraitLoader {
 		return traitNameAndValueToCreatureStatModifiers;
 	}
 
-	public void setTraitNameAndValueToCreatureStatModifiers(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers) {
-		this.traitNameAndValueToCreatureStatModifiers = traitNameAndValueToCreatureStatModifiers;
-	}
-
 }

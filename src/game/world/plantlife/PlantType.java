@@ -20,15 +20,8 @@ public enum PlantType {
 		return color;
 	}
 
-	public void setColor(Color color) {
-		this.color = color;
-	}
-
 	public double getEnergyRestoration() {
 		return energyRestoration;
 	}
 
-	public void setEnergyRestoration(double energyRestoration) {
-		this.energyRestoration = energyRestoration;
-	}
 }

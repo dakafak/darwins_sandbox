@@ -29,10 +29,14 @@ public class Camera {
 	double viewingDistance;
 	short minZoomLevel = 5;
 	short maxZoomLevel = 100;
+	BufferedImage camerasBufferedImage;
+	Graphics2D camerasGraphics;
 
-	public Camera(double x, double y, double viewingDistanceInTiles){
-		location = new Location(x, y);
+	public Camera(double x, double y, double viewingDistanceInTiles, int drawingWidth, int drawingHeight){
 		this.viewingDistance = viewingDistanceInTiles;
+		location = new Location(x, y);
+		camerasBufferedImage = new BufferedImage(drawingWidth, drawingHeight, BufferedImage.TYPE_INT_RGB);
+		camerasGraphics = camerasBufferedImage.createGraphics();
 	}
 
 	public void zoomIn(){
@@ -49,8 +53,8 @@ public class Camera {
 		}
 	}
 
-	double cachedWindowWidth;
-	double cachedWindowHeight;
+	int cachedWindowWidth;
+	int cachedWindowHeight;
 	double cachedWindowWidthMiddle;
 	double cachedWindowHeightMiddle;
 	double cachedMonitorResolutionScale;
@@ -58,10 +62,12 @@ public class Camera {
 	double cachedTileViewingDistanceHeight;
 	double cachedStandardSize;
 	double cachedViewingDistance;
-	public BufferedImage getBufferedWorldImage(final World world, double drawingWidth, double drawingHeight, double deltaUpdate, long currentFPS, int worldSpeedMultiplier) {
+	public BufferedImage getBufferedWorldImage(final World world, int drawingWidth, int drawingHeight, double deltaUpdate, long currentFPS, int worldSpeedMultiplier) {
 		if(drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight || viewingDistance != cachedViewingDistance){
 			cachedWindowWidth = drawingWidth;
 			cachedWindowHeight = drawingHeight;
+			camerasBufferedImage = new BufferedImage(drawingWidth, drawingHeight, BufferedImage.TYPE_INT_RGB);
+			camerasGraphics = camerasBufferedImage.createGraphics();
 			cachedWindowWidthMiddle = cachedWindowWidth * .5;
 			cachedWindowHeightMiddle = cachedWindowHeight * .5;
 			cachedMonitorResolutionScale = cachedWindowWidth / cachedWindowHeight;
@@ -71,14 +77,13 @@ public class Camera {
 			cachedViewingDistance = viewingDistance;
 		}
 
-		BufferedImage image = new BufferedImage((int) drawingWidth, (int) drawingHeight, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g2d = image.createGraphics();
-		drawGround(g2d, world);
-		drawPlants(g2d, world);
-		drawCreatures(g2d, world);
-		drawCameraInfo(g2d, world, deltaUpdate, currentFPS, worldSpeedMultiplier);
-		drawTraitUsageInfo(g2d, world);
-		return image;
+		camerasGraphics.clearRect(0, 0, cachedWindowWidth, cachedWindowHeight);
+		drawGround(camerasGraphics, world);
+		drawPlants(camerasGraphics, world);
+		drawCreatures(camerasGraphics, world);
+		drawCameraInfo(camerasGraphics, world, deltaUpdate, currentFPS, worldSpeedMultiplier);
+		drawTraitUsageInfo(camerasGraphics, world);
+		return camerasBufferedImage;
 	}
 
 	private void drawTraitUsageInfo(Graphics2D g2d, World world) {
