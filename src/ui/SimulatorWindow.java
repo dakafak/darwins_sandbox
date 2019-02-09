@@ -49,11 +49,7 @@ public class SimulatorWindow extends JFrame {
 					}
 				}
 				if(e.getKeyCode() == KeyEvent.VK_P) {
-					if (simulatorWindowComponent.worldSpeedMultiplier == 0) {
-						simulatorWindowComponent.worldSpeedMultiplier = 1;
-					} else {
-						simulatorWindowComponent.worldSpeedMultiplier = 0;
-					}
+					simulatorWindowComponent.togglePause();
 				}
 			}
 

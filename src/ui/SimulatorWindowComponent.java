@@ -3,6 +3,7 @@ package ui;
 import game.world.World;
 
 import javax.swing.JComponent;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -36,6 +37,7 @@ public class SimulatorWindowComponent extends JComponent {
 	long lastFPS;
 	long currentFrames;
 	long timeSinceLastFPSupdate;
+	boolean paused;
 
 	public void start() {
 		originalStartTime = System.currentTimeMillis();
@@ -65,10 +67,20 @@ public class SimulatorWindowComponent extends JComponent {
 				deltaUpdateWithSpeedModifer = deltaUpdate * worldSpeedMultiplier;
 
 				adjustCameraLocation();
-				getWorld().runWorldUpdates(deltaUpdateWithSpeedModifer);
+				if(!paused) {
+					getWorld().runWorldUpdates(deltaUpdateWithSpeedModifer);
+				}
 				repaint();
 			}
 		}
+	}
+
+	public void togglePause(){
+		paused = !paused;
+	}
+
+	public boolean isPaused(){
+		return paused;
 	}
 
 	public World getWorld() {
@@ -120,6 +132,12 @@ public class SimulatorWindowComponent extends JComponent {
 		Graphics2D g2d = (Graphics2D) g;
 		BufferedImage worldImage = currentCamera.getBufferedWorldImage(getWorld(), getWidth(), getHeight(), deltaUpdate, lastFPS, worldSpeedMultiplier);
 		g2d.drawRenderedImage(worldImage, null);
+		if(isPaused()) {
+			g2d.setColor(Color.black);
+			g2d.fillRect(500, 500, 100, 20);
+			g2d.setColor(Color.yellow);
+			g2d.drawString("PAUSED", 530, 515);
+		}
 	}
 
 	public Camera getCurrentCamera() {
