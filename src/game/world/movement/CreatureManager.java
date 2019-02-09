@@ -263,9 +263,7 @@ public class CreatureManager {
 	}
 
 	public void addCreatureToDelete(Creature creature){
-		if(!creaturesToDelete.contains(creature)){
-			creaturesToDelete.add(creature);
-		}
+		creaturesToDelete.add(creature);
 	}
 
 	/**
@@ -282,6 +280,7 @@ public class CreatureManager {
 			}
 		}
 
+		creatures.removeAll(creaturesToDelete);
 		creaturesToDelete.clear();
 		return locationsToAddFertility;
 	}
@@ -292,9 +291,8 @@ public class CreatureManager {
 	public void checkCreatureLifeSpan(double currentDay){
 		for(int i = 0; i < getCreatures().size(); i++){
 			Creature creature = getCreatures().get(i);
-			boolean creatureDies = creature.shouldDie(currentDay);
-			if(creatureDies){
-				addCreatureToDelete(creature);
+			if(creature.shouldDie(currentDay)){
+				creatures.remove(creature);
 			}
 		}
 	}

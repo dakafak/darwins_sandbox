@@ -18,11 +18,8 @@ import ui.WorldStatisticsTool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static game.dna.stats.Sex.ASEXUAL;
 import static game.dna.stats.Sex.FEMALE;
@@ -131,7 +128,7 @@ public class World {
 		for(int i = 0; i < tileMap.length; i++){
 			for(int j = 0; j < tileMap[0].length; j++){
 				Tile currentTile = tileMap[i][j];
-				if(currentTile.canGrowPlants(currentDay) && currentTile.getPlants().size() < maxPlantsPerTile){
+				if(currentTile.plantGrowthFrequencyAllowsCheckToGrow(currentDay) && currentTile.getPlants().size() < maxPlantsPerTile){
 					PlantType plantTypeToGrow = PlantType.GRASS;
 					if(currentTile.canGrowPlant()){
 						Plant newPlant = new Plant(currentTile.getLocation().getX() + Math.random(), currentTile.getLocation().getY() + Math.random(), plantTypeToGrow, currentTile);

@@ -29,7 +29,7 @@ public class Tile {
 	}
 
 	double lastGrowthCheck;
-	public boolean canGrowPlants(double worldTime){
+	public boolean plantGrowthFrequencyAllowsCheckToGrow(double worldTime){
 		if(worldTime - lastGrowthCheck >= growthFrequency){
 			lastGrowthCheck = worldTime;
 			return true;

@@ -189,7 +189,7 @@
       "stats": [
         {
           "statName":"life_span",
-          "statModifier":".5"
+          "statModifier":"4"
         }
       ]
     },
@@ -199,7 +199,7 @@
       "stats": [
         {
           "statName":"life_span",
-          "statModifier":"1"
+          "statModifier":"5"
         }
       ]
     },
@@ -209,7 +209,7 @@
       "stats": [
         {
           "statName":"life_span",
-          "statModifier":"1.5"
+          "statModifier":"6"
         }
       ]
     },
