@@ -17,7 +17,7 @@ public class Tile {
 	float tileFertility;
 	Size size;
 	List<Plant> plants;
-	double growthFrequency = .1;
+	double growthFrequency = .75;
 
 	public Tile(int x, int y, TileType tileType, double currentDay){
 		plants = new ArrayList<>();

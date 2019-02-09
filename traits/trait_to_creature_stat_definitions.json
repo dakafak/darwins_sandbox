@@ -89,7 +89,7 @@
         },
         {
           "statName":"movement_energy_drain",
-          "statModifier":".003"
+          "statModifier":".004"
         }
       ]
     },
@@ -104,7 +104,7 @@
         },
         {
           "statName":"mating_energy_requirement",
-          "statModifier":"20"
+          "statModifier":"45"
         },
         {
           "statName":"energy_restoration",
@@ -126,7 +126,7 @@
         },
         {
           "statName":"mating_energy_requirement",
-          "statModifier":"30"
+          "statModifier":"50"
         },
         {
           "statName":"energy_restoration",
@@ -148,7 +148,7 @@
         },
         {
           "statName":"mating_energy_requirement",
-          "statModifier":"40"
+          "statModifier":"55"
         },
         {
           "statName":"energy_restoration",
@@ -170,7 +170,7 @@
         },
         {
           "statName":"mating_energy_requirement",
-          "statModifier":"50"
+          "statModifier":"60"
         },
         {
           "statName":"energy_restoration",
@@ -189,7 +189,7 @@
       "stats": [
         {
           "statName":"life_span",
-          "statModifier":"25"
+          "statModifier":".5"
         }
       ]
     },
@@ -199,7 +199,7 @@
       "stats": [
         {
           "statName":"life_span",
-          "statModifier":"50"
+          "statModifier":"1"
         }
       ]
     },
@@ -209,7 +209,7 @@
       "stats": [
         {
           "statName":"life_span",
-          "statModifier":"100"
+          "statModifier":"1.5"
         }
       ]
     },
@@ -220,7 +220,7 @@
       "stats": [
         {
           "statName":"mating_frequency",
-          "statModifier":"1"
+          "statModifier":".3"
         }
       ]
     },
@@ -230,7 +230,7 @@
       "stats": [
         {
           "statName":"mating_frequency",
-          "statModifier":".75"
+          "statModifier":".2"
         }
       ]
     },
@@ -240,7 +240,7 @@
       "stats": [
         {
           "statName":"mating_frequency",
-          "statModifier":".5"
+          "statModifier":".1"
         }
       ]
     },
