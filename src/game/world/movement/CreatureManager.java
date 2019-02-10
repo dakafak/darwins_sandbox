@@ -45,7 +45,7 @@ public class CreatureManager {
 	ExecutorService executorService;
 	int numberOfThreads = 128;
 
-	public static final int MAX_CREATURE_VIEWING_DISTANCE = 5;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
+	public static final int MAX_CREATURE_VIEWING_DISTANCE = 3;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
 	public CreatureManager(){
 		creatures = new LinkedList<>();
@@ -285,9 +285,9 @@ public class CreatureManager {
 					locationsToAddFertility.add(new Location(tileToAddX, tileToAddY));
 				}
 			}
+			getCreatures().remove(creatureToDelete);
 		}
 
-		creatures.removeAll(creaturesToDelete);
 		creaturesToDelete.clear();
 		return locationsToAddFertility;
 	}

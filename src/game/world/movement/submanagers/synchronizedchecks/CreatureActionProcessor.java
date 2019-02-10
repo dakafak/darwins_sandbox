@@ -103,7 +103,8 @@ public class CreatureActionProcessor implements Runnable{
 		if(creature.getSexOfCreature() == Sex.ASEXUAL && creature.canMate(currentDay)){
 
 		} else {
-			for (Creature creatureInRange : creaturesInRange) {
+			for(int i = 0; i < creaturesInRange.size(); i++){
+				Creature creatureInRange = creaturesInRange.get(i);
 				checkMatingForCreatureAndCreatureInRange(creature, creatureInRange, currentDay);
 			}
 		}
