@@ -1,5 +1,6 @@
 package ui;
 
+import game.dna.species.Species;
 import game.world.World;
 import game.dna.stats.Sex;
 
@@ -82,13 +83,14 @@ public class SimulatorWindow extends JFrame {
 		prepareNewWorld();
 	}
 
-	int creatureSpacingDistance = 10;
+	int creatureSpacingDistance = 5;
 	private void prepareNewWorld(){
 		world = new World(-20, 20, -20, 20);
 		for(int j = (int) world.getMinWorldLocation().getY() + creatureSpacingDistance; j < world.getMaxWorldLocation().getY(); j += creatureSpacingDistance) {
 			for(int i = (int) world.getMinWorldLocation().getX() + creatureSpacingDistance; i < world.getMaxWorldLocation().getX(); i += creatureSpacingDistance) {
-				world.addRandomCreature(Sex.MALE, i, j);
-				world.addRandomCreature(Sex.FEMALE, i, j);
+				Species newSpecies = Species.getRandomNewSpecies();
+				world.addRandomCreature(Sex.MALE, i, j, newSpecies);
+				world.addRandomCreature(Sex.FEMALE, i, j, newSpecies);
 				System.out.println(world.getCreatures());
 			}
 		}

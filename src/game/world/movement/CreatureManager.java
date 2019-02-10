@@ -2,6 +2,7 @@ package game.world.movement;
 
 import game.dna.DNABuilder;
 import game.dna.DNAString;
+import game.dna.species.Species;
 import game.dna.traits.CreatureStatModifier;
 import game.dna.traits.TraitPair;
 import game.world.World;
@@ -164,7 +165,7 @@ public class CreatureManager {
 		for(int i = 0; i < asexualCreaturesToReproduce.size(); i++) {
 			Creature creature = asexualCreaturesToReproduce.get(i);
 			DNAString childString = DNABuilder.getAsexualDNAString(creature.getCreatureDNAString(), traitLoader);
-			Creature newCreature = new Creature(creature.getLocation().getX(), creature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay);
+			Creature newCreature = new Creature(creature.getLocation().getX(), creature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, creature.getSpecies());
 			childCreaturesToAddToWorld.add(newCreature);
 			creature.reduceEnergyFromMating();
 			creature.setLastMatingDay(currentDay);
@@ -231,7 +232,7 @@ public class CreatureManager {
 				maleCreature.moveCloserToPoint(deltaUpdate, femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), minWorldLocation, maxWorldLocation);
 			} else {
 				DNAString childString = DNABuilder.getChildDNAString(maleCreature.getCreatureDNAString(), femaleCreature.getCreatureDNAString(), traitLoader);
-				Creature newCreature = new Creature(femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitNameAndValueToCreatureStatModifiers, currentDay);
+				Creature newCreature = new Creature(femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitNameAndValueToCreatureStatModifiers, currentDay, maleCreature.getSpecies());
 				childCreaturesToAddToWorld.add(newCreature);
 
 				maleCreature.reduceEnergyFromMating();
@@ -309,7 +310,7 @@ public class CreatureManager {
 	 *
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool){
+	public void addRandomCreature(Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool, Species species){
 		DNAString newDNAStringForCreature = new DNAString();
 		TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
 		for (int i = 0; i < traitLoader.getTraitTypesInOrder().size(); i++) {
@@ -317,7 +318,7 @@ public class CreatureManager {
 		}
 		newDNAStringForCreature.setTraitString(allTraitsForDNAString);
 
-		addRandomCreature(newDNAStringForCreature, sexOfCreature, x, y, traitLoader, currentDay, worldStatisticsTool);
+		addRandomCreature(newDNAStringForCreature, sexOfCreature, x, y, traitLoader, currentDay, worldStatisticsTool, species);
 	}
 
 	/**
@@ -326,8 +327,8 @@ public class CreatureManager {
 	 * @param dnaString
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool){
-		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay);
+	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool, Species species){
+		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, species);
 		getCreatures().add(newCreature);
 		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
 	}

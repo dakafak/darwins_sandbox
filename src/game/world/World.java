@@ -2,6 +2,7 @@ package game.world;
 
 import game.dna.DNABuilder;
 import game.dna.DNAString;
+import game.dna.species.Species;
 import game.tiles.Tile;
 import game.tiles.TileType;
 import game.world.creatures.Creature;
@@ -163,7 +164,7 @@ public class World {
 		int numberOfMatings = malesToMate.size() <= femalesToMate.size() ? malesToMate.size() : femalesToMate.size();
 		for(int i = 0; i < numberOfMatings; i++){
 			DNAString childString = DNABuilder.getChildDNAString(malesToMate.get(i).getCreatureDNAString(), femalesToMate.get(i).getCreatureDNAString(), traitLoader);
-			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay);
+			Creature newCreature = new Creature(Math.random()*20 - 10, Math.random()*20 - 10, childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), worldDay, malesToMate.get(i).getSpecies());
 			getCreatures().add(newCreature);
 			worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
 		}
@@ -199,9 +200,9 @@ public class World {
 	 *
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(Sex sexOfCreature, double x, double y){
+	public void addRandomCreature(Sex sexOfCreature, double x, double y, Species species){
 		if(coordinateExistsOnMap((int)x, (int)y)) {
-			movementManager.addRandomCreature(sexOfCreature, x, y, traitLoader, worldDay, worldStatisticsTool);
+			movementManager.addRandomCreature(sexOfCreature, x, y, traitLoader, worldDay, worldStatisticsTool, species);
 		}
 	}
 

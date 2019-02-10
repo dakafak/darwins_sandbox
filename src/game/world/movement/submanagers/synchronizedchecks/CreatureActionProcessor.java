@@ -120,11 +120,13 @@ public class CreatureActionProcessor implements Runnable{
 	private void checkMatingForCreatureAndCreatureInRange(Creature creature, Creature creatureInRange, double currentDay){
 		if(creature.isDoingNothing() && creatureInRange.isDoingNothing()
 				&& creature.canMate(currentDay) && creatureInRange.canMate(currentDay)){
-			if(	(creature.getSexOfCreature() == MALE && creatureInRange.getSexOfCreature() == FEMALE) ||
-					(creature.getSexOfCreature() == FEMALE && creatureInRange.getSexOfCreature() == MALE)){
-				creature.setCreatureState(CreatureState.MATING);
-				creatureInRange.setCreatureState(CreatureState.MATING);
-				matingPairs.add(new MatingPair(creature, creatureInRange));
+			if(creature.getSpecies() == creatureInRange.getSpecies()) {
+				if ((creature.getSexOfCreature() == MALE && creatureInRange.getSexOfCreature() == FEMALE) ||
+						(creature.getSexOfCreature() == FEMALE && creatureInRange.getSexOfCreature() == MALE)) {
+					creature.setCreatureState(CreatureState.MATING);
+					creatureInRange.setCreatureState(CreatureState.MATING);
+					matingPairs.add(new MatingPair(creature, creatureInRange));
+				}
 			}
 		}
 	}
@@ -174,7 +176,7 @@ public class CreatureActionProcessor implements Runnable{
 		for(int i = 0; i < creatures.size(); i++){
 			Creature potentialPrey = creatures.get(i);
 			//TODO add if checks for species once that's added
-			if(potentialPrey != null && creature != potentialPrey){
+			if(creature != null && potentialPrey != null && creature.getSpecies() != potentialPrey.getSpecies() && creature != potentialPrey){
 				creature.setCreatureState(CreatureState.EATING);
 				potentialPrey.setCreatureState(CreatureState.FLEEING);
 				carnivorePairs.add(new FeedingTargetCreature(creature, potentialPrey));

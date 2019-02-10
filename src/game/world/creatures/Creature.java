@@ -1,6 +1,7 @@
 package game.world.creatures;
 
 import game.dna.DNAString;
+import game.dna.species.Species;
 import game.dna.stats.Diet;
 import game.dna.stats.Sex;
 import game.dna.stats.StatType;
@@ -25,11 +26,12 @@ import static game.world.units.Direction.NORTH;
 public class Creature {
 
     DNAString creatureDNAString;
-    Map<StatType, Object> creatureStats;//TODO should have a map for trait to value -- or hashset with enums that contain the value
+    Map<StatType, Object> creatureStats;
 	CreatureState creatureState;
 	double daySpawned;
 
-	Sex sexOfCreature;//TODO maybe should be a trait instead, could by x and Y
+	Species species;
+	Sex sexOfCreature;
 	Location location;
 	Size size;//TODO  some of these traits can be moved into creature stats once that loader is added
 	Diet diet;
@@ -49,11 +51,14 @@ public class Creature {
 					DNAString creatureDNAString,
 					Sex sexOfCreature,
 					Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers,
-					double currentDay){
+					double currentDay,
+					Species species){
     	this.creatureDNAString = creatureDNAString;
     	this.sexOfCreature = sexOfCreature;
 		this.location = new Location(x, y);
 		this.daySpawned = currentDay;
+		this.species = species;
+
 		creatureState = CreatureState.WANDERING;
 
 		creatureStats = new HashMap<>();
@@ -292,6 +297,14 @@ public class Creature {
 
 	public double getEnergyRestoration() {
 		return energyRestoration;
+	}
+
+	public Species getSpecies() {
+		return species;
+	}
+
+	public void setSpecies(Species species) {
+		this.species = species;
 	}
 
 	@Override
