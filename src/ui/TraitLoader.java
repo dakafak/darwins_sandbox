@@ -137,28 +137,38 @@ public class TraitLoader {
         if(traitFolder.exists() && traitFolder.isDirectory()){
             List<Trait> allTraits = new ArrayList<>();
 
-            File[] files = traitFolder.listFiles();
-            for(File file : files){
-                if(file.getName().startsWith("trait_")){
-                    String traitTypeString = file.getName().substring(6);
-
-                    try {
-                        BufferedReader br = new BufferedReader(new FileReader(file));
-                        String readLine = "";
-                        while((readLine = br.readLine()) != null){
-                            String[] traitProperites = readLine.split("=");
-                            if(traitProperites.length == 2){
-                                Trait newTrait = new Trait(traitProperites[0].charAt(0), traitProperites[1], TraitType.valueOf(traitTypeString));
-                                allTraits.add(newTrait);
-                            }
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            TraitType[] traitTypes = TraitType.values();
+            for(TraitType traitType : traitTypes){
+            	for(String traitTypeDefinition : traitType.getStrings()){
+            		String[] traitTypeDefinitionSplit = traitTypeDefinition.split("=");
+            		char traitTypeCharacter = traitTypeDefinitionSplit[0].charAt(0);
+            		String traitTypeDefinitionText = traitTypeDefinitionSplit[1];
+            		Trait newTrait = new Trait(traitTypeCharacter, traitTypeDefinitionText, traitType);
+            		allTraits.add(newTrait);
+				}
+			}
+//            File[] files = traitFolder.listFiles();
+//            for(File file : files){
+//                if(file.getName().startsWith("trait_")){
+//                    String traitTypeString = file.getName().substring(6);
+//
+//                    try {
+//                        BufferedReader br = new BufferedReader(new FileReader(file));
+//                        String readLine = "";
+//                        while((readLine = br.readLine()) != null){
+//                            String[] traitProperites = readLine.split("=");
+//                            if(traitProperites.length == 2){
+//                                Trait newTrait = new Trait(traitProperites[0].charAt(0), traitProperites[1], TraitType.valueOf(traitTypeString));
+//                                allTraits.add(newTrait);
+//                            }
+//                        }
+//                    } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
 
             return allTraits;
         } else {
