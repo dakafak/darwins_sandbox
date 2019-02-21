@@ -3,16 +3,16 @@ package game.world.movement;
 import game.dna.DNABuilder;
 import game.dna.DNAString;
 import game.dna.species.Species;
+import game.dna.stats.Sex;
 import game.dna.traits.CreatureStatModifier;
 import game.dna.traits.TraitPair;
 import game.world.World;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
-import game.dna.stats.Sex;
 import game.world.movement.movement_pairs.MatingPair;
+import game.world.movement.submanagers.MatingManager;
 import game.world.movement.submanagers.actionperforming.CarnivoreFeedingManager;
 import game.world.movement.submanagers.actionperforming.HerbivoreFeedingManager;
-import game.world.movement.submanagers.MatingManager;
 import game.world.movement.submanagers.synchronizedchecks.CreatureActionProcessor;
 import game.world.units.Location;
 import ui.TraitLoader;
@@ -48,7 +48,7 @@ public class CreatureManager {
 
 	public static final int MAX_CREATURE_VIEWING_DISTANCE = 3;// Primarily used as the max distance in tiles to check around each creature - when determining collisions
 
-	public CreatureManager(){
+	public CreatureManager() {
 		creatures = new LinkedList<>();
 		creaturesToDelete = new LinkedList<>();
 		herbivoreFeedingManager = new HerbivoreFeedingManager();
@@ -61,13 +61,13 @@ public class CreatureManager {
 	}
 
 	public void runMovementManagerUpdates(double currentDay,
-										  double deltaUpdate,
-										  Location minWorldLocation,
-										  Location maxWorldLocation,
-										  World world,
-										  WorldStatisticsTool worldStatisticsTool,
-										  TraitLoader traitLoader,
-										  Map<Long, CreatureActionProcessor> creatureActionProcessorMap){
+	                                      double deltaUpdate,
+	                                      Location minWorldLocation,
+	                                      Location maxWorldLocation,
+	                                      World world,
+	                                      WorldStatisticsTool worldStatisticsTool,
+	                                      TraitLoader traitLoader,
+	                                      Map<Long, CreatureActionProcessor> creatureActionProcessorMap) {
 
 		Map<Long, LinkedList<Creature>> closestTileMapForCreatures = getClosestTileMapForCreaturesMap(getCreatures());
 		setWanderDirectionForCreatures(currentDay, getCreatures());
@@ -75,11 +75,11 @@ public class CreatureManager {
 
 		// queue up all creature action processors and threads -------
 		executorService = Executors.newFixedThreadPool(numberOfThreads);
-		for(Long tileCoordinateKey : closestTileMapForCreatures.keySet()){
+		for (Long tileCoordinateKey : closestTileMapForCreatures.keySet()) {
 			LinkedList<Creature> creaturesForTile = closestTileMapForCreatures.get(tileCoordinateKey);
 			CreatureActionProcessor creatureActionProcessor = creatureActionProcessorMap.get(tileCoordinateKey);
 
-			if(creatureActionProcessor != null && creaturesForTile != null) {//TODO -- somehow a coordinate key of 85899345925 was created
+			if (creatureActionProcessor != null && creaturesForTile != null) {//TODO -- somehow a coordinate key of 85899345925 was created
 				creatureActionProcessor.prepareProcessorWithNewData(currentDay, creaturesForTile, closestTileMapForCreatures, world);
 				executorService.execute(creatureActionProcessor);
 			}
@@ -93,7 +93,7 @@ public class CreatureManager {
 			e.printStackTrace();
 		}
 
-		for(Long actionProcessorKey : creatureActionProcessorMap.keySet()){
+		for (Long actionProcessorKey : creatureActionProcessorMap.keySet()) {
 			CreatureActionProcessor creatureActionProcessor = creatureActionProcessorMap.get(actionProcessorKey);
 
 			childCreaturesToAddToWorld.addAll(creatureActionProcessor.getChildCreaturesToAddToWorld());
@@ -125,13 +125,13 @@ public class CreatureManager {
 	 * @param creatures
 	 * @return
 	 */
-	public Map<Long, LinkedList<Creature>> getClosestTileMapForCreaturesMap(List<Creature> creatures){
+	public Map<Long, LinkedList<Creature>> getClosestTileMapForCreaturesMap(List<Creature> creatures) {
 		Map<Long, LinkedList<Creature>> closestTileMapForCreatures = new HashMap<>();
 
-		for(int i = 0; i < creatures.size(); i++){
+		for (int i = 0; i < creatures.size(); i++) {
 			Creature creature = creatures.get(i);
 			long locationLong = getLocationLongFromCoordinates(creature.getLocation().getX(), creature.getLocation().getY());
-			if(closestTileMapForCreatures.containsKey(locationLong) && closestTileMapForCreatures.get(locationLong) != null){
+			if (closestTileMapForCreatures.containsKey(locationLong) && closestTileMapForCreatures.get(locationLong) != null) {
 				List<Creature> creaturesAtLocation = closestTileMapForCreatures.get(locationLong);
 				creaturesAtLocation.add(creature);
 			} else {
@@ -152,17 +152,17 @@ public class CreatureManager {
 	 * @param minWorldLocation
 	 * @param maxWorldLocation
 	 */
-	public void tellAllCreaturesToWander(List<Creature> creatures, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
-		for(int i = 0; i < creatures.size(); i++){
+	public void tellAllCreaturesToWander(List<Creature> creatures, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation) {
+		for (int i = 0; i < creatures.size(); i++) {
 			Creature creature = creatures.get(i);
-			if(creature.isDoingNothing()) {
+			if (creature.isDoingNothing()) {
 				creature.wander(deltaUpdate, minWorldLocation, maxWorldLocation);
 			}
 		}
 	}
 
-	private void reproduceAsexualCreatures(TraitLoader traitLoader, double currentDay){
-		for(int i = 0; i < asexualCreaturesToReproduce.size(); i++) {
+	private void reproduceAsexualCreatures(TraitLoader traitLoader, double currentDay) {
+		for (int i = 0; i < asexualCreaturesToReproduce.size(); i++) {
 			Creature creature = asexualCreaturesToReproduce.get(i);
 			DNAString childString = DNABuilder.getAsexualDNAString(creature.getCreatureDNAString(), traitLoader);
 			Creature newCreature = new Creature(creature.getLocation().getX(), creature.getLocation().getY(), childString, Math.random() > .5 ? MALE : FEMALE, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, creature.getSpecies());
@@ -179,7 +179,7 @@ public class CreatureManager {
 	 * @param y
 	 * @return
 	 */
-	public static long getLocationLongFromCoordinates(double x, double y){
+	public static long getLocationLongFromCoordinates(double x, double y) {
 		long xLong = (int) x;
 		long yLong = (int) y;
 
@@ -193,8 +193,8 @@ public class CreatureManager {
 	 * @param currentTime
 	 * @param creatures
 	 */
-	public void setWanderDirectionForCreatures(double currentTime, List<Creature> creatures){//TODO change this to use game time (world day) which is modified by deltaUpdate
-		for(int i = 0; i < creatures.size(); i++){
+	public void setWanderDirectionForCreatures(double currentTime, List<Creature> creatures) {//TODO change this to use game time (world day) which is modified by deltaUpdate
+		for (int i = 0; i < creatures.size(); i++) {
 			Creature creature = creatures.get(i);
 			creature.setWanderDirection(currentTime);
 		}
@@ -210,13 +210,13 @@ public class CreatureManager {
 	 * @param maxWorldLocation
 	 * @param traitLoader
 	 */
-	public void moveAndTryMatingCreatures(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation, TraitLoader traitLoader){
+	public void moveAndTryMatingCreatures(Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers, double currentDay, double deltaUpdate, Location minWorldLocation, Location maxWorldLocation, TraitLoader traitLoader) {
 		List<MatingPair> matingPairsToRemove = new LinkedList<>();
-		for(MatingPair matingPair : matingPairs){
+		for (MatingPair matingPair : matingPairs) {
 			Creature maleCreature = matingPair.getCreature1().getSexOfCreature() == MALE ? matingPair.getCreature1() : matingPair.getCreature2();
 			Creature femaleCreature = matingPair.getCreature1().getSexOfCreature() == FEMALE ? matingPair.getCreature1() : matingPair.getCreature2();
 
-			if(maleCreature.getCreatureState() != CreatureState.MATING || femaleCreature.getCreatureState() != CreatureState.MATING){
+			if (maleCreature.getCreatureState() != CreatureState.MATING || femaleCreature.getCreatureState() != CreatureState.MATING) {
 				maleCreature.setCreatureState(CreatureState.WANDERING);
 				femaleCreature.setCreatureState(CreatureState.WANDERING);
 				matingPairsToRemove.add(matingPair);
@@ -224,11 +224,11 @@ public class CreatureManager {
 
 			double distanceBetweenCreatures = distanceBetweenCreatures(maleCreature, femaleCreature);
 
-			if(distanceBetweenCreatures > MAX_CREATURE_VIEWING_DISTANCE){
+			if (distanceBetweenCreatures > MAX_CREATURE_VIEWING_DISTANCE) {
 				maleCreature.setCreatureState(CreatureState.WANDERING);
 				femaleCreature.setCreatureState(CreatureState.WANDERING);
 				matingPairsToRemove.add(matingPair);
-			} else if(distanceBetweenCreatures > maleCreature.getSize().getWidth() + femaleCreature.getSize().getWidth()){
+			} else if (distanceBetweenCreatures > maleCreature.getSize().getWidth() + femaleCreature.getSize().getWidth()) {
 				maleCreature.moveCloserToPoint(deltaUpdate, femaleCreature.getLocation().getX(), femaleCreature.getLocation().getY(), minWorldLocation, maxWorldLocation);
 			} else {
 				DNAString childString = DNABuilder.getChildDNAString(maleCreature.getCreatureDNAString(), femaleCreature.getCreatureDNAString(), traitLoader);
@@ -254,7 +254,7 @@ public class CreatureManager {
 	 * @param creatures
 	 * @param worldStatisticsTool
 	 */
-	public void addNewChildCreaturesToWorldCreatureList(List<Creature> creatures, WorldStatisticsTool worldStatisticsTool){
+	public void addNewChildCreaturesToWorldCreatureList(List<Creature> creatures, WorldStatisticsTool worldStatisticsTool) {
 		worldStatisticsTool.addTraitsForNewCreatures(childCreaturesToAddToWorld);//TODO STAT determine if this is in the correct location
 		creatures.addAll(childCreaturesToAddToWorld);
 		childCreaturesToAddToWorld.clear();
@@ -264,25 +264,25 @@ public class CreatureManager {
 		return creatures;
 	}
 
-	public void addCreaturesToDelete(List<Creature> creatures){
-		for(int i = 0; i < creatures.size(); i++){
+	public void addCreaturesToDelete(List<Creature> creatures) {
+		for (int i = 0; i < creatures.size(); i++) {
 			addCreatureToDelete(creatures.get(i));
 		}
 	}
 
-	public void addCreatureToDelete(Creature creature){
+	public void addCreatureToDelete(Creature creature) {
 		creaturesToDelete.add(creature);
 	}
 
 	/**
 	 * Removes creatures from the delete queue and updates the trait statistics
 	 */
-	public List<Location> clearCreaturesToDeleteAndGetTilesToAddFertility(){
+	public List<Location> clearCreaturesToDeleteAndGetTilesToAddFertility() {
 		List<Location> locationsToAddFertility = new LinkedList<>();
-		for(int i = 0; i < creaturesToDelete.size(); i++){
+		for (int i = 0; i < creaturesToDelete.size(); i++) {
 			Creature creatureToDelete = creaturesToDelete.get(i);
-			for(int tileToAddY = (int) creatureToDelete.getLocation().getY() - 1; tileToAddY <= creatureToDelete.getLocation().getY() + 1; tileToAddY++){
-				for(int tileToAddX = (int) creatureToDelete.getLocation().getX() - 1; tileToAddX <= creatureToDelete.getLocation().getX() + 1; tileToAddX++){
+			for (int tileToAddY = (int) creatureToDelete.getLocation().getY() - 1; tileToAddY <= creatureToDelete.getLocation().getY() + 1; tileToAddY++) {
+				for (int tileToAddX = (int) creatureToDelete.getLocation().getX() - 1; tileToAddX <= creatureToDelete.getLocation().getX() + 1; tileToAddX++) {
 					locationsToAddFertility.add(new Location(tileToAddX, tileToAddY));
 				}
 			}
@@ -296,10 +296,10 @@ public class CreatureManager {
 	/**
 	 * Iterates through all creatures and determines of any should die of old age :(
 	 */
-	public void checkCreatureLifeSpan(double currentDay){
-		for(int i = 0; i < getCreatures().size(); i++){
+	public void checkCreatureLifeSpan(double currentDay) {
+		for (int i = 0; i < getCreatures().size(); i++) {
 			Creature creature = getCreatures().get(i);
-			if(creature.shouldDie(currentDay)){
+			if (creature.shouldDie(currentDay)) {
 				creatures.remove(creature);
 			}
 		}
@@ -310,7 +310,7 @@ public class CreatureManager {
 	 *
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool, Species species){
+	public void addRandomCreature(Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool, Species species) {
 		DNAString newDNAStringForCreature = new DNAString();
 		TraitPair[] allTraitsForDNAString = new TraitPair[traitLoader.getTraitTypesInOrder().size()];
 		for (int i = 0; i < traitLoader.getTraitTypesInOrder().size(); i++) {
@@ -327,7 +327,7 @@ public class CreatureManager {
 	 * @param dnaString
 	 * @param sexOfCreature
 	 */
-	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool, Species species){
+	public void addRandomCreature(DNAString dnaString, Sex sexOfCreature, double x, double y, TraitLoader traitLoader, double currentDay, WorldStatisticsTool worldStatisticsTool, Species species) {
 		Creature newCreature = new Creature(x, y, dnaString, sexOfCreature, traitLoader.getTraitNameAndValueToCreatureStatModifiers(), currentDay, species);
 		getCreatures().add(newCreature);
 		worldStatisticsTool.addTraitsForNewCreatures(Collections.singletonList(newCreature));//TODO STAT determine if this is in the correct location
@@ -340,7 +340,7 @@ public class CreatureManager {
 	 * @param creature2
 	 * @return
 	 */
-	private double distanceBetweenCreatures(Creature creature1, Creature creature2){
+	private double distanceBetweenCreatures(Creature creature1, Creature creature2) {
 		return Math.sqrt(Math.pow(creature2.getLocation().getX() - creature1.getLocation().getX(), 2) + Math.pow(creature2.getLocation().getY() - creature1.getLocation().getY(), 2));
 	}
 }

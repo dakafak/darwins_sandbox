@@ -28,7 +28,8 @@ public class Species {
 	}
 
 	private static String[] randomSpeciesNames = new String[]{"things", "stuff", "etc"};
-	public static Species getRandomNewSpecies(){
-		return new Species(randomSpeciesNames[(int)Math.random()*randomSpeciesNames.length]);
+
+	public static Species getRandomNewSpecies() {
+		return new Species(randomSpeciesNames[(int) Math.random() * randomSpeciesNames.length]);
 	}
 }

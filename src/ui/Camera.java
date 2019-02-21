@@ -1,11 +1,11 @@
 package ui;
 
-import game.world.World;
 import game.dna.stats.StatType;
 import game.dna.traits.Trait;
 import game.dna.traits.TraitType;
 import game.tiles.Tile;
 import game.tiles.TileType;
+import game.world.World;
 import game.world.creatures.Creature;
 import game.world.creatures.CreatureState;
 import game.world.plantlife.Plant;
@@ -32,23 +32,23 @@ public class Camera {
 	BufferedImage camerasBufferedImage;
 	Graphics2D camerasGraphics;
 
-	public Camera(double x, double y, double viewingDistanceInTiles, int drawingWidth, int drawingHeight){
+	public Camera(double x, double y, double viewingDistanceInTiles, int drawingWidth, int drawingHeight) {
 		this.viewingDistance = viewingDistanceInTiles;
 		location = new Location(x, y);
 		camerasBufferedImage = new BufferedImage(drawingWidth, drawingHeight, BufferedImage.TYPE_INT_RGB);
 		camerasGraphics = camerasBufferedImage.createGraphics();
 	}
 
-	public void zoomIn(){
+	public void zoomIn() {
 		viewingDistance--;
-		if(viewingDistance < minZoomLevel){
+		if (viewingDistance < minZoomLevel) {
 			viewingDistance = minZoomLevel;
 		}
 	}
 
-	public void zoomOut(){
+	public void zoomOut() {
 		viewingDistance++;
-		if(viewingDistance > maxZoomLevel){
+		if (viewingDistance > maxZoomLevel) {
 			viewingDistance = maxZoomLevel;
 		}
 	}
@@ -62,8 +62,9 @@ public class Camera {
 	double cachedTileViewingDistanceHeight;
 	double cachedStandardSize;
 	double cachedViewingDistance;
+
 	public BufferedImage getBufferedWorldImage(final World world, int drawingWidth, int drawingHeight, double deltaUpdate, long currentFPS, int worldSpeedMultiplier) {
-		if(drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight || viewingDistance != cachedViewingDistance){
+		if (drawingWidth != cachedWindowWidth || drawingHeight != cachedWindowHeight || viewingDistance != cachedViewingDistance) {
 			cachedWindowWidth = drawingWidth;
 			cachedWindowHeight = drawingHeight;
 			camerasBufferedImage = new BufferedImage(drawingWidth, drawingHeight, BufferedImage.TYPE_INT_RGB);
@@ -91,7 +92,7 @@ public class Camera {
 		Set<TraitType> traitTypes = traitsToNumberCreaturesWithTrait.keySet();
 
 		Map<TraitType, List<Trait>> sortedTraitGroups = new HashMap<>();
-		for(TraitType traitType : traitTypes) {
+		for (TraitType traitType : traitTypes) {
 			List<Trait> allTraitsForCurrentTraitType = new ArrayList<>();
 			allTraitsForCurrentTraitType.addAll(traitsToNumberCreaturesWithTrait.get(traitType).keySet());
 			Collections.sort(allTraitsForCurrentTraitType, new Comparator<Trait>() {
@@ -104,22 +105,22 @@ public class Camera {
 		}
 
 		int i = 1;
-		for(TraitType traitType : sortedTraitGroups.keySet()) {
+		for (TraitType traitType : sortedTraitGroups.keySet()) {
 			g2d.setColor(Color.decode("#" + Integer.toHexString(traitType.hashCode()).substring(0, 5)));
-			g2d.drawLine((int) cachedWindowWidth - 100, 15 * i, (int) cachedWindowWidth, 15 * i);
-			g2d.drawString(traitType.getValue(), (int) cachedWindowWidth - 100, 15 * i);
+			g2d.drawLine(cachedWindowWidth - 100, 15 * i, cachedWindowWidth, 15 * i);
+			g2d.drawString(traitType.getValue(), cachedWindowWidth - 100, 15 * i);
 			i++;
 
 			for (Trait trait : sortedTraitGroups.get(traitType)) {
-				g2d.drawString(traitsToNumberCreaturesWithTrait.get(traitType).get(trait) + "\t| " + trait.getTraitDefinition(), (int) cachedWindowWidth - 100, 15 * i);
+				g2d.drawString(traitsToNumberCreaturesWithTrait.get(traitType).get(trait) + "\t| " + trait.getTraitDefinition(), cachedWindowWidth - 100, 15 * i);
 				i++;
 			}
 			i++;
 		}
 	}
 
-	private void drawGround(Graphics2D g2d, World world){
-		for(int y = 0; y < world.getTileMap().length; y++) {
+	private void drawGround(Graphics2D g2d, World world) {
+		for (int y = 0; y < world.getTileMap().length; y++) {
 			for (int x = 0; x < world.getTileMap()[0].length; x++) {
 				Tile currentTile = world.getTileMap()[y][x];
 				TileType currentTileType = currentTile.getType();
@@ -134,11 +135,11 @@ public class Camera {
 		}
 	}
 
-	private void drawPlants(Graphics2D g2d, World world){
-		for(int y = 0; y < world.getTileMap().length; y++) {
+	private void drawPlants(Graphics2D g2d, World world) {
+		for (int y = 0; y < world.getTileMap().length; y++) {
 			for (int x = 0; x < world.getTileMap()[0].length; x++) {
 				Tile currentTile = world.getTileMap()[y][x];
-				for(int i = 0; i < currentTile.getPlants().size(); i++){
+				for (int i = 0; i < currentTile.getPlants().size(); i++) {
 					Plant currentPlant = currentTile.getPlants().get(i);
 					Color plantColor = currentPlant.getPlantType().getColor();
 					g2d.setColor(plantColor);
@@ -153,9 +154,9 @@ public class Camera {
 		}
 	}
 
-	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate, long currentFPS, int worldSpeedMultiplier){
+	private void drawCameraInfo(Graphics2D g2d, World world, double deltaUpdate, long currentFPS, int worldSpeedMultiplier) {
 		g2d.setColor(Color.WHITE);
-		g2d.drawString("Window Width: " + cachedWindowWidth,5, 15);
+		g2d.drawString("Window Width: " + cachedWindowWidth, 5, 15);
 		g2d.drawString("Window Height: " + cachedWindowHeight, 5, 30);
 		g2d.drawString("Aspect Scale: " + cachedMonitorResolutionScale, 5, 45);
 		g2d.drawString("TVDW: " + cachedTileViewingDistanceWidth, 5, 60);
@@ -169,14 +170,14 @@ public class Camera {
 		g2d.drawString("Delta update: " + deltaUpdate, 5, 180);
 		g2d.drawString("World Speed Multiplier: " + worldSpeedMultiplier, 5, 195);
 
-		g2d.fillRect((int)Math.ceil(cachedWindowWidthMiddle - 2), (int) Math.ceil(cachedWindowHeightMiddle - 2), 4, 4);
+		g2d.fillRect((int) Math.ceil(cachedWindowWidthMiddle - 2), (int) Math.ceil(cachedWindowHeightMiddle - 2), 4, 4);
 	}
 
-	private void drawCreatures(Graphics2D g2d, World world){
-		for(int i = 0; i < world.getCreatures().size(); i++){
+	private void drawCreatures(Graphics2D g2d, World world) {
+		for (int i = 0; i < world.getCreatures().size(); i++) {
 			Creature creature = world.getCreatures().get(i);
-			if(creature.getCreatureStats().containsKey(StatType.color)){
-				g2d.setColor((Color)creature.getCreatureStats().get(StatType.color));
+			if (creature.getCreatureStats().containsKey(StatType.color)) {
+				g2d.setColor((Color) creature.getCreatureStats().get(StatType.color));
 			} else {
 				g2d.setColor(Color.RED);
 			}
@@ -188,14 +189,14 @@ public class Camera {
 					scaledSize.getWidth(),
 					scaledSize.getHeight());
 
-			if(creature.getCreatureState() == CreatureState.MATING){
+			if (creature.getCreatureState() == CreatureState.MATING) {
 				g2d.setColor(Color.PINK);
 				g2d.drawOval(
 						getScreenX(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleWidth(),
 						getScreenY(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleHeight(),
 						scaledSize.getWidth(),
 						scaledSize.getHeight());
-			} else if(creature.getCreatureState() == CreatureState.EATING){
+			} else if (creature.getCreatureState() == CreatureState.EATING) {
 				g2d.setColor(Color.WHITE);
 				g2d.drawOval(
 						getScreenX(creature.getLocation()) - creature.getSize().getScaledSize(cachedStandardSize).getMiddleWidth(),
@@ -206,11 +207,11 @@ public class Camera {
 		}
 	}
 
-	private int getScreenX(Location objectLocation){
+	private int getScreenX(Location objectLocation) {
 		return (int) Math.ceil(objectLocation.getScaledLocation(cachedStandardSize).getX() + location.getScaledLocation(cachedStandardSize).getX() + cachedWindowWidthMiddle);
 	}
 
-	private int getScreenY(Location objectLocation){
+	private int getScreenY(Location objectLocation) {
 		return (int) Math.ceil(objectLocation.getScaledLocation(cachedStandardSize).getY() + location.getScaledLocation(cachedStandardSize).getY() + cachedWindowHeightMiddle);
 	}
 

@@ -14,7 +14,8 @@ public enum TileType {
 
 	private float fertility;
 	private Color color;
-	TileType(float fertility, Color color){
+
+	TileType(float fertility, Color color) {
 		this.fertility = fertility;
 		this.color = color;
 	}

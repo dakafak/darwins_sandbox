@@ -10,7 +10,7 @@ public class FeedingTargetCreature {
 	Creature predator;
 	Creature prey;
 
-	public FeedingTargetCreature(Creature predator, Creature prey){
+	public FeedingTargetCreature(Creature predator, Creature prey) {
 		this.predator = predator;
 		this.prey = prey;
 	}

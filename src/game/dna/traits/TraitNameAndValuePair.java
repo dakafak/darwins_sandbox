@@ -7,11 +7,11 @@ public class TraitNameAndValuePair {
 
 	String key;
 
-	public TraitNameAndValuePair(String traitName, String traitValue){
+	public TraitNameAndValuePair(String traitName, String traitValue) {
 		key = traitName + "_" + traitValue;
 	}
 
-	public TraitNameAndValuePair(Trait trait){
+	public TraitNameAndValuePair(Trait trait) {
 		key = trait.getTraitType() + "_" + trait.getTraitDefinition();
 	}
 

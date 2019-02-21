@@ -7,11 +7,11 @@ public class SimulatorRunner {
 
 	List<StatisticsSave> allSaves;
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		SimulatorRunner runner = new SimulatorRunner();
 	}
 
-	public SimulatorRunner(){
+	public SimulatorRunner() {
 		allSaves = new ArrayList<>();
 		SimulatorWindow simulatorWindow = new SimulatorWindow("World Simulator");
 	}

@@ -11,7 +11,7 @@ public class FeedingTargetPlant {
 	Creature creature;
 	Plant plant;
 
-	public FeedingTargetPlant(Creature creature, Plant plant){
+	public FeedingTargetPlant(Creature creature, Plant plant) {
 		this.creature = creature;
 		this.plant = plant;
 	}

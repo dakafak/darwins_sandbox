@@ -20,12 +20,13 @@ public enum StatType {
 
 	String value;
 	Object classType;
-	StatType(String value, Object classtype){
+
+	StatType(String value, Object classtype) {
 		this.value = value;
 		this.classType = classtype;
 	}
 
-	StatType(String value){
+	StatType(String value) {
 		this.value = value;
 		this.classType = String.class;
 	}

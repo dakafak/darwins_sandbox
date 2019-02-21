@@ -11,9 +11,9 @@ public class Plant {
 	Size size;
 	Tile tileForPlant;
 
-	public Plant(double x, double y, PlantType plantType, Tile tile){
+	public Plant(double x, double y, PlantType plantType, Tile tile) {
 		location = new Location(x, y);
-		size = new Size(.25,.25);
+		size = new Size(.25, .25);
 		this.plantType = plantType;
 		tileForPlant = tile;
 	}

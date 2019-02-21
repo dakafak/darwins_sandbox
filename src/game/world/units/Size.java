@@ -7,7 +7,7 @@ public class Size {
 	double cachedStandardScale;
 	ScaledSize cachedScaledSize;
 
-	public Size(double width, double height){
+	public Size(double width, double height) {
 		this.width = width;
 		this.height = height;
 	}
@@ -26,8 +26,8 @@ public class Size {
 	 * @param standardScale
 	 * @return
 	 */
-	public ScaledSize getScaledSize(double standardScale){
-		if(cachedStandardScale != standardScale){
+	public ScaledSize getScaledSize(double standardScale) {
+		if (cachedStandardScale != standardScale) {
 			cachedStandardScale = standardScale;
 
 			cachedScaledSize = new ScaledSize();

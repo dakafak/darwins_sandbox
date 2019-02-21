@@ -10,7 +10,7 @@ public class MatingPair {
 	Creature creature1;
 	Creature creature2;
 
-	public MatingPair(Creature creature1, Creature creature2){
+	public MatingPair(Creature creature1, Creature creature2) {
 		this.creature1 = creature1;
 		this.creature2 = creature2;
 	}
