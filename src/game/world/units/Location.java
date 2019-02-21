@@ -10,7 +10,7 @@ public class Location {
 	double cachedStandardScale;
 	ScaledLocation cachedScaledLocation;
 
-	public Location(double x, double y){
+	public Location(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -37,8 +37,8 @@ public class Location {
 	 * @param standardScale
 	 * @return
 	 */
-	public ScaledLocation getScaledLocation(double standardScale){
-		if(cachedStandardScale != standardScale){
+	public ScaledLocation getScaledLocation(double standardScale) {
+		if (cachedStandardScale != standardScale) {
 			cachedStandardScale = standardScale;
 
 			cachedScaledLocation = new ScaledLocation();

@@ -17,16 +17,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static game.world.units.Direction.NORTH;
+
 //import static game.world.units.Direction.MOVING_EAST;
 //import static game.world.units.Direction.MOVING_NORTH;
 //import static game.world.units.Direction.MOVING_SOUTH;
 //import static game.world.units.Direction.MOVING_WEST;
-import static game.world.units.Direction.NORTH;
 
 public class Creature {
 
-    DNAString creatureDNAString;
-    Map<StatType, Object> creatureStats;
+	DNAString creatureDNAString;
+	Map<StatType, Object> creatureStats;
 	CreatureState creatureState;
 	double daySpawned;
 
@@ -46,15 +47,15 @@ public class Creature {
 	double movementEnergyDrain;
 	private double energyRestoration;
 
-    public Creature(double x,
-					double y,
-					DNAString creatureDNAString,
-					Sex sexOfCreature,
-					Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers,
-					double currentDay,
-					Species species){
-    	this.creatureDNAString = creatureDNAString;
-    	this.sexOfCreature = sexOfCreature;
+	public Creature(double x,
+	                double y,
+	                DNAString creatureDNAString,
+	                Sex sexOfCreature,
+	                Map<String, List<CreatureStatModifier>> traitNameAndValueToCreatureStatModifiers,
+	                double currentDay,
+	                Species species) {
+		this.creatureDNAString = creatureDNAString;
+		this.sexOfCreature = sexOfCreature;
 		this.location = new Location(x, y);
 		this.daySpawned = currentDay;
 		this.species = species;
@@ -63,17 +64,17 @@ public class Creature {
 
 		creatureStats = new HashMap<>();
 
-		for(TraitPair traitPair : creatureDNAString.getTraitString()){
+		for (TraitPair traitPair : creatureDNAString.getTraitString()) {
 
 			TraitNameAndValuePair traitNameAndValuePair = new TraitNameAndValuePair(traitPair.getTraits()[0]);//Get displayed trait for creature
-			if(traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValuePair.getKey())) {
+			if (traitNameAndValueToCreatureStatModifiers.containsKey(traitNameAndValuePair.getKey())) {
 				for (CreatureStatModifier statModifierForTrait : traitNameAndValueToCreatureStatModifiers.get(traitNameAndValuePair.getKey())) {
 
 					Map<StatType, Object> statModifiers = statModifierForTrait.getStatModifiers();
-					for(StatType statType : statModifiers.keySet()){
-						if(creatureStats.containsKey(statType)){
-							if(statType.getClassType().equals(Double.class)){
-								Double newValue = (Double)creatureStats.get(statType) + (Double)statModifiers.get(statType);
+					for (StatType statType : statModifiers.keySet()) {
+						if (creatureStats.containsKey(statType)) {
+							if (statType.getClassType().equals(Double.class)) {
+								Double newValue = (Double) creatureStats.get(statType) + (Double) statModifiers.get(statType);
 								creatureStats.put(statType, newValue);
 							} else {
 								creatureStats.put(statType, statModifiers.get(statType));
@@ -93,60 +94,58 @@ public class Creature {
 		lifeSpan = (Double) creatureStats.get(StatType.life_span);
 		mating_frequency = (Double) creatureStats.get(StatType.mating_frequency);
 		lastMatingDay = currentDay;
-		diet =  Diet.valueOf(creatureStats.get(StatType.diet).toString());
+		diet = Diet.valueOf(creatureStats.get(StatType.diet).toString());
 		energy = diet == Diet.CARNIVORE ? (Double) creatureStats.get(StatType.energy) * .5 : (Double) creatureStats.get(StatType.energy) * .5;
 		hungerThreshold = (Double) creatureStats.get(StatType.hunger_threshold);
 		matingEnergyRequirement = (Double) creatureStats.get(StatType.mating_energy_requirement);
 		movementEnergyDrain = (Double) creatureStats.get(StatType.movement_energy_drain);
 		energyRestoration = (Double) creatureStats.get(StatType.energy_restoration);
-    }
-
-    public boolean isDoingNothing(){
-    	return creatureState == CreatureState.WANDERING;
 	}
 
-    public boolean canMate(double currentDay){
-    	if(creatureState == CreatureState.WANDERING && energy > matingEnergyRequirement && (currentDay - lastMatingDay) > mating_frequency){
-    		return true;
-		}
-
-		return false;
+	public boolean isDoingNothing() {
+		return creatureState == CreatureState.WANDERING;
 	}
 
-	public boolean isHungry(){
-    	return energy < hungerThreshold;
+	public boolean canMate(double currentDay) {
+		return creatureState == CreatureState.WANDERING && energy > matingEnergyRequirement && (currentDay - lastMatingDay) > mating_frequency;
+
 	}
 
-	public void addEnergy(double energyAddition){
-    	energy += energyAddition;
+	public boolean isHungry() {
+		return energy < hungerThreshold;
 	}
 
-	public void reduceEnergyFromMating(){
-    	energy -= matingEnergyRequirement;
+	public void addEnergy(double energyAddition) {
+		energy += energyAddition;
+	}
+
+	public void reduceEnergyFromMating() {
+		energy -= matingEnergyRequirement;
 	}
 
 	@Override
-    public String toString(){
-        return sexOfCreature.getSexString().substring(0, 1) + "{" + location.getX() + ", " + location.getY() + "}" + "(" + creatureDNAString.toString() + ")";
-    }
+	public String toString() {
+		return sexOfCreature.getSexString().substring(0, 1) + "{" + location.getX() + ", " + location.getY() + "}" + "(" + creatureDNAString.toString() + ")";
+	}
 
-    double nextDirectionChange;
-    double inGameDaysToWander = .01;
-    double wanderTimeAdditionInMilliseconds = .01;
+	double nextDirectionChange;
+	double inGameDaysToWander = .01;
+	double wanderTimeAdditionInMilliseconds = .01;
+
 	public void setWanderDirection(double currentTime) {
-		if(currentTime > nextDirectionChange){
+		if (currentTime > nextDirectionChange) {
 			setRandomDirection();
-			nextDirectionChange = currentTime + inGameDaysToWander + (Math.random()*wanderTimeAdditionInMilliseconds);
+			nextDirectionChange = currentTime + inGameDaysToWander + (Math.random() * wanderTimeAdditionInMilliseconds);
 		}
 	}
 
-	private void setRandomDirection(){
+	private void setRandomDirection() {
 		Direction[] allDirections = Direction.values();
-		int randomDirection = (int)Math.floor(Math.random()*allDirections.length);
+		int randomDirection = (int) Math.floor(Math.random() * allDirections.length);
 		direction = allDirections[randomDirection];
 	}
 
-	public void wander(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation){
+	public void wander(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation) {
 		double dx = 0;
 		double dy = 0;
 
@@ -163,12 +162,9 @@ public class Creature {
 		move(deltaUpdate, dx, dy, minWorldLocation, maxWorldLocation);
 	}
 
-	public boolean shouldDie(double day){
-		if(energy <= 0 || day - daySpawned > lifeSpan){
-			return true;
-		}
+	public boolean shouldDie(double day) {
+		return energy <= 0 || day - daySpawned > lifeSpan;
 
-		return false;
 	}
 
 	public void moveCloserToPoint(double deltaUpdate, double x, double y, Location minWorldLocation, Location maxWorldLocation) {
@@ -177,16 +173,16 @@ public class Creature {
 
 		double distanceY = y - location.getY();
 		double distanceX = x - location.getX();
-		if(Math.abs(distanceY) > Math.abs(distanceX)){
-			if(distanceY > 0){
+		if (Math.abs(distanceY) > Math.abs(distanceX)) {
+			if (distanceY > 0) {
 				dy = 1;
-			} else if(distanceY < 0){
+			} else if (distanceY < 0) {
 				dy = -1;
 			}
 		} else {
-			if(distanceX > 0){
+			if (distanceX > 0) {
 				dx = 1;
-			} else if(distanceX < 0){
+			} else if (distanceX < 0) {
 				dx = -1;
 			}
 		}
@@ -200,16 +196,16 @@ public class Creature {
 
 		double distanceY = y - location.getY();
 		double distanceX = x - location.getX();
-		if(Math.abs(distanceY) > Math.abs(distanceX)){
-			if(distanceY > 0){
+		if (Math.abs(distanceY) > Math.abs(distanceX)) {
+			if (distanceY > 0) {
 				dy = 1;
-			} else if(distanceY < 0){
+			} else if (distanceY < 0) {
 				dy = -1;
 			}
 		} else {
-			if(distanceX > 0){
+			if (distanceX > 0) {
 				dx = 1;
-			} else if(distanceX < 0){
+			} else if (distanceX < 0) {
 				dx = -1;
 			}
 		}
@@ -223,8 +219,9 @@ public class Creature {
 	double cachedDx;
 	double cachedDy;
 	double cachedDeltaUpdate;
-	private void move(double deltaUpdate, double dx, double dy, Location minWorldLocation, Location maxWorldLocation){
-		if(dx != cachedDx || dy != cachedDy || deltaUpdate != cachedDeltaUpdate){
+
+	private void move(double deltaUpdate, double dx, double dy, Location minWorldLocation, Location maxWorldLocation) {
+		if (dx != cachedDx || dy != cachedDy || deltaUpdate != cachedDeltaUpdate) {
 			cachedLocationXChange = dx * speed * deltaUpdate;
 			cachedLocationYChange = dy * speed * deltaUpdate;
 		}
@@ -232,23 +229,23 @@ public class Creature {
 		double nextX = location.getX() + cachedLocationXChange;
 		double nextY = location.getY() + cachedLocationYChange;
 
-		if(nextX < minWorldLocation.getX()){
+		if (nextX < minWorldLocation.getX()) {
 			location.setX(minWorldLocation.getX());
 //			direction = MOVING_EAST;
-		} else if(nextX > maxWorldLocation.getX()){
+		} else if (nextX > maxWorldLocation.getX()) {
 			location.setX(maxWorldLocation.getX());
 //			direction = MOVING_WEST;
-		} else if(nextX >= minWorldLocation.getX() && nextX <= maxWorldLocation.getX()){
+		} else if (nextX >= minWorldLocation.getX() && nextX <= maxWorldLocation.getX()) {
 			location.setX(nextX);
 		}
 
-		if(nextY < minWorldLocation.getY()){
+		if (nextY < minWorldLocation.getY()) {
 			location.setY(minWorldLocation.getY());
 //			direction = MOVING_SOUTH;
-		} else if(nextY > maxWorldLocation.getY()){
+		} else if (nextY > maxWorldLocation.getY()) {
 			location.setY(maxWorldLocation.getY());
 //			direction = MOVING_NORTH;
-		} else if(nextY >= minWorldLocation.getY() && nextY <= maxWorldLocation.getY()){
+		} else if (nextY >= minWorldLocation.getY() && nextY <= maxWorldLocation.getY()) {
 			location.setY(nextY);
 		}
 

@@ -15,17 +15,17 @@ public class CarnivoreFeedingManager {
 	private List<FeedingTargetCreature> carnivorePairs;
 	private List<Creature> eatenCreatures;
 
-	public CarnivoreFeedingManager(){
+	public CarnivoreFeedingManager() {
 		creaturesDoneEating = new LinkedList<>();
 		carnivorePairs = new LinkedList<>();
 		eatenCreatures = new LinkedList<>();
 	}
 
-	synchronized public void addCarnivoreFeedingPair(FeedingTargetCreature feedingTargetCreature){
+	synchronized public void addCarnivoreFeedingPair(FeedingTargetCreature feedingTargetCreature) {
 		carnivorePairs.add(feedingTargetCreature);
 	}
 
-	synchronized  public void addAllCarnivoreFeedingPairs(List<FeedingTargetCreature> feedingTargetCreatures){
+	synchronized public void addAllCarnivoreFeedingPairs(List<FeedingTargetCreature> feedingTargetCreatures) {
 		carnivorePairs.addAll(feedingTargetCreatures);
 	}
 
@@ -37,20 +37,20 @@ public class CarnivoreFeedingManager {
 	 * @param maxWorldLocation
 	 * @return
 	 */
-	public void moveAndTryEatingForCarnivores(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation, double maxCreatureViewDistance){
+	public void moveAndTryEatingForCarnivores(double deltaUpdate, Location minWorldLocation, Location maxWorldLocation, double maxCreatureViewDistance) {
 		List<FeedingTargetCreature> carnivoreFeedingPairsToRemove = new LinkedList<>();
 		List<Creature> creaturestoRemove = new ArrayList<>();
-		for(FeedingTargetCreature feedingTargetCreature : carnivorePairs){
+		for (FeedingTargetCreature feedingTargetCreature : carnivorePairs) {
 			Creature predator = feedingTargetCreature.getPredator();
 			Creature prey = feedingTargetCreature.getPrey();
 
 			double distanceBetweenCreatures = distanceBetweenCreatures(predator, prey);
 
-			if(distanceBetweenCreatures > maxCreatureViewDistance){
+			if (distanceBetweenCreatures > maxCreatureViewDistance) {
 				predator.setCreatureState(CreatureState.WANDERING);
 				prey.setCreatureState(CreatureState.WANDERING);
 				carnivoreFeedingPairsToRemove.add(feedingTargetCreature);
-			} else if (distanceBetweenCreatures > predator.getSize().getWidth() + prey.getSize().getWidth()){
+			} else if (distanceBetweenCreatures > predator.getSize().getWidth() + prey.getSize().getWidth()) {
 				predator.moveCloserToPoint(deltaUpdate, prey.getLocation().getX(), prey.getLocation().getY(), minWorldLocation, maxWorldLocation);
 				prey.moveAwayFromPoint(deltaUpdate, predator.getLocation().getX(), predator.getLocation().getY(), minWorldLocation, maxWorldLocation);
 			} else {
@@ -65,7 +65,7 @@ public class CarnivoreFeedingManager {
 		eatenCreatures.addAll(creaturestoRemove);
 	}
 
-	synchronized public List<Creature> getEatenCreatures(){
+	synchronized public List<Creature> getEatenCreatures() {
 		return eatenCreatures;
 	}
 
@@ -73,7 +73,7 @@ public class CarnivoreFeedingManager {
 		return creaturesDoneEating;
 	}
 
-	synchronized public void clearDisposableLists(){
+	synchronized public void clearDisposableLists() {
 		creaturesDoneEating.clear();
 		eatenCreatures.clear();
 	}
@@ -85,7 +85,7 @@ public class CarnivoreFeedingManager {
 	 * @param creature2
 	 * @return
 	 */
-	private double distanceBetweenCreatures(Creature creature1, Creature creature2){
+	private double distanceBetweenCreatures(Creature creature1, Creature creature2) {
 		return Math.sqrt(Math.pow(creature2.getLocation().getX() - creature1.getLocation().getX(), 2) + Math.pow(creature2.getLocation().getY() - creature1.getLocation().getY(), 2));
 	}
 

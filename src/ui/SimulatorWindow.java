@@ -1,8 +1,8 @@
 package ui;
 
 import game.dna.species.Species;
-import game.world.World;
 import game.dna.stats.Sex;
+import game.world.World;
 
 import javax.swing.JFrame;
 import java.awt.event.KeyEvent;
@@ -13,7 +13,7 @@ public class SimulatorWindow extends JFrame {
 	SimulatorWindowComponent simulatorWindowComponent;
 	World world;
 
-	public SimulatorWindow(String title){
+	public SimulatorWindow(String title) {
 		setTitle(title);
 		setSize(1800, 900);//TODO later set this to full screen
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,54 +28,54 @@ public class SimulatorWindow extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_W){
+				if (e.getKeyCode() == KeyEvent.VK_W) {
 					simulatorWindowComponent.wpressed = true;
-				} else if(e.getKeyCode() == KeyEvent.VK_S){
+				} else if (e.getKeyCode() == KeyEvent.VK_S) {
 					simulatorWindowComponent.spressed = true;
-				} else if(e.getKeyCode() == KeyEvent.VK_A){
+				} else if (e.getKeyCode() == KeyEvent.VK_A) {
 					simulatorWindowComponent.apressed = true;
-				} else if(e.getKeyCode() == KeyEvent.VK_D){
+				} else if (e.getKeyCode() == KeyEvent.VK_D) {
 					simulatorWindowComponent.dpressed = true;
 				}
 
-				if(e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET){
-					if(simulatorWindowComponent.worldSpeedMultiplier < 10) {
+				if (e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET) {
+					if (simulatorWindowComponent.worldSpeedMultiplier < 10) {
 						simulatorWindowComponent.worldSpeedMultiplier += 1;
 					}
 				}
 
-				if(e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET){
-					if(simulatorWindowComponent.worldSpeedMultiplier > 1){
+				if (e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET) {
+					if (simulatorWindowComponent.worldSpeedMultiplier > 1) {
 						simulatorWindowComponent.worldSpeedMultiplier -= 1;
 					}
 				}
-				if(e.getKeyCode() == KeyEvent.VK_P) {
+				if (e.getKeyCode() == KeyEvent.VK_P) {
 					simulatorWindowComponent.togglePause();
 				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_W){
+				if (e.getKeyCode() == KeyEvent.VK_W) {
 					simulatorWindowComponent.wpressed = false;
-				} else if(e.getKeyCode() == KeyEvent.VK_S){
+				} else if (e.getKeyCode() == KeyEvent.VK_S) {
 					simulatorWindowComponent.spressed = false;
-				} else if(e.getKeyCode() == KeyEvent.VK_A){
+				} else if (e.getKeyCode() == KeyEvent.VK_A) {
 					simulatorWindowComponent.apressed = false;
-				} else if(e.getKeyCode() == KeyEvent.VK_D){
+				} else if (e.getKeyCode() == KeyEvent.VK_D) {
 					simulatorWindowComponent.dpressed = false;
-				} else if(e.getKeyCode() == KeyEvent.VK_ESCAPE){
+				} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					SimulatorWindow.super.dispose();
 					System.exit(0);
-				} else if(e.getKeyCode() == KeyEvent.VK_M){
+				} else if (e.getKeyCode() == KeyEvent.VK_M) {
 					world.tryMatingCreatures();
 				}
 			}
 		});
 		addMouseWheelListener(e -> {
-			if(e.getWheelRotation() < 0){
+			if (e.getWheelRotation() < 0) {
 				simulatorWindowComponent.getCurrentCamera().zoomIn();
-			} else if(e.getWheelRotation() > 0){
+			} else if (e.getWheelRotation() > 0) {
 				simulatorWindowComponent.getCurrentCamera().zoomOut();
 			}
 		});
@@ -84,10 +84,11 @@ public class SimulatorWindow extends JFrame {
 	}
 
 	int creatureSpacingDistance = 5;
-	private void prepareNewWorld(){
+
+	private void prepareNewWorld() {
 		world = new World(-20, 20, -20, 20);
-		for(int j = (int) world.getMinWorldLocation().getY() + creatureSpacingDistance; j < world.getMaxWorldLocation().getY(); j += creatureSpacingDistance) {
-			for(int i = (int) world.getMinWorldLocation().getX() + creatureSpacingDistance; i < world.getMaxWorldLocation().getX(); i += creatureSpacingDistance) {
+		for (int j = (int) world.getMinWorldLocation().getY() + creatureSpacingDistance; j < world.getMaxWorldLocation().getY(); j += creatureSpacingDistance) {
+			for (int i = (int) world.getMinWorldLocation().getX() + creatureSpacingDistance; i < world.getMaxWorldLocation().getX(); i += creatureSpacingDistance) {
 				Species newSpecies = Species.getRandomNewSpecies();
 				world.addRandomCreature(Sex.MALE, i, j, newSpecies);
 				world.addRandomCreature(Sex.FEMALE, i, j, newSpecies);

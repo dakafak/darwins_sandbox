@@ -11,7 +11,7 @@ public enum PlantType {
 	private Color color;
 	private double energyRestoration;
 
-	PlantType(Color color, double energyRestoration){
+	PlantType(Color color, double energyRestoration) {
 		this.color = color;
 		this.energyRestoration = energyRestoration;
 	}

@@ -15,9 +15,9 @@ public class DNAString {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder traitStringBuilder = new StringBuilder();
-		for(TraitPair trait : traitString){
+		for (TraitPair trait : traitString) {
 			traitStringBuilder.append(trait.toString());
 		}
 

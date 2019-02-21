@@ -7,7 +7,7 @@ public class TraitPair {
 	char[] characterRepresentation;
 	Trait[] traits;
 
-	public TraitPair(Trait trait1, Trait trait2){
+	public TraitPair(Trait trait1, Trait trait2) {
 		this.traits = new Trait[]{trait1, trait2};
 		this.characterRepresentation = new char[]{traits[0].getTraitCharacter(), traits[1].getTraitCharacter()};
 	}
@@ -29,9 +29,9 @@ public class TraitPair {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder traitStringBuilder = new StringBuilder();
-		for(char characters : characterRepresentation){
+		for (char characters : characterRepresentation) {
 			traitStringBuilder.append(characters);
 		}
 
